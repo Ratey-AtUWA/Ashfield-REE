@@ -12,6 +12,7 @@ output:
 ---
 
 ```{r load packages and environment but do not show, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
+library(mgsub)
 library(sp)
 library(lctools)
 library(gstat)
@@ -36,14 +37,39 @@ afs1922 <- read.csv(paste0(git,"afs1922.csv"), stringsAsFactors = TRUE)
 afs1922$Year <- as.factor(afs1922$Year)
 ```
 
-```{r}
-(pXRDfiles <- list.files("./RP-XRD-S2-2022/"))
+```{r store and show file lists, results='hold'}
+require(mgsub)
+
+cat("--+-- Random powder XRD sample list --+--\n")
+(pXRDfiles<-mgsub(list.files("./RP-XRD-S2-2022/"),c(".csv","Sample"),c("","S")))
+
+cat("\n--+-- Oriented clay XRD sample list --+--\n")
+clayfiles <- mgsub(list.files("./clay-plate-XRD-S2-2022/"),
+                   c(".csv","ENVT4461 "," ","-"),
+                   c("","","_","_"))
+(clayfiles <- gsub("Heated_","Heat",clayfiles))
 ```
 
-```{r fig.height=3.75, fig.width=10, message=FALSE, warning=FALSE}
-S22_pXRD <- read.csv("./RP-XRD-S2-2022/S22.csv")
-par(mar = c(3,3,1,1), mgp = c(1.7,0.3,0), tcl = 0.25, font.lab = 2)
+```{r read all the random powder datafiles}
+for (i in 1:14){
+  assign(paste0(pXRDfiles[i],"_pXRD"), 
+         (paste0("./RP-XRD-S2-2022/", pXRDfiles[i],".csv")))
+}
+ls(pattern = "_pXRD")
+```
+
+```{r rp-xrd-plots, fig.height=3.75, fig.width=10, message=FALSE, warning=FALSE}
 with(S22_pXRD, plot(Counts ~ Angle, type = "l", col = 2, 
-                    xlab = "Angle (\u00B0 2\u03B8)"))
+                    xlab = "Angle (\u00B0 2\u03B8)", xaxt = "n"))
+axis(1, at = seq(0,80,10), labels = seq(0,80,10))
+mtext("Ashfield Flats sediment sample S22_2022", 3, -1.2,col=2, adj=0.99, font=2)
+```
+
+```{r}
+for (i in 1:length(clayfiles)){
+  assign(paste0("CP_",clayfiles[i]), 
+         (paste0("./clay-plate-XRD-S2-2022/", clayfiles[i],".csv")))
+}
+
 ```
 
