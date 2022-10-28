@@ -24,13 +24,13 @@ library(ncf)
 ```
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
-private <- "C:/Users/00028958/LocalData/R Projects/"
+git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
 ```
 
 ```{r importing the data, message=FALSE, warning=FALSE, results='hold', echo=FALSE}
-afs1922 <- read.csv(file="afs1922.csv", stringsAsFactors = TRUE)
-afs1922$REE <- with(afs1922, Ce+La+Nd+Gd)
-af_border <- read.csv(paste0(private,"Ashfield Flats/afr_hull.csv"))
+afs1922 <- read.csv(paste0(git,"afs1922.csv"), stringsAsFactors = TRUE)
+afs1922$Year <- as.factor(afs1922$Year)
+af_border <- read.csv(paste0(git,"afr_hull.csv"))
 afs1922surf <- droplevels(afs1922[-which(afs1922$Depth_upper_cm > 1 & 
                                            afs1922$Type=="Soil"),])
 ```
@@ -75,6 +75,8 @@ box()
 ```
 
 #### **Note**: in this document REE ($\equiv \sum$REE) = Ce + La + Nd + Gd.
+$\sum$REE does not include yttrium (Y) at present, but it could using \
+`afs1922$YREE <- afs1922$REE + afs1922$Y`.
 
 ## Spatial Autocorrelation
 
@@ -260,7 +262,8 @@ par(mfrow=c(1,1), mar=c(3,3,0.5,0.5), oma=c(0,0,0,0), mgp=c(1.6,0.2,0),
 
 ```{r remove temps 2, message=FALSE, warning=FALSE, include=FALSE}
 rm(list = c("data_temp","Coords","mI","locMI", "plotdata", "pos0", "neg0",
-            "LISA","medREE","HiHi","LoLo","HiLo","LoHi"))
+            "LISA","medREE","HiHi","LoLo","HiLo","LoHi","bw","i","local_moran",
+            "var0","varz"))
 ```
 
 <hr>
@@ -337,7 +340,17 @@ par(new=TRUE, fig=c(0,0.07,0.68,0.92), mar=c(0,0,0,0),
 boxplot(REE_sp@data$REE, col = "#A0A0A080");box(which = "plot")
 ```
 
+Bins for Figure \@ref(fig:ree-tukey-plot):
+
 ## Variograms and Kriging
+```{r tukey-map-bins, echo=FALSE}
+(data.frame(bins=c("-outliers","loWsk to LQR","LQR to med",
+                                "med to UQR","UQR to upWsk","+outliers"),
+      logfrom=signif(c(-4,boxplot.stats(REE_sp@data[,1])$stats),3),
+      logto=signif(c(boxplot.stats(REE_sp@data[,1])$stats,Inf),3),
+      from=round(10^c(-4,boxplot.stats(REE_sp@data[,1])$stats),1),
+      to=round(10^c(boxplot.stats(REE_sp@data[,1])$stats,Inf),1)))
+```
 
 ### ├ Make a binned simple variogram object
 
@@ -439,7 +452,7 @@ spplot(kriged_REE, colorkey=T, pch=15, # with kriging variances
 
 ### ├ Plot a map with overlay of the kriging predictions
 
-```{r map-krig-mod-pred, fig.height=10.6, fig.width=8, fig.align='center', fig.cap="Map showing kriging predictions for REE in Ashfield Flats sediments 2019-2022.", message=FALSE, warning=FALSE, echo=FALSE}
+```{r map-krig-mod-pred, fig.height=10.6, fig.width=8, fig.align='center', fig.cap="Map showing kriging predictions for REE in Ashfield Flats sediments 2019-2022. Sample points are tiny dots.", message=FALSE, warning=FALSE, echo=FALSE}
 par(mfrow=c(2,1), oma=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), lend=2, ljoin=1, tcl=0.3)
 plot(aftiles)
 axis(1, mgp=c(2, 0.3, 0), labels=F)
@@ -458,7 +471,7 @@ quilt.plot(afgrid@coords[,1], afgrid@coords[,2],kriged_REE@data[,1],
            axis.args = list(at=log10(axtx), labels=axtx, mgp=c(1.2,0.1,0)))
 addnortharrow(border=1, lwd=1, text.col=1, padin=c(0.1,0.1), scale = 0.9)
 addscalebar(plotepsg = 32750, pos = "topleft")
-points(afs1922surf[,c("Easting","Northing")], pch = 3, col = "grey88", cex = 0.7)
+points(afs1922surf[,c("Easting","Northing")], pch=".", col = "yellow")
 box() ; mtext("(a)",3,-1.5,font=2,cex=1.5)
 
 plot(aftiles)
@@ -478,7 +491,7 @@ quilt.plot(afgrid@coords[,1], afgrid@coords[,2],kriged_REE@data[,2],
            axis.args = list(at=axtx, labels=axtx, mgp=c(1.2,0.1,0)))
 addnortharrow(border=1, lwd=1, text.col=1, padin=c(0.1,0.1), scale = 0.9)
 addscalebar(plotepsg = 32750, pos = "topleft")
-points(afs1922surf[,c("Easting","Northing")], pch = 3, col="grey88", cex = 0.7)
+points(afs1922surf[,c("Easting","Northing")], pch=".", col="red3")
 box() ; mtext("(b)",3,-1.5,font=2,cex=1.5)
 ```
 
