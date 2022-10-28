@@ -43,7 +43,8 @@ UTM50 <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
 ```
 
 ```{r setup data, echo=FALSE}
-afs1922 <- read.csv("afs1922.csv", stringsAsFactors = TRUE)
+git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
+afs1922 <- read.csv(paste0(git,"afs1922.csv"), stringsAsFactors = TRUE)
 afs1922$Year <- as.factor(afs1922$Year)
 afs1922utm <- st_as_sf(afs1922, coords = c("Easting","Northing"), 
                        crs = "+proj=utm +zone=50 +south")
@@ -52,9 +53,8 @@ afs1922ll <- st_transform(afs1922utm,
 ```
 
 ```{r annotation data and palettes, echo=FALSE}
-git <- "https://raw.githubusercontent.com/Ratey-AtUWA/"
-afr_map <- read.csv(file=paste0(git,"spatial/main/afr_map_v3.csv"), 
-                      stringsAsFactors = TRUE)
+afr_map <- read.csv(file=paste0(git,"afr_map_v3.csv"), stringsAsFactors = TRUE)
+afr_zones <- read.csv(file=paste0(git,"afr_zones.csv"), stringsAsFactors = TRUE)
 pal4lite <- c("black", "purple2", "blue2", "cyan4", "forestgreen", 
               "darkorange", "gold3", "red3", "gray80", "white")
 pal4liteTransp <- c("#000000","#912CEEb0","#0000EEb0","#008B8Bb0","#228B22b0",
