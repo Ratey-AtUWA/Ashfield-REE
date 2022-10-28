@@ -9,3 +9,5 @@ Ashfield-REE.Rproj
 *.xlsx
 
 *.docx
+
+/Ashfield-geostatistics-using-gstat_files/*
