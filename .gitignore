@@ -1,3 +1,11 @@
 .Rproj.user
+
 .Rdata
+
 Ashfield-REE.Rproj
+
+*.html
+
+*.xlsx
+
+*.docx
