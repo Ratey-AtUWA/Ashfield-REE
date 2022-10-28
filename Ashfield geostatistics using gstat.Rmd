@@ -471,7 +471,7 @@ quilt.plot(afgrid@coords[,1], afgrid@coords[,2],kriged_REE@data[,1],
            axis.args = list(at=log10(axtx), labels=axtx, mgp=c(1.2,0.1,0)))
 addnortharrow(border=1, lwd=1, text.col=1, padin=c(0.1,0.1), scale = 0.9)
 addscalebar(plotepsg = 32750, pos = "topleft")
-points(afs1922surf[,c("Easting","Northing")], pch=".", col = "yellow")
+points(afs1922surf[,c("Easting","Northing")], pch=".", col = "orange")
 box() ; mtext("(a)",3,-1.5,font=2,cex=1.5)
 
 plot(aftiles)
