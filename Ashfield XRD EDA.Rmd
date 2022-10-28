@@ -1,0 +1,49 @@
+---
+title: "Ashfield 2019-2022 spatial analyses"
+output: 
+  bookdown::html_document2:
+    fig_width: 6.4
+    fig_height: 4.8
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+```{r load packages and environment but do not show, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
+library(sp)
+library(lctools)
+library(gstat)
+library(sf)
+library(maptiles)
+library(prettymapr)
+library(fields)
+library(viridis)
+library(ncf)
+library(flextable)
+  set_flextable_defaults(font.family = 'sans', theme_fun = "theme_zebra", 
+        font.size = 11, text.align = "right",padding.left = 1, padding.right = 1,
+        padding.top = 2, padding.bottom = 2)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
+```
+
+```{r importing the data, message=FALSE, warning=FALSE, results='hold', echo=FALSE}
+afs1922 <- read.csv(paste0(git,"afs1922.csv"), stringsAsFactors = TRUE)
+afs1922$Year <- as.factor(afs1922$Year)
+```
+
+```{r}
+(pXRDfiles <- list.files("./RP-XRD-S2-2022/"))
+```
+
+```{r fig.height=3.75, fig.width=10, message=FALSE, warning=FALSE}
+S22_pXRD <- read.csv("./RP-XRD-S2-2022/S22.csv")
+par(mar = c(3,3,1,1), mgp = c(1.7,0.3,0), tcl = 0.25, font.lab = 2)
+with(S22_pXRD, plot(Counts ~ Angle, type = "l", col = 2, 
+                    xlab = "Angle (\u00B0 2\u03B8)"))
+```
+
