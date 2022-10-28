@@ -21,6 +21,10 @@ library(prettymapr)
 library(fields)
 library(viridis)
 library(ncf)
+library(flextable)
+  set_flextable_defaults(font.family = 'sans', theme_fun = "theme_zebra", 
+        font.size = 11, text.align = "right",padding.left = 1, padding.right = 1,
+        padding.top = 2, padding.bottom = 2)
 ```
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
@@ -340,17 +344,19 @@ par(new=TRUE, fig=c(0,0.07,0.68,0.92), mar=c(0,0,0,0),
 boxplot(REE_sp@data$REE, col = "#A0A0A080");box(which = "plot")
 ```
 
-Bins for Figure \@ref(fig:ree-tukey-plot):
+Bins for boxplot-categorised-point map in Figure \@ref(fig:ree-tukey-plot):
 
-## Variograms and Kriging
 ```{r tukey-map-bins, echo=FALSE}
-(data.frame(bins=c("-outliers","loWsk to LQR","LQR to med",
+tukbins <- data.frame(bins=c("-outliers","loWsk to LQR","LQR to med",
                                 "med to UQR","UQR to upWsk","+outliers"),
       logfrom=signif(c(-4,boxplot.stats(REE_sp@data[,1])$stats),3),
       logto=signif(c(boxplot.stats(REE_sp@data[,1])$stats,Inf),3),
       from=round(10^c(-4,boxplot.stats(REE_sp@data[,1])$stats),1),
-      to=round(10^c(boxplot.stats(REE_sp@data[,1])$stats,Inf),1)))
+      to=round(10^c(boxplot.stats(REE_sp@data[,1])$stats,Inf),1))
+knitr::kable(tukbins)
 ```
+
+## Variograms and Kriging
 
 ### ├ Make a binned simple variogram object
 

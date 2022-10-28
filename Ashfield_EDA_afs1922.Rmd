@@ -270,6 +270,7 @@ of low-Na locations, corresponding with where low salinity would be expected
 salts is unlikely).
 
 ```{r plot-Na-split, fig.align='center', fig.cap="Density histograms for potentially multi-modal variables.", fig.height=5, fig.width=9, message=FALSE, warning=FALSE, echo=FALSE}
+source("https://raw.githubusercontent.com/Ratey-AtUWA/spatial/main/afr_map_function.R", echo = FALSE)
 layout(matrix(c(1,1,2,1,1,3),ncol=3,byrow=T))
 afs1922$NaFac <- cut(afs1922$Na, breaks = c(0,1000,999999), 
                      labels=c("Low_Na","High_Na"))
