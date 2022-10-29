@@ -13,52 +13,51 @@ output:
 
 ```{r load packages and environment but do not show, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
 library(mgsub)
-library(sp)
-library(lctools)
-library(gstat)
-library(sf)
-library(maptiles)
-library(prettymapr)
-library(fields)
-library(viridis)
-library(ncf)
+library(stringr)
 library(flextable)
   set_flextable_defaults(font.family = 'sans', theme_fun = "theme_zebra", 
         font.size = 11, text.align = "right",padding.left = 1, padding.right = 1,
         padding.top = 2, padding.bottom = 2)
 ```
 
-```{r message=FALSE, warning=FALSE, include=FALSE}
+```{r more-setup, message=FALSE, warning=FALSE, include=FALSE}
 git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
+pal4lite <- c("black", "purple2", "blue2", "cyan4", "forestgreen", 
+              "darkorange", "gold3", "red3", "gray80", "white")
+pal4liteTransp <- c("#000000","#912CEEb0","#0000EEb0","#008B8Bb0","#228B22b0",
+                    "#CDAD00b0", "#FF8C00b0", "#CD0000b0", "#CCCCCC", "#FFFFFF")
+pal4dark <- c("white", "pink1", "orange", "khaki1", "lightgreen", "cadetblue1", 
+              "deepskyblue", "plum", "gray80", "black")
 ```
 
-```{r importing the data, message=FALSE, warning=FALSE, results='hold', echo=FALSE}
-afs1922 <- read.csv(paste0(git,"afs1922.csv"), stringsAsFactors = TRUE)
-afs1922$Year <- as.factor(afs1922$Year)
-```
-
-```{r store and show file lists, results='hold'}
+```{r store and show file lists, paged.print=FALSE, results='hold'}
 require(mgsub)
 
 cat("--+-- Random powder XRD sample list --+--\n")
-(pXRDfiles<-mgsub(list.files("./RP-XRD-S2-2022/"),c(".csv","Sample"),c("","S")))
+pXRDfiles<-list.files("./RP-XRD-S2-2022/")
+pXRDnames<-mgsub(pXRDfiles,c(".csv","Sample"),c("","S"))
+(data.frame(filename=pXRDfiles,objectname=pXRDnames))
 
 cat("\n--+-- Oriented clay XRD sample list --+--\n")
-clayfiles <- mgsub(list.files("./clay-plate-XRD-S2-2022/"),
-                   c(".csv","ENVT4461 "," ","-"),
-                   c("","","_","_"))
-(clayfiles <- gsub("Heated_","Heat",clayfiles))
+clayfiles <- list.files("./clay-plate-XRD-S2-2022/")
+claynames <- mgsub(clayfiles, c(".csv","ENVT4461 "," ","-"),
+                   c("","","_",""))
+claynames <- gsub("Heated","Heat",claynames)
+(data.frame(filename=clayfiles,objectname=claynames))
 ```
 
 ```{r read all the random powder datafiles}
+i <- 1; wkd <- getwd()
 for (i in 1:14){
-  assign(paste0(pXRDfiles[i],"_pXRD"), 
-         (paste0("./RP-XRD-S2-2022/", pXRDfiles[i],".csv")))
+  assign(paste0(pXRDnames[i],"_pXRD"), 
+         read.csv(paste0(wkd,"/RP-XRD-S2-2022/", pXRDfiles[i])))
 }
 ls(pattern = "_pXRD")
 ```
 
 ```{r rp-xrd-plots, fig.height=3.75, fig.width=10, message=FALSE, warning=FALSE}
+palette(pal4lite) ; par(mar = c(3,3,1,1), mgp = c(1.7,0.3,0), tcl = 0.25,
+                        font.lab = 2)
 with(S22_pXRD, plot(Counts ~ Angle, type = "l", col = 2, 
                     xlab = "Angle (\u00B0 2\u03B8)", xaxt = "n"))
 axis(1, at = seq(0,80,10), labels = seq(0,80,10))
@@ -67,9 +66,31 @@ mtext("Ashfield Flats sediment sample S22_2022", 3, -1.2,col=2, adj=0.99, font=2
 
 ```{r}
 for (i in 1:length(clayfiles)){
-  assign(paste0("CP_",clayfiles[i]), 
-         (paste0("./clay-plate-XRD-S2-2022/", clayfiles[i],".csv")))
+  assign(paste0("CP_",claynames[i]), 
+         read.csv(paste0(wkd,"/clay-plate-XRD-S2-2022/", clayfiles[i])))
 }
+ls(pattern = "CP_")
+```
 
+```{r make clay plots, fig.height=16, fig.width=8}
+allTreats <- ls(pattern="CP_")
+claySamples <- unique(substr(allTreats,1,6))
+
+palette(c("#000000", "#BA55D380", "#1E90FF80", "#20B2AA80", "#FFD70080"))
+par(mfrow=c(length(claySamples),1), mar=c(3,3,1,1), mgp = c(1.6,0.3,0), font.lab = 2)
+i <- 1
+for (i in 1:length(claySamples)){
+  plotObjs <- allTreats[grep(claySamples[i],allTreats)]
+  yM <- max(get(plotObjs[1])[,2])*1.2
+  plot(get(plotObjs[1]), ylim=c(0,yM), yaxs="i", type="l", col=2, lwd=2,
+       xlab = "Angle (\u00B0 2\u03B8)")
+  j <- 2
+  for(j in 2:length(plotObjs)){
+    lines(get(plotObjs[j]), col = j+1, lwd=2)
+  }
+}
+legend(18,par("usr")[4], bty="n", inset = 0.05, cex = 1.5, 
+       legend=c("Mg","Mg + Glycerol", "Heat 400 \u00B0C", "Heat 550 \u00B0C"), 
+       lwd=2, col=c(2,3,4,5))
 ```
 
