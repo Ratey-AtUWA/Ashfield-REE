@@ -6,6 +6,8 @@
 
 Ashfield-REE.Rproj
 
+*.html
+
 *.xlsx
 
 *.docx
@@ -13,3 +15,5 @@ Ashfield-REE.Rproj
 /Ashfield-geostatistics-using-gstat_files/*
 
 /Ashfield_EDA_afs1922_files/*
+
+/Ashfield-XRD-EDA_files/*
