@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Ashfield 2019-2022 spatial analyses</title>
+
+<script src="Ashfield-geostatistics-using-gstat_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Ashfield-geostatistics-using-gstat_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="Ashfield-geostatistics-using-gstat_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="Ashfield-geostatistics-using-gstat_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="Ashfield-geostatistics-using-gstat_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="Ashfield-geostatistics-using-gstat_files/navigation-1.1/tabsets.js"></script>
+<link href="Ashfield-geostatistics-using-gstat_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="Ashfield-geostatistics-using-gstat_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Ashfield 2019-2022 spatial analyses</h1>
+
+</div>
+
+
+<div id="making-our-base-map-of-ashfield-flats" class="section level1">
+<h1>Making our base map of Ashfield Flats</h1>
+<div id="map-extent-object" class="section level3">
+<h3>├ Map extent object</h3>
+<pre><code>##        X       Y
+## 1 399860 6467870
+## 2 400580 6468350</code></pre>
+</div>
+<div id="getting-and-plotting-the-map-tile-data" class="section level3">
+<h3>├ Getting and plotting the map tile data</h3>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:basemap"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/basemap-1.png" alt="Map of Ashfield Flats Reserve and adjacent area (UTM projection, Zone 50S, EPSG:32750) used subsequently as the base map for spatial analyses. Generated using the maptiles R package, with OpenStreetMap tiles." width="75%" />
+<p class="caption">
+Figure 1: Map of Ashfield Flats Reserve and adjacent area (UTM projection, Zone 50S, EPSG:32750) used subsequently as the base map for spatial analyses. Generated using the maptiles R package, with OpenStreetMap tiles.
+</p>
+</div>
+<div id="note-in-this-document-ree-equiv-sumree-ce-la-nd-gd." class="section level4">
+<h4><strong>Note</strong>: in this document REE (<span class="math inline">\(\equiv \sum\)</span>REE) = Ce + La + Nd + Gd.</h4>
+<p><span class="math inline">\(\sum\)</span>REE does not include yttrium (Y) at present, but it could using<br />
+<code>afs1922$YREE &lt;- afs1922$REE + afs1922$Y</code>.</p>
+</div>
+</div>
+<div id="spatial-autocorrelation" class="section level2">
+<h2>Spatial Autocorrelation</h2>
+<div id="calculate-global-morans-i" class="section level3">
+<h3>├ Calculate Global Moran’s I</h3>
+<pre><code>## Global Moran&#39;s I for REE; from the NGSA (af only), topsoil, -2mm fraction
+##      Morans.I  z.resampling z.randomization p.value.resampling
+## [1,] 0.5166285 17.3832      17.35986        1.106035e-67      
+##      p.value.randomization
+## [1,] 1.661242e-67</code></pre>
+</div>
+<div id="plot-local-morans-i" class="section level3">
+<h3>├ Plot local Moran’s I</h3>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:local-Moran"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/local-Moran-1.png" alt="Map of Local Moran's I for REE concentrations in Ashfield Flats sediments 2019-2022. The Global Moran's I parameter is also shown beneath the legend." width="80%" />
+<p class="caption">
+Figure 2: Map of Local Moran’s I for REE concentrations in Ashfield Flats sediments 2019-2022. The Global Moran’s I parameter is also shown beneath the legend.
+</p>
+</div>
+</div>
+<div id="plot-lisa" class="section level3">
+<h3>├ Plot ‘LISA’</h3>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:lisa-plot"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/lisa-plot-1.png" alt="Map of LISA for REE concentrations in the Ashfield Flats sediment data, 2019-2022." width="80%" />
+<p class="caption">
+Figure 3: Map of LISA for REE concentrations in the Ashfield Flats sediment data, 2019-2022.
+</p>
+</div>
+</div>
+<div id="lisa-maps-for-multiple-variables" class="section level3">
+<h3>├ LISA maps for multiple variables</h3>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:multi-LISA"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/multi-LISA-1.png" alt="LISA autocorrelation maps for REE, Al, Fe, S, As, Cu, Pb, and Zn concentrations in the Ashfield Flats sediment data, 2019-2022." width="748.8" />
+<p class="caption">
+Figure 4: LISA autocorrelation maps for REE, Al, Fe, S, As, Cu, Pb, and Zn concentrations in the Ashfield Flats sediment data, 2019-2022.
+</p>
+</div>
+<hr>
+</div>
+</div>
+<div id="using-the-gstat-package-for-geostatistics-variograms-kriging-and-visualization" class="section level2">
+<h2>Using the gstat package for geostatistics: variograms, kriging, and visualization</h2>
+<div id="make-a-spatialpointsdataframe-object-from-a-data-frame" class="section level3">
+<h3>├ Make a ‘SpatialPointsDataFrame’ object from a data frame</h3>
+<p>In this example (as for Moran’s I) we <span class="math inline">\(log_{10}\)</span>-transform our variable as its
+distribution is highly positively skewed. (Using the untransformed variable
+would result in too many apparent upper outliers.)</p>
+<pre><code>## Object of class SpatialPointsDataFrame
+## Coordinates:
+##              min     max
+## Easting   399908  400577
+## Northing 6467930 6468346
+## Is projected: TRUE 
+## proj4string :
+## [+proj=utm +zone=50 +south +datum=WGS84 +units=m +no_defs]
+## Number of points: 230
+## Data attributes:
+##       REE        
+##  Min.   :0.9395  
+##  1st Qu.:1.9497  
+##  Median :2.2550  
+##  Mean   :2.1521  
+##  3rd Qu.:2.4183  
+##  Max.   :2.7050</code></pre>
+</div>
+<div id="plot-the-spatial-object-for-checking" class="section level3">
+<h3>├ Plot the spatial object for checking</h3>
+<p>To quickly check our data, we use the function bubble()} from the
+sp} package to make a <em>bubble map</em> of our variable, where the symbol
+<em>area</em> is proportional to the variable value (in this case, <span class="math inline">\(log_{10}\)</span> gadolinium
+concentration).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:spplot-spdf"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/spplot-spdf-1.png" alt="Visualization of spatial point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022." width="80%" />
+<p class="caption">
+Figure 5: Visualization of spatial point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022.
+</p>
+</div>
+</div>
+<div id="plot-a-map-with-range-class-symbols" class="section level3">
+<h3>├ Plot a map with range-class symbols</h3>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:ree-tukey-plot"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/ree-tukey-plot-1.png" alt="Map of REE concentrations expressed as symbols for concentration ranges (UQR is 75th percentile, upWsk is upper whisker, med is median, LQR is 25th percentile, loWsk is lower whisker). Data are from Ashfield Flats sediments 2019-2022." width="80%" />
+<p class="caption">
+Figure 6: Map of REE concentrations expressed as symbols for concentration ranges (UQR is 75th percentile, upWsk is upper whisker, med is median, LQR is 25th percentile, loWsk is lower whisker). Data are from Ashfield Flats sediments 2019-2022.
+</p>
+</div>
+<p>Bins for Figure <a href="#fig:ree-tukey-plot">6</a>:</p>
+</div>
+</div>
+<div id="variograms-and-kriging" class="section level2">
+<h2>Variograms and Kriging</h2>
+<pre><code>##           bins logfrom logto  from    to
+## 1    -outliers   -4.00  1.33   0.0  21.4
+## 2 loWsk to LQR    1.33  1.95  21.4  89.0
+## 3   LQR to med    1.95  2.25  89.0 179.9
+## 4   med to UQR    2.25  2.42 179.9 262.0
+## 5 UQR to upWsk    2.42  2.71 262.0 507.0
+## 6    +outliers    2.71   Inf 507.0   Inf</code></pre>
+<div id="make-a-binned-simple-variogram-object" class="section level3">
+<h3>├ Make a binned simple variogram object</h3>
+<div class="figure" style="text-align: center">
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/make%20variogram%20object-1.png" alt="Plot of experimental binned variogram for REE in Ashfield Flats sediments 2019-2022." width="50%" />
+<p class="caption">
+(#fig:make variogram object)Plot of experimental binned variogram for REE in Ashfield Flats sediments 2019-2022.
+</p>
+</div>
+<pre><code>##      np  dist gamma
+## 1   344  11.6 0.059
+## 2   774  26.6 0.078
+## 3   813  44.0 0.084
+## 4   868  61.3 0.100
+## 5   775  78.9 0.112
+## 6   913  96.5 0.110
+## 7  1064 113.6 0.107
+## 8  1091 131.4 0.110
+## 9  1134 148.9 0.119
+## 10 1196 166.5 0.111
+## 11 1292 183.9 0.135
+## 12 1349 201.8 0.130
+## 13 1443 218.9 0.135
+## 14 1423 236.3 0.149
+## 15 1331 253.7 0.140</code></pre>
+</div>
+<div id="fit-a-variogram-model-using-weighted-least-squares" class="section level3">
+<h3>├ Fit a variogram model using weighted least squares</h3>
+<pre><code>##   model      psill    range
+## 1   Nug 0.04587152  0.00000
+## 2   Exp 0.08498744 63.38943</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:plot-exp-model-variograms"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/plot-exp-model-variograms-1.png" alt="Plot of experimental binned variogram, and exponential variogram model, for REE in Ashfield Flats sediments 2019-2022." width="50%" />
+<p class="caption">
+Figure 7: Plot of experimental binned variogram, and exponential variogram model, for REE in Ashfield Flats sediments 2019-2022.
+</p>
+</div>
+</div>
+<div id="perform-kriging-interpolation" class="section level3">
+<h3>├ Perform kriging interpolation</h3>
+</div>
+<div id="first-make-a-grid-mask" class="section level3">
+<h3>├ first make a grid mask</h3>
+<pre><code>## Prediction grid:
+## Object of class SpatialPoints
+## Coordinates:
+##          min     max
+## Var1  399908  400573
+## Var2 6467930 6468345
+## Is projected: TRUE 
+## proj4string :
+## [+proj=utm +zone=50 +south +datum=WGS84 +units=m +no_defs]
+## Number of points: 6136</code></pre>
+</div>
+<div id="krige-to-grid" class="section level3">
+<h3>├ Krige to grid</h3>
+<pre><code>## [using ordinary kriging]
+## Object of class SpatialPointsDataFrame
+## Coordinates:
+##          min     max
+## Var1  399908  400573
+## Var2 6467930 6468345
+## Is projected: TRUE 
+## proj4string :
+## [+proj=utm +zone=50 +south +datum=WGS84 +units=m +no_defs]
+## Number of points: 6136
+## Data attributes:
+##    var1.pred        var1.var      
+##  Min.   :1.198   Min.   :0.00000  
+##  1st Qu.:2.109   1st Qu.:0.07383  
+##  Median :2.240   Median :0.08221  
+##  Mean   :2.192   Mean   :0.08060  
+##  3rd Qu.:2.304   3rd Qu.:0.08783  
+##  Max.   :2.593   Max.   :0.11094  
+## _____________________________________________________________________
+## 
+## [inverse distance weighted interpolation]
+## Object of class SpatialPointsDataFrame
+## Coordinates:
+##          min     max
+## Var1  399908  400573
+## Var2 6467930 6468345
+## Is projected: TRUE 
+## proj4string :
+## [+proj=utm +zone=50 +south +datum=WGS84 +units=m +no_defs]
+## Number of points: 6136
+## Data attributes:
+##    var1.pred    
+##  Min.   :1.085  
+##  1st Qu.:2.125  
+##  Median :2.244  
+##  Mean   :2.197  
+##  3rd Qu.:2.299  
+##  Max.   :2.642</code></pre>
+</div>
+<div id="simple-plot-of-kriging-output" class="section level3">
+<h3>├ Simple plot of kriging output</h3>
+<p>We can then us the spplot() function from sp to visualise the
+kriging predictions and variance, but without a background map.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:spplot-kriging-output"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/spplot-kriging-output-1.png" alt="Plots of simple kriging predictions and variance for log-transformed REE in Ashfield Flats sediments 2019-2022." width="75%" />
+<p class="caption">
+Figure 8: Plots of simple kriging predictions and variance for log-transformed REE in Ashfield Flats sediments 2019-2022.
+</p>
+</div>
+</div>
+<div id="plot-a-map-with-overlay-of-the-kriging-predictions" class="section level3">
+<h3>├ Plot a map with overlay of the kriging predictions</h3>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:map-krig-mod-pred"></span>
+<img src="Ashfield-geostatistics-using-gstat_files/figure-html/map-krig-mod-pred-1.png" alt="Map showing kriging predictions for REE in Ashfield Flats sediments 2019-2022. Sample points are tiny dots." width="768" />
+<p class="caption">
+Figure 9: Map showing kriging predictions for REE in Ashfield Flats sediments 2019-2022. Sample points are tiny dots.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

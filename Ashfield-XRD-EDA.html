@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Ashfield 2021-2022 XRD analyses</title>
+
+<script src="Ashfield-XRD-EDA_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Ashfield-XRD-EDA_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="Ashfield-XRD-EDA_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="Ashfield-XRD-EDA_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="Ashfield-XRD-EDA_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="Ashfield-XRD-EDA_files/navigation-1.1/tabsets.js"></script>
+<link href="Ashfield-XRD-EDA_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="Ashfield-XRD-EDA_files/highlightjs-9.12.0/highlight.js"></script>
+<link href="Ashfield-XRD-EDA_files/tabwid-1.1.0/tabwid.css" rel="stylesheet" />
+<link href="Ashfield-XRD-EDA_files/tabwid-1.1.0/scrool.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Ashfield 2021-2022 XRD analyses</h1>
+
+</div>
+
+
+<div id="sample-lists" class="section level2">
+<h2>Sample lists</h2>
+<pre><code>## --+-- Random powder XRD sample list --+--
+##           filename objectname
+## 1          S14.csv        S14
+## 2          S15.csv        S15
+## 3          S16.csv        S16
+## 4          S17.csv        S17
+## 5          S22.csv        S22
+## 6          S24.csv        S24
+## 7          S25.csv        S25
+## 8          S31.csv        S31
+## 9    Sample_01.csv       S_01
+## 10 Sample_3_G4.csv     S_3_G4
+## 11 Sample_4_G4.csv     S_4_G4
+## 12    Sample_A.csv        S_A
+## 13    Sample_B.csv        S_B
+## 14    Sample_D.csv        S_D
+## 
+## --+-- Oriented clay XRD sample list --+--
+##                        filename  objectname
+## 1          ENVT4461 S-01 Mg.csv      S01_Mg
+## 2      ENVT4461 S-01 Mg+Gly.csv  S01_Mg+Gly
+## 3  ENVT4461 S-12 Heated-400.csv S12_Heat400
+## 4  ENVT4461 S-12 Heated-550.csv S12_Heat550
+## 5          ENVT4461 S-12 Mg.csv      S12_Mg
+## 6      ENVT4461 S-12 Mg+Gly.csv  S12_Mg+Gly
+## 7  ENVT4461 S-13 Heated-400.csv S13_Heat400
+## 8  ENVT4461 S-13 Heated-550.csv S13_Heat550
+## 9          ENVT4461 S-13 Mg.csv      S13_Mg
+## 10     ENVT4461 S-13 Mg+Gly.csv  S13_Mg+Gly
+## 11         ENVT4461 S-14 Mg.csv      S14_Mg
+## 12     ENVT4461 S-14 Mg+Gly.csv  S14_Mg+Gly
+## 13 ENVT4461 S-15 Heated-400.csv S15_Heat400
+## 14 ENVT4461 S-15 Heated-550.csv S15_Heat550
+## 15         ENVT4461 S-15 Mg.csv      S15_Mg
+## 16     ENVT4461 S-15 Mg+Gly.csv  S15_Mg+Gly
+## 17 ENVT4461 S-16 Heated-400.csv S16_Heat400
+## 18 ENVT4461 S-16 Heated-550.csv S16_Heat550
+## 19         ENVT4461 S-16 Mg.csv      S16_Mg
+## 20     ENVT4461 S-16 Mg+Gly.csv  S16_Mg+Gly</code></pre>
+</div>
+<div id="random-powder-data-object-list" class="section level2">
+<h2>Random powder data object list</h2>
+<pre><code>##  [1] &quot;S_01_pXRD&quot;   &quot;S_3_G4_pXRD&quot; &quot;S_4_G4_pXRD&quot; &quot;S_A_pXRD&quot;    &quot;S_B_pXRD&quot;   
+##  [6] &quot;S_D_pXRD&quot;    &quot;S14_pXRD&quot;    &quot;S15_pXRD&quot;    &quot;S16_pXRD&quot;    &quot;S17_pXRD&quot;   
+## [11] &quot;S22_pXRD&quot;    &quot;S24_pXRD&quot;    &quot;S25_pXRD&quot;    &quot;S31_pXRD&quot;</code></pre>
+<div class="figure"><span style="display:block;" id="fig:rp-xrd-plots"></span>
+<img src="Ashfield-XRD-EDA_files/figure-html/rp-xrd-plots-1.png" alt="Random powder XRD patterns for selected Ashfield Flats samples. [Samples containing pyrite: S_4_G4, S22, and S31; vertical dotted lines are main pyrite peak angles with Co K-α1 x-rays.]" width="768" />
+<p class="caption">
+Figure 1: Random powder XRD patterns for selected Ashfield Flats samples. [Samples containing pyrite: S_4_G4, S22, and S31; vertical dotted lines are main pyrite peak angles with Co K-α1 x-rays.]
+</p>
+</div>
+<div class="figure"><span style="display:block;" id="fig:pyrite-loc-map"></span>
+<img src="Ashfield-XRD-EDA_files/figure-html/pyrite-loc-map-1.png" alt="Map of locations for samples containing pyrite detectable by XRD at Ashfield Flats 2021-2022" width="768" />
+<p class="caption">
+Figure 2: Map of locations for samples containing pyrite detectable by XRD at Ashfield Flats 2021-2022
+</p>
+</div>
+</div>
+<div id="list-of-clay-plate-data-objects" class="section level2">
+<h2>List of clay plate data objects</h2>
+<pre><code>##  [1] &quot;CP_S01_Mg&quot;      &quot;CP_S01_Mg+Gly&quot;  &quot;CP_S12_Heat400&quot; &quot;CP_S12_Heat550&quot;
+##  [5] &quot;CP_S12_Mg&quot;      &quot;CP_S12_Mg+Gly&quot;  &quot;CP_S13_Heat400&quot; &quot;CP_S13_Heat550&quot;
+##  [9] &quot;CP_S13_Mg&quot;      &quot;CP_S13_Mg+Gly&quot;  &quot;CP_S14_Mg&quot;      &quot;CP_S14_Mg+Gly&quot; 
+## [13] &quot;CP_S15_Heat400&quot; &quot;CP_S15_Heat550&quot; &quot;CP_S15_Mg&quot;      &quot;CP_S15_Mg+Gly&quot; 
+## [17] &quot;CP_S16_Heat400&quot; &quot;CP_S16_Heat550&quot; &quot;CP_S16_Mg&quot;      &quot;CP_S16_Mg+Gly&quot;</code></pre>
+<div class="figure"><span style="display:block;" id="fig:clay-plots"></span>
+<img src="Ashfield-XRD-EDA_files/figure-html/clay-plots-1.png" alt="Oriented clay plate XRD patterns for selected samples from Ashfield Flats 2022, showing changes with standard sample treatments." width="768" />
+<p class="caption">
+Figure 3: Oriented clay plate XRD patterns for selected samples from Ashfield Flats 2022, showing changes with standard sample treatments.
+</p>
+</div>
+<template id="3366b3bd-2532-4aa1-b021-f2333a8aab36"><style>
+.tabwid table{
+  border-spacing:0px !important;
+  border-collapse:collapse;
+  line-height:1;
+  margin-left:auto;
+  margin-right:auto;
+  border-width: 0;
+  display: table;
+  border-color: transparent;
+  caption-side: top;
+}
+.tabwid-caption-bottom table{
+  caption-side: bottom;
+}
+.tabwid_left table{
+  margin-left:0;
+}
+.tabwid_right table{
+  margin-right:0;
+}
+.tabwid td {
+    padding: 0;
+}
+.tabwid a {
+  text-decoration: none;
+}
+.tabwid thead {
+    background-color: transparent;
+}
+.tabwid tfoot {
+    background-color: transparent;
+}
+.tabwid table tr {
+background-color: transparent;
+}
+.katex-display {
+    margin: 0 0 !important;
+}
+</style><div class="tabwid"><style>.cl-00be487a{}.cl-00adc7d4{font-family:'sans';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-00adc7e8{font-family:'sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-00b418be{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:1pt;padding-right:1pt;line-height: 1;background-color:transparent;}.cl-00b439e8{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-00b439f2{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-00b439fc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-00a0f6da{font-family:'sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}</style><table class='cl-00be487a'>
+
+<caption>
+<span id="tab:clay-table">Table 1: </span><span class="cl-00a0f6da">Summary of clay plate XRD for Ashfield Flats samples 2022. (S = strong, M = medium, W = weak, p = possible, - = absent)</span>
+</caption>
+
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Sample</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Kaolinite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Illite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Vermiculite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Smectite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Boehmite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Gibbsite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Jarosite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Quartz</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Heulandite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Calcite</span></p></td><td class="cl-00b439e8"><p class="cl-00b418be"><span class="cl-00adc7d4">Albite</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S12</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S13</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S14</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S15</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S16</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S17</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S22</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S23</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">p</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S24</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S25</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S26</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">p</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S01</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S29</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">p</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S30</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S31</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S_A</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S_B</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S_C</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">p</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S_D</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">M</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">W</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439f2"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S_E</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">S</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td><td class="cl-00b439fc"><p class="cl-00b418be"><span class="cl-00adc7e8">-</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="62832563-acf6-4ffa-97a0-05aa8d8881fc"></div>
+<script>
+var dest = document.getElementById("62832563-acf6-4ffa-97a0-05aa8d8881fc");
+var template = document.getElementById("3366b3bd-2532-4aa1-b021-f2333a8aab36");
+var caption = template.content.querySelector("caption");
+var fantome = dest.attachShadow({mode: 'open'});
+var templateContent = template.content;
+fantome.appendChild(templateContent);
+</script>
+
+<hr>
+<p>That’s it so far</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
