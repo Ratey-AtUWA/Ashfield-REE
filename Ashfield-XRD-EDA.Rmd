@@ -92,6 +92,7 @@ for (i in 1:length(RP_Samples)){
 afr_map <- read.csv("afr_map_v3.csv", stringsAsFactors = TRUE)
 afs_pyr_coords <- read.csv("afs_pyr_coords.csv")
 afs_pyr_coords$Type <- as.factor(afs_pyr_coords$Type)
+afs_pyr_coords$Type <- factor(afs_pyr_coords$Type, levels = c("Surface","Deep core"))
 UTM50 <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
 extent <- st_as_sf(x = data.frame(x = c(399860,400580), 
                                   y = c(6467870,6468350)), 
@@ -161,44 +162,9 @@ for (i in 1:length(claySamples)){
 ```
 
 ```{r clay-table, results='hold', echo=FALSE}
-claytable <- data.frame(Sample = c("S12","S13","S14","S15","S16","S17","S22",
-                                   "S23","S24","S25","S26","S01","S29","S30",
-                                   "S31","S_A","S_B","S_C","S_D","S_E"),
-                        Kaolinite = c("S","S","S","S","S","S","S",
-                                      "S","S","W","S","M","S","W",
-                                      "S","S","S","S","S","S"),
-                           Illite = c("S","S","M","S","S","W","S",
-                                      "M","W","-","M","W","S","-",
-                                      "S","M","M","M","M","S"),
-                      Vermiculite = c("S","M","-","M","S","M","-",
-                                      "p","-","-","-","-","p","-",
-                                      "S","-","-","-","M","S"),
-                         Smectite = c("-","-","-","M","-","-","-",
-                                      "-","-","-","p","-","-","-",
-                                      "-","-","-","p","-","-"),
-                         Boehmite = c("-","-","-","-","-","-","-",
-                                      "-","M","S","-","S","S","-",
-                                      "-","-","-","-","W","-"),
-                         Gibbsite = c("-","-","-","-","-","-","-",
-                                      "-","M","W","-","W","M","-",
-                                      "-","-","-","-","-","-"),
-                         Jarosite = c("-","-","-","-","-","-","-",
-                                      "-","M","-","-","-","-","-",
-                                      "-","-","-","-","W","-"),
-                           Quartz = c("-","-","-","-","-","-","-",
-                                      "-","S","M","-","W","-","-",
-                                      "-","-","-","-","-","-"),
-                       Heulandite = c("-","-","-","-","-","-","-",
-                                      "-","M","M","-","M","-","-",
-                                      "-","-","-","-","-","-"),
-                          Calcite = c("-","-","-","-","-","-","-",
-                                      "-","-","M","-","W","-","-",
-                                      "-","-","-","-","-","-"),
-                           Albite = c("-","-","-","-","-","-","-",
-                                      "-","-","W","-","-","-","-",
-                                      "-","-","-","-","-","-"))
-set_caption(flextable(claytable),
-            caption = "Summary of clay plate XRD for Ashfield Flats samples 2022. (S = strong, M = medium, W = weak, p = possible, - = absent)")
+claytable <- read.csv(file="clay_mineralogy_S2_2022.csv")
+font(set_caption(flextable(claytable),
+            caption = "Summary of clay plate XRD for Ashfield Flats samples 2022. (S = strong, M = medium, W = weak, p = possible, - = absent)"), fontname = "Arial Narrow", part="all")
 ```
 
 <hr>
