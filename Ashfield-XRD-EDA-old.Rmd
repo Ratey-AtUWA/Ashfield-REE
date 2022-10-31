@@ -1,0 +1,205 @@
+---
+title: "Ashfield 2021-2022 XRD analyses"
+output: 
+  bookdown::html_document2:
+    fig_width: 6.4
+    fig_height: 4.8
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+```{r load packages and environment but do not show, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
+library(mgsub)
+library(stringr)
+library(flextable)
+  set_flextable_defaults(font.family = 'sans', theme_fun = "theme_zebra", 
+        font.size = 11, text.align = "right",padding.left = 1, padding.right = 1,
+        padding.top = 2, padding.bottom = 2)
+library(sp)
+library(lctools)
+library(gstat)
+library(sf)
+library(maptiles)
+library(prettymapr)
+```
+
+```{r more-setup, message=FALSE, warning=FALSE, include=FALSE}
+git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
+pal4lite <- c("black", "purple2", "blue2", "cyan4", "forestgreen", 
+              "darkorange", "gold3", "red3", "gray80", "white")
+pal4liteTransp <- c("#000000","#912CEEb0","#0000EEb0","#008B8Bb0","#228B22b0",
+                    "#CDAD00b0", "#FF8C00b0", "#CD0000b0", "#CCCCCC", "#FFFFFF")
+pal4dark <- c("white", "pink1", "orange", "khaki1", "lightgreen", "cadetblue1", 
+              "deepskyblue", "plum", "gray80", "black")
+```
+
+## Sample lists
+
+```{r store and show file lists, paged.print=FALSE, results='hold', echo=FALSE}
+require(mgsub)
+
+cat("--+-- Random powder XRD sample list --+--\n")
+pXRDfiles<-list.files("./RP-XRD-S2-2022/")
+pXRDnames<-mgsub(pXRDfiles,c(".csv","Sample"),c("","S"))
+(data.frame(filename=pXRDfiles,objectname=pXRDnames))
+
+cat("\n--+-- Oriented clay XRD sample list --+--\n")
+clayfiles <- list.files("./clay-plate-XRD-S2-2022/")
+claynames <- mgsub(clayfiles, c(".csv","ENVT4461 "," ","-"),
+                   c("","","_",""))
+claynames <- gsub("Heated","Heat",claynames)
+(data.frame(filename=clayfiles,objectname=claynames))
+```
+
+## Random powder data object list
+
+```{r read all the random powder datafiles, results='hold', echo=FALSE}
+i <- 1; wkd <- getwd()
+for (i in 1:14){
+  assign(paste0(pXRDnames[i],"_pXRD"), 
+         read.csv(paste0(wkd,"/RP-XRD-S2-2022/", pXRDfiles[i])))
+}
+ls(pattern = "_pXRD")
+```
+
+```{r rp-xrd-plots, fig.height=12, fig.width=8, message=FALSE, warning=FALSE, fig.cap="Random powder XRD patterns for selected Ashfield Flats samples. [Samples containing pyrite: S_4_G4, S22, and S31; vertical dotted lines are main pyrite peak angles with Co K-α1 x-rays.]", results='hold', echo=FALSE}
+RP_Samples <- ls(pattern="_pXRD")
+pyr <- c(33.155,38.45,43.184,47.543,55.539)
+
+palette(c("black", rainbow(length(RP_Samples), end = 0.18, v=0.6)))
+par(mfrow=c(ceiling(length(RP_Samples)/2),2), oma=c(3,3,1,1), mar=c(0,0,0,0), 
+    mgp = c(1.6,0.3,0), font.lab = 2)
+for (i in 1:length(RP_Samples)){
+  plot(get(RP_Samples[i]), type="l", col=i+1, lwd=1,
+       xlab = "", xaxt="n", ylab="", yaxt="n", xlim = c(5,78))
+  mtext(RP_Samples[i], 3, -1.5, adj=0.05, font = 2, col = i+1)
+  if(round(i/2,0)!=i/2) {
+    axis(2)
+    mtext("Counts",2,1.6,font=2)
+  }
+  if(i >= length(RP_Samples)-1) {
+    axis(1, at = seq(10,70,10), labels = seq(10,70,10))
+    mtext("Angle (\u00B0 2\u03B8)",1,1.6,font=2)
+  }
+  abline(v = pyr, lty = 3, col = "grey88")
+}
+```
+
+```{r pyrite-loc-map, fig.height=5.8, fig.width=8, message=FALSE, warning=FALSE, fig.cap="Map of locations for samples containing pyrite detectable by XRD at Ashfield Flats 2021-2022", results='hold', echo=FALSE}
+afr_map <- read.csv("afr_map_v3.csv", stringsAsFactors = TRUE)
+afs_pyr_coords <- read.csv("afs_pyr_coords.csv")
+UTM50 <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
+extent <- st_as_sf(x = data.frame(x = c(399860,400580), 
+                                  y = c(6467870,6468350)), 
+                   coords = c("x", "y"), crs = UTM50)
+aftiles <- get_tiles(extent, provider = "OpenStreetMap.HOT", 
+                     crop = TRUE, zoom = 17) # make map object
+palette(pal4liteTransp)
+par(oma=c(3,3,1,1), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), 
+    lend=2, ljoin=1, tcl=0.3)
+plot(aftiles)
+axis(1)
+mtext(side=1, line=2, text="Easting (UTM Zone 50, m)",
+      font=2, cex=1.2)
+axis(2)
+mtext(side=2, line=2, text="Northing (UTM Zone 50, m)",
+      font=2, cex=1.2)
+with(afr_map, polygon(wetland_E, wetland_N, border="steelblue", col="lightblue"))
+with(afs_pyr_coords, points(pyrE, pyrN, cex = c(1.5,1.2)[Type], 
+                            pch = c(21,25)[Type], 
+                            bg = c(8,6)[Type]))
+addnortharrow()
+addscalebar(plotepsg = 32750, pos = "topleft")
+box()
+legend("bottomright", bty = "n", inset = 0.05, cex = 1.25,
+       legend = c("Surface (0-10 cm)","Core (\u2265 3 m)"),
+       pch = c(21,25), pt.cex = c(1.5,1.2), pt.bg=c(8,6),
+       title = expression(italic("Sample type")))
+```
+
+## List of clay plate data objects
+
+```{r clay-data-objs, results='hold', echo=FALSE}
+for (i in 1:length(clayfiles)){
+  assign(paste0("CP_",claynames[i]), 
+         read.csv(paste0(wkd,"/clay-plate-XRD-S2-2022/", clayfiles[i])))
+}
+ls(pattern = "CP_")
+```
+
+```{r clay-plots, fig.height=16, fig.width=8, fig.cap="Oriented clay plate XRD patterns for selected samples from Ashfield Flats 2022, showing changes with standard sample treatments.", results='hold', echo=FALSE}
+allTreats <- ls(pattern="CP_")
+claySamples <- unique(substr(allTreats,1,6))
+
+palette(c("#000000", "#BA55D380", "#1E90FF80", "#20B2AA80", "#FFD70080"))
+par(mfrow=c(length(claySamples),1), mar=c(3,3,1,1), mgp = c(1.6,0.3,0), font.lab = 2)
+i <- 1
+for (i in 1:length(claySamples)){
+  plotObjs <- allTreats[grep(claySamples[i],allTreats)]
+  yM <- max(get(plotObjs[1])[,2])*1.2
+  plot(get(plotObjs[1]), ylim=c(0,yM), yaxs="i", type="l", col=2, lwd=2,
+       xlab = "Angle (\u00B0 2\u03B8)")
+  j <- 2
+  for(j in 2:length(plotObjs)){
+    lines(get(plotObjs[j]), col = j+1, lwd=2)
+  }
+  if (length(plotObjs)==2){
+    legend(18,par("usr")[4], bty="n", inset = 0.05, cex = 1.5, 
+       legend=c("Mg","Mg + Glycerol"), 
+       lwd=2, col=c(2,3), title = expression(italic("Treatment")))
+  } else {
+    legend(18,par("usr")[4], bty="n", inset = 0.05, cex = 1.5, 
+       legend=c("Mg","Mg + Glycerol", "Heat 400 \u00B0C", "Heat 550 \u00B0C"), 
+       lwd=2, col=c(2,3,4,5), title = expression(italic("Treatment")))
+  }
+  mtext(claySamples[i], 3, -1.5, adj=0.05, font = 2)
+}
+```
+
+```{r clay-table, results='hold', echo=FALSE}
+claytable <- data.frame(Sample = c("S12","S13","S14","S15","S16","S17","S22",
+                                   "S23","S24","S25","S26","S01","S29","S30",
+                                   "S31","S_A","S_B","S_C","S_D","S_E"),
+                        Kaolinite = c("S","S","S","S","S","S","S",
+                                      "S","S","W","S","M","S","W",
+                                      "S","S","S","S","S","S"),
+                           Illite = c("S","S","M","S","S","W","S",
+                                      "M","W","-","M","W","S","-",
+                                      "S","M","M","M","M","S"),
+                      Vermiculite = c("S","M","-","M","S","M","-",
+                                      "p","-","-","-","-","p","-",
+                                      "S","-","-","-","M","S"),
+                         Smectite = c("-","-","-","M","-","-","-",
+                                      "-","-","-","p","-","-","-",
+                                      "-","-","-","p","-","-"),
+                         Boehmite = c("-","-","-","-","-","-","-",
+                                      "-","M","S","-","S","S","-",
+                                      "-","-","-","-","W","-"),
+                         Gibbsite = c("-","-","-","-","-","-","-",
+                                      "-","M","W","-","W","M","-",
+                                      "-","-","-","-","-","-"),
+                         Jarosite = c("-","-","-","-","-","-","-",
+                                      "-","M","-","-","-","-","-",
+                                      "-","-","-","-","W","-"),
+                           Quartz = c("-","-","-","-","-","-","-",
+                                      "-","S","M","-","W","-","-",
+                                      "-","-","-","-","-","-"),
+                       Heulandite = c("-","-","-","-","-","-","-",
+                                      "-","M","M","-","M","-","-",
+                                      "-","-","-","-","-","-"),
+                          Calcite = c("-","-","-","-","-","-","-",
+                                      "-","-","M","-","W","-","-",
+                                      "-","-","-","-","-","-"),
+                           Albite = c("-","-","-","-","-","-","-",
+                                      "-","-","W","-","-","-","-",
+                                      "-","-","-","-","-","-"))
+set_caption(flextable(claytable),
+            caption = "Summary of clay plate XRD for Ashfield Flats samples 2022. (S = strong, M = medium, W = weak, p = possible, - = absent)")
+```
+
+<hr>
+
+That's it so far
