@@ -1,0 +1,16 @@
+Sample,Type,Depth_top,Depth_bot,Quartz,Halite,Kaolinite,Albite,Sanidine,Microcline,Muscovite,Gypsum,Pyrite,Jarosite,Illite,Calcite,Palygorskite,Halloysite,Hornblende
+2022_G1,Surface,0,10,Y,t,Y,Y,-,-,-,t,-,-,Y,-,-,-,-
+2022_G2,Surface,0,10,Y,Y,Y,Y,Y,-,Y,t,t,-,-,t,-,-,-
+2022_G7,Surface,0,10,Y,Y,Y,Y,-,-,Y,t,-,-,-,-,-,-,-
+2022_G8,Surface,0,10,Y,Y,Y,t,-,-,Y,t,-,-,-,-,-,-,-
+2022_G9,Surface,0,10,Y,Y,Y,-,-,-,Y,t,-,-,-,-,-,-,-
+2022_G10,Surface,0,10,Y,t,Y,t,-,-,Y,Y,t,-,-,-,-,-,-
+2022_G11,Surface,0,10,Y,Y,Y,Y,-,-,Y,Y,Y,-,-,-,-,-,-
+B03_1.5m_H2,Core,150,200,Y,Y,Y,Y,-,-,-,t,-,-,Y,-,-,-,-
+B03_4.5m_H1,Core,450,500,Y,Y,Y,Y,-,Y,-,t,Y,Y,Y,-,Y,Y,-
+B03_7.5m_H1,Core,750,800,Y,-,Y,Y,-,Y,-,-,-,-,Y,-,Y,-,Y
+B13_3.0m_H3,Core,400,450,Y,t,Y,Y,-,-,-,t,-,-,Y,-,-,-,Y
+B13_4.5m_H1,Core,450,500,Y,-,Y,Y,-,-,-,Y,-,-,Y,-,-,-,t
+B13_4.5m_H2,Core,500,550,Y,-,Y,Y,-,Y,-,t,-,Y,Y,-,-,-,Y
+B13_4.5m_H3,Core,550,600,Y,-,Y,Y,-,Y,-,Y,-,Y,Y,-,-,-,t
+B13_6.0_h1,Core,600,650,Y,-,Y,Y,-,Y,-,Y,-,-,Y,-,-,-,T

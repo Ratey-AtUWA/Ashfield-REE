@@ -169,4 +169,18 @@ font(set_caption(flextable(claytable),
 
 <hr>
 
+```{r RP-XRD-table, results='hold', echo=FALSE}
+rp_table <- read.csv("RP_XRD_table.csv")
+rp_table$Type <- as.factor(rp_table$Type)
+rp_table$Type <- factor(rp_table$Type, levels = c("Surface","Core"))
+flextable(rp_table) |> 
+  set_caption(caption = "Summary of random powder XRD for Ashfield Flats samples 2022. (Y = present, t = trace, - = absent)") |>
+  font(fontname = "Arial Narrow", part = "all") |>
+  fontsize(size = 10, part = "all") |>
+  rotate(rotation = "btlr", part = "header", align = "bottom") |>
+  align(align="center", part = "all")
+```
+
+<hr>
+
 That's it so far
