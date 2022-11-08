@@ -78,8 +78,8 @@ addscalebar(plotepsg = 32750, pos = "topleft")
 box()
 ```
 
-#### **Note**: in this document REE ($\equiv \sum$REE) = Ce + La + Nd + Gd.
-$\sum$REE does not include yttrium (Y) at present, but it could using \
+#### **Note**: in this document REE (&equiv; &sum;REE) = Ce + La + Nd + Gd.
+&sum;REE does not include yttrium (Y) at present, but it could using \
 `afs1922$YREE <- afs1922$REE + afs1922$Y`.
 
 ## Spatial Autocorrelation
@@ -276,7 +276,7 @@ rm(list = c("data_temp","Coords","mI","locMI", "plotdata", "pos0", "neg0",
 
 ### ├ Make a 'SpatialPointsDataFrame' object from a data frame
 
-In this example (as for Moran's I) we $log_{10}$-transform our variable as its
+In this example (as for Moran's I) we log~~10~~-transform our variable as its
 distribution is highly positively skewed. (Using the untransformed variable
 would result in too many apparent upper outliers.)
 
@@ -296,9 +296,9 @@ summary(REE_sp)
 
 ### ├ Plot the spatial object for checking
 
-To quickly check our data, we use the function bubble()} from the
-sp} package to make a *bubble map* of our variable, where the symbol
-*area* is proportional to the variable value (in this case, $log_{10}$ gadolinium
+To quickly check our data, we use the function `bubble()` from the
+`sp` package to make a *bubble map* of our variable, where the symbol
+*area* is proportional to the variable value (in this case, log~~10~~ gadolinium
 concentration).
 
 ```{r spplot-spdf, fig.height=5, fig.width=8, fig.align='center', out.width="80%", fig.cap="Visualization of spatial point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022.", message=FALSE, warning=FALSE, results='hold', echo=FALSE}
