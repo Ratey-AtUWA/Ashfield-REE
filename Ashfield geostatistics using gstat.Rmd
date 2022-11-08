@@ -94,7 +94,7 @@ data_temp <- na.omit(afs1922surf[,c("Easting", "Northing", var0)])
 Coords <- cbind(data_temp$Easting, data_temp$Northing)
 bw <- 8 # bw = bandwidth, = number of nearest point for calculation
 mI <- moransI(Coords, bw, data_temp[,3])
-cat("Global Moran's I for ",var0,"; from the NGSA (af only), topsoil, -2mm fraction\n", sep="");
+cat("Global Moran's I for ",var0,"; from Ashfield Flats 2019-2022\n", sep="");
 t(as.matrix(mI[c(2,4:7)]))
 rm(list = c("data_temp","Coords","bw","mI","var0")) # remove temporary objects
 ```
