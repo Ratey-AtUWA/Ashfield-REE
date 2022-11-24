@@ -31,21 +31,45 @@ Y). The REE are geochemically similar metallic elements whose chemical
 properties show systematic trends related to their charge-radius ratio. Most of
 the REE exist as trivalent cations, but two show naturally anomalous behaviour
 since they can form different oxidation states: cerium (Ce) is also stable as
-Ce^4+^, and europium (Eu) often occurs as Eu^2+^.
+Ce^4+^, and europium (Eu) often occurs as Eu^2+^. The REE are enriched in the
+Earth's crust relative to its bulk composition, occurring in primary mineral
+phases such as silicates, carbonates, oxides, and phosphates (Chakhmouradian &
+Wall, 2012).
+
+In Earth surface environments REE are sometimes concentrated in weathering
+profiles developed from felsic silicate rocks (Condie et al. 1995; Bao et al.
+2008). REEs in weathered materials occur in clays (Condie et al. 1995), and also
+in secondary minerals such as REE phosphates and oxides (Chakhmouradian & Wall,
+2012). In contrast, Ma et al. (2011) observed REE depletion in weathered shale
+relative to the unweathered parent material, and depletion is also known with
+igneous parent materials (`#REFs`), and both depletion and enrichment can be
+observed in different zones of the same weathered material (`#REFs`).
+
+In wetland sediments having varying inputs from acid sulfate soil drainage,
+Morgan *et al*. (2012) found that REEs were significantly correlated with Fe,
+and that drain sediments receiving the most acid sulfate drainage showed the
+most enrichment in REEs. Similar observations were made by Xu et al. (2018), who
+also found that REE concentrations showed a compositional relationship with
+phosphorus. The presence of REE-phosphate minerals such as florencite and
+monazite was confirmed in estuarine sediments by Xu et al. (2019), who also
+detected a mixed La-Fe-O phase consistent with an orthoferrite-type compound.
 
 # Methods
 
 ## Site description
 
-(similar to previous reports/articles - see Rate & McGrath 2022)
+(similar to previous reports/articles - see Rate & McGrath 2022),
+`but adding samples from 2022 if needed`.
 
 ## Chemical and Physical Analysis
 
-(similar to previous reports/articles - see Rate & McGrath 2022)
+(similar to previous reports/articles - see Rate & McGrath 2022),
+`but need to add XRD`
 
 ## Data analysis
 
-(similar to previous reports/articles - see Rate & McGrath 2022)
+(similar to previous reports/articles - see Rate & McGrath 2022),
+`but need to add XRD`
 
 # Results & Discussion
 
@@ -78,6 +102,15 @@ anomalies in river waters. *Earth and Planetary Science Letters*, **143**(1--4),
 245-255.
 [doi:10.1016/0012-821X(96)00127-6](https://doi.org/10.1016/0012-821X(96)00127-6){.uri}
 
+Chakhmouradian, A. R., & Wall, F. (2012). Rare earth elements: Minerals, mines,
+magnets (and more). *Elements*, **8**, 333-340.
+[doi:10.2113/gselements.8.5.333](https://doi.org/10.2113/gselements.8.5.333)
+
+Condie, K. C., Dengate, J., & Cullers, R. L. (1995). Behavior of rare earth
+elements in a paleoweathering profile on granodiorite in the Front Range,
+Colorado, USA. Geochimica et Cosmochimica Acta, 59(2), 279-294. [**NEEDS
+DOI**]{.underline}
+
 Dunbabin, J. S., & Bowmer, K. H. (1992). Potential use of constructed wetlands
 for treatment of industrial wastewaters containing metals. *Science of* *the
 Total Environment*, **111**(2-3), 151-168.
@@ -106,6 +139,12 @@ The key example of China. *Elements*, **8**(5), 361-367.
 Loos, C. (2003). *Acid Sulfate Soils in Ashfield, Bassendean*. Master of Science
 Dissertation. School of Environmental Science, Murdoch University, Western
 Australia.
+
+Ma, L., Jin, L., & Brantley, S. L. (2011). How mineralogy and slope aspect
+affect REE release and fractionation during shale weathering in the
+Susquehanna/Shale Hills Critical Zone Observatory. *Chemical Geology*,
+**290**(1-2), 31-49.
+[doi:10.1016/j.chemgeo.2011.08.013](https://doi.org/10.1016/j.chemgeo.2011.08.013)
 
 McGrath, G. S. (2021). Ashfield Flats Hydrological Study: Summary Report.
 Kensington, Western Australia, Department of Biodiversity, Conservation, and
