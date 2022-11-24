@@ -26,7 +26,7 @@ library(maptiles)
 library(prettymapr)
 ```
 
-```{r more-setup, message=FALSE, warning=FALSE, include=FALSE}
+```{r more-setup, message=FALSE, warning=FALSE, echo=FALSE}
 git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
 pal4lite <- c("black", "purple2", "blue2", "cyan4", "forestgreen", 
               "darkorange", "gold3", "red3", "gray80", "white")
@@ -167,7 +167,7 @@ font(set_caption(flextable(claytable),
             caption = "Summary of clay plate XRD for Ashfield Flats samples 2022. (S = strong, M = medium, W = weak, p = possible, - = absent)"), fontname = "Arial Narrow", part="all")
 ```
 
-<hr>
+----------------------
 
 ```{r RP-XRD-table, results='hold', echo=FALSE}
 rp_table <- read.csv("RP_XRD_table.csv")
@@ -181,6 +181,6 @@ flextable(rp_table) |>
   align(align="center", part = "all")
 ```
 
-<hr>
+----------------------
 
 That's it so far
