@@ -1,4 +1,5 @@
 ---
+loo---
 title: "notes for REE paper"
 output: 
   bookdown::html_document2:
@@ -16,60 +17,27 @@ editor_options:
 
 # Introduction
 
-Wetlands are geochemically diverse environments which, in urban areas, commonly
-represent sinks for potential pollutants such as trace elements and immobile
-nutrients. The accumulation of trace elements by wetlands occurs in both natural
-and anthropogenic environments (Hart *et al*. 1987; Dunbabin and Bowmer, 1992)
-from sources including urban stormwater (Howitt *et al*. 2014).
+Wetlands are geochemically diverse environments which, in urban areas, commonly represent sinks for potential pollutants such as trace elements and immobile nutrients. The accumulation of trace elements by wetlands occurs in both natural and anthropogenic environments (Hart *et al*. 1987; Dunbabin and Bowmer, 1992) from sources including urban stormwater (Howitt *et al*. 2014).
 
-In recent decades, the 'rare-earth elements' have been recognised as
-environmental pollutants (Bau & Dulski, 1996; Geagea *et al*. 2007; Pérez-López
-*et al*. 2010), related to their use in electronics, medical imaging, and other
-technologies. The rare-earth elements (REE) are elements from the lanthanide
-series (atomic numbers 57 to 71, La to Lu, sometimes extended to include Sc and
-Y). The REE are geochemically similar metallic elements whose chemical
-properties show systematic trends related to their charge-radius ratio. Most of
-the REE exist as trivalent cations, but two show naturally anomalous behaviour
-since they can form different oxidation states: cerium (Ce) is also stable as
-Ce^4+^, and europium (Eu) often occurs as Eu^2+^. The REE are enriched in the
-Earth's crust relative to its bulk composition, occurring in primary mineral
-phases such as silicates, carbonates, oxides, and phosphates (Chakhmouradian &
-Wall, 2012).
+In recent decades, the 'rare-earth elements' have been recognised as environmental pollutants (Bau & Dulski, 1996; Geagea *et al*. 2007; Pérez-López *et al*. 2010), related to their use in electronics, medical imaging, and other technologies. The rare-earth elements (REE) are elements from the lanthanide series (atomic numbers 57 to 71, La to Lu, sometimes extended to include Sc and Y). The REE are geochemically similar metallic elements whose chemical properties show systematic trends related to their charge-radius ratio. Most of the REE exist as trivalent cations, but two show naturally anomalous behaviour since they can form different oxidation states: cerium (Ce) is also stable as Ce^4+^, and europium (Eu) often occurs as Eu^2+^. The REE are enriched in the Earth's crust relative to its bulk composition, occurring in primary mineral phases such as silicates, carbonates, oxides, and phosphates (Chakhmouradian & Wall, 2012).
 
-In Earth surface environments REE are sometimes concentrated in weathering
-profiles developed from felsic silicate rocks (Condie et al. 1995; Bao et al.
-2008). REEs in weathered materials occur in clays (Condie et al. 1995), and also
-in secondary minerals such as REE phosphates and oxides (Chakhmouradian & Wall,
-2012). In contrast, Ma et al. (2011) observed REE depletion in weathered shale
-relative to the unweathered parent material, and depletion is also known with
-igneous parent materials (`#REFs`), and both depletion and enrichment can be
-observed in different zones of the same weathered material (`#REFs`).
+In Earth surface environments REE are sometimes concentrated in weathering profiles developed from felsic silicate rocks (Condie et al. 1995; Bao et al. 2008). REEs in weathered materials occur in clays (Condie et al. 1995), and also in secondary minerals such as REE phosphates and oxides (Chakhmouradian & Wall, 2012). In contrast, Ma et al. (2011) observed REE depletion in weathered shale relative to the unweathered parent material, and depletion is also known with igneous parent materials (`#REFs`), and both depletion and enrichment can be observed in different zones of the same weathered material (`#REFs`).
 
-In wetland sediments having varying inputs from acid sulfate soil drainage,
-Morgan *et al*. (2012) found that REEs were significantly correlated with Fe,
-and that drain sediments receiving the most acid sulfate drainage showed the
-most enrichment in REEs. Similar observations were made by Xu et al. (2018), who
-also found that REE concentrations showed a compositional relationship with
-phosphorus. The presence of REE-phosphate minerals such as florencite and
-monazite was confirmed in estuarine sediments by Xu et al. (2019), who also
-detected a mixed La-Fe-O phase consistent with an orthoferrite-type compound.
+In wetland sediments having varying inputs from acid sulfate soil drainage, Morgan *et al*. (2012) found that REEs were significantly correlated with Fe, and that drain sediments receiving the most acid sulfate drainage showed the most enrichment in REEs. Similar observations were made by Xu et al. (2018), who also found that REE concentrations showed a compositional relationship with phosphorus. The presence of REE-phosphate minerals such as florencite and monazite was confirmed in estuarine sediments by Xu et al. (2019), who also detected a mixed La-Fe-O phase consistent with an orthoferrite-type compound.
 
 # Methods
 
 ## Site description
 
-(similar to previous reports/articles - see Rate & McGrath 2022),
-`but adding samples from 2022 if needed`.
+(similar to previous reports/articles - see Rate & McGrath 2022), `but adding samples from 2022 if needed`.
 
 ## Chemical and Physical Analysis
 
-(similar to previous reports/articles - see Rate & McGrath 2022),
-`but need to add XRD`
+(similar to previous reports/articles - see Rate & McGrath 2022), `but need to add XRD`
 
 ## Data analysis
 
-(similar to previous reports/articles - see Rate & McGrath 2022),
-`but need to add XRD`
+(similar to previous reports/articles - see Rate & McGrath 2022), `but need to add XRD`
 
 # Results & Discussion
 
@@ -77,103 +45,49 @@ detected a mixed La-Fe-O phase consistent with an orthoferrite-type compound.
 
 -   association of REE with Al
 
-    -   (not Fe or P as in previous ASS-impacted environments; Morgan *et al*.
-        2012; Xu *et al*. 2018)
-    -   may resemble REE deposits in South China which are 'ion adsorption
-        clays' characterised by easily-extractable ('exchangeable') REE (?) (Bao
-        & Zhao. 2008)
+    -   (not Fe or P as in previous ASS-impacted environments; Morgan *et al*. 2012; Xu *et al*. 2018)
+    -   may resemble REE deposits in South China which are 'ion adsorption clays' characterised by easily-extractable ('exchangeable') REE (?) (Bao & Zhao. 2008)
 
 -   evidence for ASS
 
-    -   from our work mainly occurrence of pyrite & jarosite, some from SO~4~/Cl
-        ratio
+    -   from our work mainly occurrence of pyrite & jarosite, some from SO~4~/Cl ratio
     -   from previous work at Ashfield (McGrath 2021; Loos 2003; Scott *et al*.
         2009) 
 
 # References
 
-Bao, Z., & Zhao, Z. (2008). Geochemistry of mineralization with exchangeable REY
-in the weathering crusts of granitic rocks in South China. *Ore Geology
-Reviews*, **33**(3), 519-535.
-[doi:10.1016/j.oregeorev.2007.03.005](https://doi.org/https://doi.org/10.1016/j.oregeorev.2007.03.005){.uri}
+Bao, Z., & Zhao, Z. (2008). Geochemistry of mineralization with exchangeable REY in the weathering crusts of granitic rocks in South China. *Ore Geology Reviews*, **33**(3), 519-535. [doi:10.1016/j.oregeorev.2007.03.005](https://doi.org/https://doi.org/10.1016/j.oregeorev.2007.03.005){.uri}
 
-Bau, M., & Dulski, P. (1996). Anthropogenic origin of positive gadolinium
-anomalies in river waters. *Earth and Planetary Science Letters*, **143**(1--4),
-245-255.
-[doi:10.1016/0012-821X(96)00127-6](https://doi.org/10.1016/0012-821X(96)00127-6){.uri}
+Bau, M., & Dulski, P. (1996). Anthropogenic origin of positive gadolinium anomalies in river waters. *Earth and Planetary Science Letters*, **143**(1--4), 245-255. [doi:10.1016/0012-821X(96)00127-6](https://doi.org/10.1016/0012-821X(96)00127-6){.uri}
 
-Chakhmouradian, A. R., & Wall, F. (2012). Rare earth elements: Minerals, mines,
-magnets (and more). *Elements*, **8**, 333-340.
-[doi:10.2113/gselements.8.5.333](https://doi.org/10.2113/gselements.8.5.333)
+Chakhmouradian, A. R., & Wall, F. (2012). Rare earth elements: Minerals, mines, magnets (and more). *Elements*, **8**, 333-340. [doi:10.2113/gselements.8.5.333](https://doi.org/10.2113/gselements.8.5.333)
 
-Condie, K. C., Dengate, J., & Cullers, R. L. (1995). Behavior of rare earth
-elements in a paleoweathering profile on granodiorite in the Front Range,
-Colorado, USA. Geochimica et Cosmochimica Acta, 59(2), 279-294. [**NEEDS
-DOI**]{.underline}
+Condie, K. C., Dengate, J., & Cullers, R. L. (1995). Behavior of rare earth elements in a paleoweathering profile on granodiorite in the Front Range, Colorado, USA. Geochimica et Cosmochimica Acta, 59(2), 279-294. [**NEEDS DOI**]{.underline}
 
-Dunbabin, J. S., & Bowmer, K. H. (1992). Potential use of constructed wetlands
-for treatment of industrial wastewaters containing metals. *Science of* *the
-Total Environment*, **111**(2-3), 151-168.
-[doi:10.1016/0048-9697(92)90353-t](https://doi.org/10.1016/0048-9697(92)90353-t){.uri}
+Dunbabin, J. S., & Bowmer, K. H. (1992). Potential use of constructed wetlands for treatment of industrial wastewaters containing metals. *Science of* *the Total Environment*, **111**(2-3), 151-168. [doi:10.1016/0048-9697(92)90353-t](https://doi.org/10.1016/0048-9697(92)90353-t){.uri}
 
-Geagea, M. L., Stille, P., Millet, M., & Perrone, T. (2007). REE characteristics
-and Pb, Sr and Nd isotopic compositions of steel plant emissions. *Science of
-The Total Environment*, **373**(1), 404-419.
-[doi:10.1016/j.scitotenv.2006.11.011](https://doi.org/10.1016/j.scitotenv.2006.11.011){.uri}
+Geagea, M. L., Stille, P., Millet, M., & Perrone, T. (2007). REE characteristics and Pb, Sr and Nd isotopic compositions of steel plant emissions. *Science of The Total Environment*, **373**(1), 404-419. [doi:10.1016/j.scitotenv.2006.11.011](https://doi.org/10.1016/j.scitotenv.2006.11.011){.uri}
 
-Hart, B. T., Ottaway, E. M., & Nollers, B. N. (1987). Magela creek system,
-northern australia. II.\* Material budget for the floodplain. *Marine and
-Freshwater Researc*h, **38**(6), 861-876.
-[doi:10.1071/mf9870861](https://doi.org/10.1071/mf9870861)
+Hart, B. T., Ottaway, E. M., & Nollers, B. N. (1987). Magela creek system, northern australia. II.\* Material budget for the floodplain. *Marine and Freshwater Researc*h, **38**(6), 861-876. [doi:10.1071/mf9870861](https://doi.org/10.1071/mf9870861)
 
-Howitt, J. A., Mondon, J., Mitchell, B. D., Kidd, T., & Eshelman, B. (2014).
-Urban stormwater inputs to an adapted coastal wetland: Role in water treatment
-and impacts on wetland biota. *Science of The Total Environment*,
-**485-486**(1), 534-544.
-[doi:10.1016/j.scitotenv.2014.03.101](https://doi.org/10.1016/j.scitotenv.2014.03.101)
+Howitt, J. A., Mondon, J., Mitchell, B. D., Kidd, T., & Eshelman, B. (2014). Urban stormwater inputs to an adapted coastal wetland: Role in water treatment and impacts on wetland biota. *Science of The Total Environment*, **485-486**(1), 534-544. [doi:10.1016/j.scitotenv.2014.03.101](https://doi.org/10.1016/j.scitotenv.2014.03.101)
 
-Kynicky, J., Smith, M. P., & Xu, C. (2012). Diversity of rare earth deposits:
-The key example of China. *Elements*, **8**(5), 361-367.
-[doi:10.2113/gselements.8.5.361](https://doi.org/10.2113/gselements.8.5.361){.uri}
+Kynicky, J., Smith, M. P., & Xu, C. (2012). Diversity of rare earth deposits: The key example of China. *Elements*, **8**(5), 361-367. [doi:10.2113/gselements.8.5.361](https://doi.org/10.2113/gselements.8.5.361){.uri}
 
-Loos, C. (2003). *Acid Sulfate Soils in Ashfield, Bassendean*. Master of Science
-Dissertation. School of Environmental Science, Murdoch University, Western
-Australia.
+Loos, C. (2003). *Acid Sulfate Soils in Ashfield, Bassendean*. Master of Science Dissertation. School of Environmental Science, Murdoch University, Western Australia.
 
-Ma, L., Jin, L., & Brantley, S. L. (2011). How mineralogy and slope aspect
-affect REE release and fractionation during shale weathering in the
-Susquehanna/Shale Hills Critical Zone Observatory. *Chemical Geology*,
-**290**(1-2), 31-49.
-[doi:10.1016/j.chemgeo.2011.08.013](https://doi.org/10.1016/j.chemgeo.2011.08.013)
+Ma, L., Jin, L., & Brantley, S. L. (2011). How mineralogy and slope aspect affect REE release and fractionation during shale weathering in the Susquehanna/Shale Hills Critical Zone Observatory. *Chemical Geology*, **290**(1-2), 31-49. [doi:10.1016/j.chemgeo.2011.08.013](https://doi.org/10.1016/j.chemgeo.2011.08.013)
 
-McGrath, G. S. (2021). Ashfield Flats Hydrological Study: Summary Report.
-Kensington, Western Australia, Department of Biodiversity, Conservation, and
-Attractions (Government of Western Australia).
-<http://www.dbca.wa.gov.au/sites/default/files/2021-12/Ashfield%20Flats%20summary%20report.pdf>
+McGrath, G. S. (2021). Ashfield Flats Hydrological Study: Summary Report. Kensington, Western Australia, Department of Biodiversity, Conservation, and Attractions (Government of Western Australia). <http://www.dbca.wa.gov.au/sites/default/files/2021-12/Ashfield%20Flats%20summary%20report.pdf>
 
-Morgan, B., Rate, A. W., Burton, E. D., & Smirk, M. (2012). Enrichment and
-fractionation of rare earth elements in FeS-rich eutrophic estuarine sediments
-receiving acid sulfate soil drainage. *Chemical Geology*, **308-309**, 60-73.
-[doi:10.1016/j.chemgeo.2012.03.012](https://doi.org/10.1016/j.chemgeo.2012.03.012){.uri}
+Morgan, B., Rate, A. W., Burton, E. D., & Smirk, M. (2012). Enrichment and fractionation of rare earth elements in FeS-rich eutrophic estuarine sediments receiving acid sulfate soil drainage. *Chemical Geology*, **308-309**, 60-73. [doi:10.1016/j.chemgeo.2012.03.012](https://doi.org/10.1016/j.chemgeo.2012.03.012){.uri}
 
-Pérez-López, R., Delgado, J., Nieto, J. M., & Márquez-García, B. (2010). Rare
-earth element geochemistry of sulphide weathering in the São Domingos mine area
-(Iberian Pyrite Belt): A proxy for fluid-rock interaction and ancient mining
-pollution. *Chemical Geology*, **276**(1-2), 29-40.
-[doi:10.1016/j.chemgeo.2010.05.018](https://doi.org/10.1016/j.chemgeo.2010.05.018){.uri}
+Pérez-López, R., Delgado, J., Nieto, J. M., & Márquez-García, B. (2010). Rare earth element geochemistry of sulphide weathering in the São Domingos mine area (Iberian Pyrite Belt): A proxy for fluid-rock interaction and ancient mining pollution. *Chemical Geology*, **276**(1-2), 29-40. [doi:10.1016/j.chemgeo.2010.05.018](https://doi.org/10.1016/j.chemgeo.2010.05.018){.uri}
 
-Rate, A. W., & McGrath, G. S. (2022). Data for assessment of sediment, soil, and
-water quality at Ashfield Flats Reserve, Western Australia. *Data in Brief*,
-**41**, 107970.
-[doi:10.1016/j.dib.2022.107970](https://doi.org/10.1016/j.dib.2022.107970)
+Rate, A. W., & McGrath, G. S. (2022). Data for assessment of sediment, soil, and water quality at Ashfield Flats Reserve, Western Australia. *Data in Brief*, **41**, 107970. [doi:10.1016/j.dib.2022.107970](https://doi.org/10.1016/j.dib.2022.107970)
 
-Scott, B., Taplin, R., & Loos, C. (2009). Classification and acid sulfate soil
-detection at Ashfield, Western Australia. *Environmental Health*, **9**(3/4),
-72-86.
+Scott, B., Taplin, R., & Loos, C. (2009). Classification and acid sulfate soil detection at Ashfield, Western Australia. *Environmental Health*, **9**(3/4), 72-86.
 
-Xu, N., Rate, A. W., & Morgan, B. (2018). From source to sink: Rare-earth
-elements trace the legacy of sulfuric dredge spoils on estuarine sediments.
-*Science of The Total Environment*, **637-638**, 1537-1549.
-[doi:10.1016/j.scitotenv.2018.04.398](https://doi.org/10.1016/j.scitotenv.2018.04.398){.uri}
+Xu, N., Rate, A. W., & Morgan, B. (2018). From source to sink: Rare-earth elements trace the legacy of sulfuric dredge spoils on estuarine sediments. *Science of The Total Environment*, **637-638**, 1537-1549. [doi:10.1016/j.scitotenv.2018.04.398](https://doi.org/10.1016/j.scitotenv.2018.04.398){.uri}
 
 #### end of file

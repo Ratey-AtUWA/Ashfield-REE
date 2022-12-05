@@ -35,8 +35,11 @@ git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
 afs1922 <- read.csv(paste0(git,"afs1922.csv"), stringsAsFactors = TRUE)
 afs1922$Year <- as.factor(afs1922$Year)
 af_border <- read.csv(paste0(git,"afr_hull.csv"))
-afs1922surf <- droplevels(afs1922[-which(afs1922$Depth_upper_cm > 1 & 
-                                           afs1922$Type=="Soil"),])
+afs1922surf <- afs1922[-which(afs1922$Depth_upper_cm > 1 & 
+                                           afs1922$Type=="Soil"),]
+afs1922surf[which(afs1922surf$Type=="Soil"),"Type"] <- 
+  rep("Saltmarsh",length(which(afs1922surf$Type=="Soil")))
+afs1922surf <- droplevels(afs1922surf)
 ```
 
 # Making our base map of Ashfield Flats
@@ -44,7 +47,7 @@ afs1922surf <- droplevels(afs1922[-which(afs1922$Depth_upper_cm > 1 &
 ```{r define CRS, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
 LongLat <- CRS("+proj=longlat +ellps=WGS84 
            +datum=WGS84 +no_defs") # uses Earth ellipsis specs from WGS84 datum
-UTM50 <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
+UTM50S <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
 ```
 
 ### ├ Map extent object
@@ -52,7 +55,7 @@ UTM50 <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
 ```{r make map extent object, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
 extent <- st_as_sf(x = data.frame(x = c(399860,400580), 
                                   y = c(6467870,6468350)), 
-                   coords = c("x", "y"), crs = UTM50)
+                   coords = c("x", "y"), crs = UTM50S)
 st_coordinates(extent)
 ```
 
@@ -202,8 +205,8 @@ legend("bottomright", bty = "o", inset = 0.015, cex = 1, ncol = 3,
 
 ### ├ LISA maps for multiple variables
 
-```{r multi-LISA, fig.height=10.6, fig.width=7.8, fig.align='center', fig.cap="LISA autocorrelation maps for REE, Al, Fe, S, As, Cu, Pb, and Zn concentrations in the Ashfield Flats sediment data, 2019-2022.", message=FALSE, warning=FALSE, echo=FALSE}
-par(mfrow=c(4,2), mar=c(0,0,0,0), oma=c(3,3,0.5,0.5), mgp=c(1.6,0.2,0), 
+```{r multi-LISA, fig.height=10.6, fig.width=8, fig.align='center', fig.cap="LISA autocorrelation maps for REE, Al, Fe, S, As, Cu, Pb, and Zn concentrations in the Ashfield Flats sediment data, 2019-2022.", message=FALSE, warning=FALSE, echo=FALSE}
+par(mfrow=c(4,2), mar=c(0,0,0,0), oma=c(3,3,0.5,1.5), mgp=c(1.6,0.2,0), 
     tcl=0.3,lend="square", ljoin="mitre")
 palette(c("black","#400000","blue3","orange","skyblue",
           "#FF8080","#8080FF","#FFA50040","#87CEEB40","white"))
@@ -228,7 +231,8 @@ for (i in 1:length(varz)){
 
   plot(aftiles)
   if(i > 6.5) {
-    axis(1)
+    axis(1, at = seq(399900,400500,100), 
+     labels = c("399900","400000","400100","400200","400300","400400","400500"))
     mtext(side=1, line=1.6, text="Easting (UTM Zone 50, m)", font=2, cex=1)
     }
   if(round(i/2,0) != (i/2)) {
@@ -237,7 +241,7 @@ for (i in 1:length(varz)){
   }
   axis(1, labels=F); axis(2, labels = F)
   addnortharrow(pos="topleft", border=1, lwd=1, text.col=1,  
-              padin=c(0.05,0.05), scale = 0.8)
+              padin=c(0.05,0.05), scale = 0.7)
   addscalebar(plotepsg = 32750, label.cex = 1.2)
   box()
   with(data_temp, points(Easting, Northing, pch=3, cex = 0.7, col="grey"))
@@ -249,16 +253,18 @@ for (i in 1:length(varz)){
                   col = 2, bg = 7, lwd = 3, cex = 1.4))
   with(LoHi, points(Northing ~ Easting, pch = 24,
                   col = 3, bg = 6, lwd = 3, cex = 1.4))
-  mtext(varz[i],3,-1.5,adj=0.98,font=2)
+  mtext(varz[i],3,-1.5,adj=0.98,font=2,cex=1.5)
 }
+rect(400090,6467855,400590,6467930,col="#FFFFFF80", border = "#B0B0B080")
 legend("bottomright", bty = "n", cex = 1.2, ncol=3,
        legend = c("High-High", "Low-Low","High-Low","Low-High","Samples"),
        pch = c(22, 21, 25,24,3), pt.cex = c(1.8,2,1.4,1.4,0.7), 
        pt.lwd = c(2,2,2,2,1),
        col = c(2,3,2,3,"grey"), pt.bg = c(6,7,7,6,NA), text.col = 1,
-       box.col = "#b0b0b0", box.lwd = 1.3, bg = "#E8E8E8", 
-       title=expression(italic("Spatial autocorrelation key")),
+       box.col = "#b0b0b0", box.lwd = 1.3, bg = "#E8E8E8",
        x.intersp = 0.8)
+text(400340,6467930,pos=3,labels="Spatial autocorrelation key", font=3,
+     cex=1.2, offset = 0.15)
 par(mfrow=c(1,1), mar=c(3,3,0.5,0.5), oma=c(0,0,0,0), mgp=c(1.6,0.2,0), 
     tcl=0.3,lend="square", ljoin="mitre")
 
@@ -289,7 +295,7 @@ var1 <- as.data.frame(log10(data0[,var0])); colnames(var1) <- var0
 assign(spname, 
        SpatialPointsDataFrame(coords = data0[,c("Easting","Northing")],
                               data = var1,
-                              proj4string = UTM50))
+                              proj4string = UTM50S))
 REE_sp <- REE_sp[-zerodist(REE_sp)[,1],]
 summary(REE_sp)
 ```
@@ -419,12 +425,12 @@ grid0 <- expand.grid(seq(round(min(REE_sp@coords[,1]),1),
                             round(max(REE_sp@coords[,1]),1), 5),
                         seq(round(min(REE_sp@coords[,2]),1), 
                             round(max(REE_sp@coords[,2]),1), 5))
-afgrid <- SpatialPoints(grid0, proj4string = UTM50)
+afgrid <- SpatialPoints(grid0, proj4string = UTM50S)
 
 irregpoly <- Polygon(af_border[,c(1,2)], hole=F)
 irregPolys = Polygons(list(irregpoly),1)
 gridMask = SpatialPolygons(list(irregPolys), 
-                           proj4string = UTM50)
+                           proj4string = UTM50S)
 inOrOut <- as.vector(over(afgrid, gridMask))
 afgrid <- afgrid[which(inOrOut>0)]
 cat("Prediction grid:\n"); summary(afgrid)
