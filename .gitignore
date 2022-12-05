@@ -6,6 +6,8 @@
 
 Ashfield-REE.Rproj
 
+*.tmp
+
 *.html
 
 *.png
