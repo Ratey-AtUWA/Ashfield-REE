@@ -190,6 +190,106 @@ dev.off()
 
 # -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
 
+# multiple box plots REE by Zone and Type ####
+varz <- c("La","Ce","Gd","Nd","Y")
+palette(c("black",colorRampPalette(c("navy","lemonchiffon"))(7),"grey","white"))
+par(mfrow = c(2,3), mar = c(4,3.5,0.5,0.5), mgp = c(2,0.2,0),
+    cex.lab = 1.5, font.lab = 2, tcl = 0.2,las=2, xpd=T)
+for(i in 1:length(varz)){
+  with(afs1922, boxplot(afs1922[,which(colnames(afs1922)==varz[i])] ~ ZoneSimp,
+                        cex=1.2, xlab="Zone", ylab = paste(varz[i],"(mg/kg)"),
+                        col = c(3,10,3,5,5,5,10,5,7,5,3)))
+  m0 <- tapply(afs1922[,which(colnames(afs1922)==varz[i])],
+               afs1922$ZoneSimp, median, na.rm=T)
+  lines(c(.65,1.35,NA,2.65,3.35,NA,10.65,11.35),
+        c(m0[1],m0[1],NA,m0[3],m0[3],NA,m0[11],m0[11]),
+        col="white",lwd=2,lend=2)
+}
+plot(c(0,1),c(0,1),type="n",ann=F,xaxt="n",yaxt="n",bty="n",
+     xlab="",ylab="",xaxs="i")
+legend(-0.16,1, bty = "n", inset = 0, cex = 1.6,
+       legend = c("Drain","Pond","Saltmarsh","Mixed/other"), pch = 22,
+       pt.bg = c(3,5,7,10), pt.cex = 3)
+text(-0.15,0.18,pos=4,cex=1.2,
+     labels=paste0("CMD = Chapman Drain, ", "KMD = Kitchener Drain,\n",
+        "FW = Flooded woodland, ", "N = North wetland lake,\n",
+        "NE = North-east wetland lake,\n", "NW = North-west wetland lake,\n",
+        "S = South wetlands / side drain,\n", "SE = South-east wetland lake,\n",
+        "SM = Saltmarsh (east of CMD),\n","SW = South-west wetland lake,\n",
+        "WD = Woolcock Drain"))
+
+# -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
+
+# multiple box plots Al Ca Fe S P by Zone and Type ####
+palette(c("black",colorRampPalette(c("navy","lemonchiffon"))(7),"grey","white"))
+par(mfrow = c(2,3), mar = c(4,5.5,0.5,0.5), mgp = c(3.5,0.3,0),
+    cex.lab = 1.5, cex.axis=1.2, font.lab = 2, tcl = 0.2,las=2, xpd=T)
+# Al
+with(afs1922, boxplot(Al ~ ZoneSimp, cex=1.2, xlab="", ylab = "Al (mg/kg)",
+                      col = c(3,10,3,5,5,5,10,5,7,5,3)))
+mtext("Zone", side=1, line=2.5, font=2, cex=1.1, las=0)
+m0 <- tapply(afs1922$Al, afs1922$ZoneSimp, median, na.rm=T)
+lines(c(0.7,1.36,NA,2.7,3.36,NA,10.7,11.36),
+      c(m0[1],m0[1],NA,m0[3],m0[3],NA,m0[11],m0[11]),
+      col="white",lwd=2,lend=2)
+
+# Ca
+with(afs1922, boxplot(log10(Ca) ~ ZoneSimp, cex=1.2, xlab="", ylab="Ca (mg/kg)",
+                      col = c(3,10,3,5,5,5,10,5,7,5,3), log="y", yaxt="n"))
+axis(2, at=log10(c(500,1000,2000,5000,10000,20000,50000)),
+     labels=c(500,1000,2000,5000,10000,20000,50000))
+mtext("Zone", side=1, line=2.5, font=2, cex=1.1, las=0)
+m0 <- tapply(log10(afs1922$Ca), afs1922$ZoneSimp, median, na.rm=T)
+lines(c(0.7,1.36,NA,2.7,3.36,NA,10.7,11.36),
+      c(m0[1],m0[1],NA,m0[3],m0[3],NA,m0[11],m0[11]),
+      col="white",lwd=2,lend=2)
+
+# Fe
+with(afs1922, boxplot(Fe ~ ZoneSimp, cex=1.2, xlab="", ylab = "Fe (mg/kg)",
+                      col = c(3,10,3,5,5,5,10,5,7,5,3)))
+mtext("Zone", side=1, line=2.5, font=2, cex=1.1, las=0)
+m0 <- tapply(afs1922$Fe, afs1922$ZoneSimp, median, na.rm=T)
+lines(c(0.7,1.36,NA,2.7,3.36,NA,10.7,11.36),
+      c(m0[1],m0[1],NA,m0[3],m0[3],NA,m0[11],m0[11]),
+      col="white",lwd=2,lend=2)
+
+# P
+with(afs1922, boxplot(log10(P) ~ ZoneSimp, cex=1.2, xlab="", ylab="P (mg/kg)",
+                      col = c(3,10,3,5,5,5,10,5,7,5,3), log="y", yaxt="n"))
+axis(2, at=log10(c(50,100,200,500,1000,2000,5000,10000)),
+     labels=c(50,100,200,500,1000,2000,5000,10000))
+mtext("Zone", side=1, line=2.5, font=2, cex=1.1, las=0)
+m0 <- tapply(log10(afs1922$P), afs1922$ZoneSimp, median, na.rm=T)
+lines(c(0.7,1.36,NA,2.7,3.36,NA,10.7,11.36),
+      c(m0[1],m0[1],NA,m0[3],m0[3],NA,m0[11],m0[11]),
+      col="white",lwd=2,lend=2)
+
+# S
+with(afs1922, boxplot(log10(S) ~ ZoneSimp, cex=1.2, xlab="", ylab="S (mg/kg)",
+                      col = c(3,10,3,5,5,5,10,5,7,5,3), log="y", yaxt="n"))
+axis(2, at=log10(c(200,500,1000,2000,5000,10000,20000,50000)),
+     labels=c(200,500,1000,2000,5000,10000,20000,50000))
+mtext("Zone", side=1, line=2.5, font=2, cex=1.1, las=0)
+m0 <- tapply(log10(afs1922$S), afs1922$ZoneSimp, median, na.rm=T)
+lines(c(0.7,1.36,NA,2.7,3.36,NA,10.7,11.36),
+      c(m0[1],m0[1],NA,m0[3],m0[3],NA,m0[11],m0[11]),
+      col="white",lwd=2,lend=2)
+
+plot(c(0,1),c(0,1),type="n",ann=F,xaxt="n",yaxt="n",bty="n",
+     xlab="",ylab="",xaxs="i")
+legend(-0.15,1.1, bty = "n", inset = 0, cex = 1.6,
+       legend = c("Drain","Pond","Saltmarsh","Mixed/other"), pch = 22,
+       pt.bg = c(3,5,7,10), pt.cex = 3)
+text(-0.15,0.21,pos=4,cex=1.2,
+     labels=paste0("CMD = Chapman Drain,\n", "KMD = Kitchener Drain,\n",
+        "FW = Flooded woodland,\n", "N = North wetland lake,\n",
+        "NE = North-east wetland lake,\n", "NW = North-west wetland lake,\n",
+        "S = South wetlands / side drain,\n", "SE = South-east wetland lake,\n",
+        "SM = Saltmarsh (east of CMD),\n","SW = South-west wetland lake,\n",
+        "WD = Woolcock Drain"))
+
+# -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
+
 # multiple LISA-type maps ####
 aftiles <- get_tiles(extent, provider = "OpenTopoMap",
                      crop = TRUE, zoom=17)
