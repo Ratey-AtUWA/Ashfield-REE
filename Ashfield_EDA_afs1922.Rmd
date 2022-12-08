@@ -51,6 +51,8 @@ afs1922surf <- afs1922[-which(afs1922$Depth_upper_cm > 1 &
 afs1922surf[which(afs1922surf$Type=="Soil"),"Type"] <- 
   rep("Saltmarsh",length(which(afs1922surf$Type=="Soil")))
 afs1922surf <- droplevels(afs1922surf)
+afs1922surf$Type <- factor(afs1922surf$Type, 
+                 levels = c("Drain_Sed", "Lake_Sed", "Saltmarsh", "Flooded"))
 afs1922utm <- st_as_sf(afs1922surf, coords = c("Easting","Northing"), 
                        crs = st_crs(32750))
 afs1922ll <- st_transform(afs1922utm, crs = st_crs(4326))
@@ -767,7 +769,7 @@ spm(~Al+Ca+Fe+S+P+La+Ce+Nd+Gd|Type, data = data0, smooth=F, regLine=T,
 
 ```{r scatterplots-Al, fig.height=7, fig.width=10, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Al relationships at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
 varz <- c("La","Ce","Gd","Nd")
-clrz <- c("#00000080","#0000b080","#00808080","#6000b080","#CD850080")
+clrz <- c("grey63","#4040FF","#40c0c0","#b000ff","#CCA666")
 par(mfrow = c(2,2), mar = c(4,4,0.5,0.5), mgp = c(1.7,0.2,0),
     cex.lab = 1.5, cex.axis = 1.25, font.lab = 2, tcl = 0.2, las = 1)
 for(i in 1:length(varz)){
@@ -1015,6 +1017,156 @@ bp23 <- fviz_pca_biplot(af_pca, col.ind = data0$ZoneSimp,
   theme_bw()
 ggarrange(bp12, bp23, nrow = 1)
 ```
+# REE normalization & pseudo-fractionation
+
+## ├ make PAAS reference data
+
+```{r make-reference-data, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+PAAS <- data.frame(Element=c("Y", "La","Ce","Pr","Nd","Sm","Eu","Gd",
+                             "Tb","Dy","Ho","Er","Tm","Yb","Lu","REE"),
+            PAAS=c(27,38,80,8.9,32,5.6,1.1,4.7,0.77,4.4,1,2.9,0.4,2.8,0.43,154.7))
+row.names(PAAS) <- PAAS$Element
+cat("Crustal average REE concentration in post-Archean Austrlian Shale (PAAS) proxy\n(Taylor & McLennan 1985). NOTE: in these data, REE=La_Ce+Nd+Gd. \n----------------\n")
+print(PAAS)
+```
+
+## ├ normalize YREE to PAAS and plot by element
+```{r make-PAAS-normalised-data-and-plot, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+afs1922_PAAS <- afs1922utm[,c(1,6:11,35,27,33,41,52,54)]
+varz <- c("La","Ce","Gd","Nd","Y","REE")
+for (i in 1:length(varz)){
+  afs1922_PAAS[,varz[i]] <- afs1922_PAAS[,varz[i]]/PAAS[varz[i],"PAAS"]
+}
+plotdata <- 
+  stack(st_drop_geometry(afs1922_PAAS[,c("La","Ce","Gd","Nd","Y","REE")]))
+plotdata$ind <- factor(plotdata$ind, levels=c("La","Ce","Gd","Nd","Y","REE"))
+par(mfrow=c(1,1), mar = c(3,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n",  
+                       xlab="", ylab="Normalized REE = sample/PAAS",
+                       col = viridis::mako(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Gd","Nd","Y","\u2211REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+```
+## ├ over all data are REE fractionated?
+```{r}
+with(plotdata, bartlett.test(values~ind))
+with(plotdata, oneway.test(values~ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+Based on these comparisons it seems there is some fractionation. Gd is enriched which could be due to (1) the MREE bulge in reduced environments, or (2) anthropogenic addition of Gd.
+
+## ├ are REE significantly differnt from PAAS?
+
+```{r}
+with(afs1922_PAAS, t.test(La, mu=1))
+with(afs1922_PAAS, t.test(Ce, mu=1))
+with(afs1922_PAAS, t.test(Nd, mu=1))
+with(afs1922_PAAS, t.test(Gd, mu=1))
+with(afs1922_PAAS, t.test(Y, mu=1))
+with(afs1922_PAAS, t.test(REE, mu=1))
+```
+
+Based on these analyses all YREE differ significantly from PAAS - La, Ce, Nd, Gd greater and Y less. ∑REE is also significantly greater than PAAS.
+
+## ├ REE/PAAS in drain sediments
+
+```{r normalized-REE-Drain_sed, fig.height=3.6, fig.width=6, results='hold'}
+require(viridis)
+PAAS_DrainSed <- subset(afs1922_PAAS, afs1922_PAAS$Type=="Drain_Sed")
+plotdata <- 
+  stack(st_drop_geometry(PAAS_DrainSed[,c("La","Ce","Gd","Nd","Y","REE")]))
+par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n", xlab="", 
+              ylab="Normalized REE = sample/PAAS", col = mako(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Gd","Nd","Y","∑REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+```
+```{r}
+with(plotdata, oneway.test(values ~ ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+Drain sediments are depleted in REE relative to PAAS. Gd/PAAS is greatest but not different from La, Ce or Nd, only greater than Y/PAAS (lowest mean).
+
+## ├ REE/PAAS in Lake sediments
+
+```{r normalized-REE-Lake_sed, fig.height=3.6, fig.width=6, results='hold'}
+require(viridis)
+PAAS_LakeSed <- subset(afs1922_PAAS, afs1922_PAAS$Type=="Lake_Sed")
+plotdata <- 
+  stack(st_drop_geometry(PAAS_LakeSed[,c("La","Ce","Gd","Nd","Y","REE")]))
+par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n", xlab="", 
+              ylab="Normalized REE = sample/PAAS", col = mako(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Gd","Nd","Y","∑REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+```
+
+Wetland pond ("Lake") sediments are enriched relative to PAAS. Y is significantly less than La, Ce, Nd, and Gd.
+
+```{r}
+with(plotdata, oneway.test(values ~ ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+## ├ REE/PAAS in Saltmarsh sediments
+
+```{r normalized-REE-Drain_sed, fig.height=3.6, fig.width=6, results='hold'}
+require(viridis)
+PAAS_SM <- subset(afs1922_PAAS, afs1922_PAAS$Type=="Saltmarsh")
+plotdata <- 
+  stack(st_drop_geometry(PAAS_SM[,c("La","Ce","Gd","Nd","Y","REE")]))
+par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n", xlab="", 
+              ylab="Normalized REE = sample/PAAS", col = mako(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Gd","Nd","Y","∑REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+```
+```{r}
+with(plotdata, oneway.test(values ~ ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+Saltmarsh sediments are enriched in YREE relative to PAAS. Gd > all others
+except La. Y < all others.
+
+```{r normalized-REE-Drain_sed, fig.height=3.6, fig.width=6, results='hold'}
+require(viridis)
+PAAS_Flooded <- subset(afs1922_PAAS, afs1922_PAAS$Type=="Flooded")
+plotdata <- 
+  stack(st_drop_geometry(PAAS_Flooded[,c("La","Ce","Gd","Nd","Y","REE")]))
+par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n", xlab="", 
+              ylab="Normalized REE = sample/PAAS", col = mako(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Gd","Nd","Y","∑REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+```
+
+```{r}
+with(plotdata, oneway.test(values ~ ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
 
 ```{r tidy up, message=FALSE, warning=FALSE, include=FALSE}
 rm(list = c("s0","ns0","d0","f0","p1","p2","varz","clrz","x0","x1","lm0","v0",
@@ -1113,6 +1265,9 @@ receiving acid sulfate soil drainage. *Chemical Geology*, **308-309**, 60-73.
 Scott, B., Taplin, R., & Loos, C. (2009). Classification and acid sulfate soil
 detection at Ashfield, Western Australia. *Environmental Health*, **9**(3/4),
 72-86.
+
+Taylor, S. R. and McClennan, S. M., 1985. *The Continental Crust: its* 
+*Composition and Evolution*. Blackwell Scientific Publications, Oxford.
 
 Xu, N., Rate, A. W., & Morgan, B. (2018). From source to sink: Rare-earth
 elements trace the legacy of sulfuric dredge spoils on estuarine sediments.
