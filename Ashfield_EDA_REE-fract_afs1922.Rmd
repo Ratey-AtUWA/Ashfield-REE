@@ -1,0 +1,367 @@
+---
+title: "EDA Ashfield Sediment Data 2019-2022"
+output: 
+  bookdown::html_document2:
+    fig_width: 6.4
+    fig_height: 4.8
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+This document describes exploratory and some detailed data analysis
+
+```{r setup packages, warning = FALSE, message = FALSE, results='hide', echo=FALSE}
+load(".RData")
+library(prettymapr)
+library(ggmap)
+library(sf)
+library(sp)
+library(maptiles)
+library(TeachingDemos)
+library(geosphere)
+library(RcmdrMisc)
+library(flextable)
+  set_flextable_defaults(font.family = 'sans', theme_fun = "theme_zebra", 
+        font.size = 11, text.align = "right",padding.left = 1, padding.right = 1,
+        padding.top = 2, padding.bottom = 2)
+library(car)
+library(diptest)
+library(PMCMRplus)
+library(rcompanion)
+library(multcompView)
+library(factoextra)
+library(ggpubr)
+library(viridis)
+```
+
+```{r define CRS, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+LongLat <- CRS("+proj=longlat +ellps=WGS84 
+           +datum=WGS84 +no_defs") # uses Earth ellipsis specs from WGS84 datum
+UTM50S <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
+```
+
+```{r setup data, echo=FALSE}
+git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
+afs1922 <- read.csv(paste0(git,"afs1922.csv"), stringsAsFactors = TRUE)
+afs1922$Year <- as.factor(afs1922$Year)
+afs1922surf <- afs1922[-which(afs1922$Depth_upper_cm > 1 & 
+                                           afs1922$Type=="Soil"),]
+afs1922surf[which(afs1922surf$Type=="Soil"),"Type"] <- 
+  rep("Saltmarsh",length(which(afs1922surf$Type=="Soil")))
+afs1922surf <- droplevels(afs1922surf)
+afs1922surf$Type <- factor(afs1922surf$Type, 
+                 levels = c("Drain_Sed", "Lake_Sed", "Saltmarsh", "Flooded"))
+afs1922utm <- st_as_sf(afs1922surf, coords = c("Easting","Northing"), 
+                       crs = st_crs(32750))
+afs1922ll <- st_transform(afs1922utm, crs = st_crs(4326))
+```
+
+```{r annotation data and palettes, echo=FALSE}
+afr_map <- read.csv(file=paste0(git,"afr_map_v3.csv"), stringsAsFactors = TRUE)
+afr_zones <- read.csv(file=paste0(git,"afr_zones.csv"), stringsAsFactors = TRUE)
+pal4lite <- c("black", "purple2", "blue2", "cyan4", "forestgreen", 
+              "darkorange", "gold3", "red3", "gray80", "white")
+pal4liteTransp <- c("#000000","#912CEEb0","#0000EEb0","#008B8Bb0","#228B22b0",
+                    "#CDAD00b0", "#FF8C00b0", "#CD0000b0", "#CCCCCC", "#FFFFFF")
+pal4dark <- c("white", "pink1", "orange", "khaki1", "lightgreen", "cadetblue1", 
+              "deepskyblue", "plum", "gray80", "black")
+```
+
+# REE normalization & pseudo-fractionation
+
+## ├ make PAAS reference data
+
+```{r make-reference-data, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+PAAS <- data.frame(Element=c("Y", "La","Ce","Pr","Nd","Sm","Eu","Gd",
+                             "Tb","Dy","Ho","Er","Tm","Yb","Lu","REE"),
+            PAAS=c(27,38,80,8.9,32,5.6,1.1,4.7,0.77,4.4,1,2.9,0.4,2.8,0.43,154.7))
+row.names(PAAS) <- PAAS$Element
+cat("Crustal average REE concentration in post-Archean Austrlian Shale (PAAS) proxy\n(Taylor & McLennan 1985). *NOTE: in these data, REE = La + Ce + Nd + Gd. \n------------------\n")
+print(PAAS)
+```
+
+## ├ normalize YREE to PAAS and plot by element
+```{r make-PAAS-normalised-data-and-plot, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+afs1922_PAAS <- afs1922utm[,c(1,6:11,35,27,33,41,52,54)]
+afs1922_PAAS$Type <- factor(afs1922_PAAS$Type, 
+        levels=c("Drain_Sed","Lake_Sed","Saltmarsh","Flooded"))
+varz <- c("La","Ce","Nd","Gd","Y","REE")
+for (i in 1:length(varz)){
+  afs1922_PAAS[,varz[i]] <- afs1922_PAAS[,varz[i]]/PAAS[varz[i],"PAAS"]
+}
+plotdata <- 
+  stack(st_drop_geometry(afs1922_PAAS[,c("La","Ce","Nd","Gd","Y","REE")]))
+plotdata$ind <- factor(plotdata$ind, levels=c("La","Ce","Nd","Gd","Y","REE"))
+par(mfrow=c(1,1), mar = c(3,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n",  
+                       xlab="", ylab="Normalized REE = sample/PAAS",
+                       col = viridis::mako(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Nd","Gd","Y","\u2211REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+```
+
+```{r, results='hold'}
+ree0 <- with(plotdata, signif(tapply(values, ind, mean, na.rm=T),3))
+ree0 <- rbind(ree0,with(plotdata, signif(tapply(values, ind, sd, na.rm=T),3)))
+ree0 <- rbind(ree0,with(plotdata, signif(tapply(values, ind, min, na.rm=T),3)))
+ree0 <- rbind(ree0,with(plotdata, signif(tapply(values, ind, max, na.rm=T),3)))
+row.names(ree0) <- c("Mean","SD","Min","Max")
+cat("Statistics for PAAS-normalized REE across all samples & years:\n")
+print(ree0)
+```
+
+## ├ over all data, are YREE fractionated from each other?
+```{r}
+with(plotdata, bartlett.test(values~ind))
+with(plotdata, oneway.test(values~ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+Based on these comparisons it seems there is some fractionation. Gd is enriched
+which could be due to (1) the 'MREE bulge' commonly observed in reduced
+environments, or (2) anthropogenic addition of Gd.
+
+## ├ are YREE significantly differnt from PAAS?
+
+```{r}
+with(afs1922_PAAS, t.test(La, mu=1))
+with(afs1922_PAAS, t.test(Ce, mu=1))
+with(afs1922_PAAS, t.test(Nd, mu=1))
+with(afs1922_PAAS, t.test(Gd, mu=1))
+with(afs1922_PAAS, t.test(Y, mu=1))
+with(afs1922_PAAS, t.test(REE, mu=1))
+```
+
+Based on these analyses all YREE differ significantly from PAAS - La, Ce, Nd, Gd greater and Y less. ∑REE is also significantly greater than PAAS.
+
+## ├ Comparisons across environment Types
+
+### ├ ∑REE
+
+```{r REE-normalised-PAAS-by-Type}
+s0=1;par(mfrow = c(1,1), mar = c(3.5,3.5,0.5,0.5)*s0, mgp = c(1.6,0.3,0)*s0,
+    cex.lab = 1.5*s0, cex.axis=1.4*s0, font.lab = 2, tcl = 0.2*s0, las=1)
+with(afs1922_PAAS, boxplot(REE ~ Type, xlab="", xaxt="n", 
+     ylab=expression(bold(paste(Sigma,REE[sample]," / ",Sigma,"REE"[PAAS]))), 
+     col=c("royalblue","wheat","honeydew3","lightblue"), ylim=c(0,3.8)))
+axis(1, at=1:4, labels=c("Drain\nsediment","Lake\nsediment",
+             "Saltmarsh\n","Flooded\nwoodland"), mgp=c(3,1.8,0), font=2)
+abline(h=0.995, lty="23",col="coral4");abline(h=1.005, lty="23", col="gold")
+```
+
+### ├ La-Ce-Nd-Gd
+
+```{r La-Ce-Nd-Gd-norm-PAAS-by-Type, fig.height=10, fig.width=10}
+s0=1;par(mfrow = c(3,2), mar = c(3.5,4,0.5,0.5)*s0, mgp = c(1.6,0.3,0)*s0,
+    cex.lab = 1.8*s0, cex.axis=1.6*s0, font.lab = 2, tcl = 0.2*s0, las=1)
+with(afs1922_PAAS, boxplot(La ~ Type, xlab="", xaxt="n", cex.lab=1.8, 
+     ylab=expression(bold(paste(La[sample],"/La"[PAAS]))), ylim=c(0,3.8), 
+     col=c("royalblue","wheat","honeydew3","lightblue"), cex=1.5))
+axis(1, at=1:4, labels=c("Drain\nsediment","Lake\nsediment","Saltmarsh\n",
+        "Flooded\nwoodland"), mgp=c(3,2,0), gap.axis=0)
+abline(h=0.98, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+with(afs1922_PAAS, boxplot(Ce ~ Type, xlab="", xaxt="n", cex.lab=1.8, 
+     ylab=expression(bold(paste(Ce[sample],"/Ce"[PAAS]))), ylim=c(0,3.8), 
+     col=c("royalblue","wheat","honeydew3","lightblue"), cex=1.5))
+axis(1, at=1:4, labels=c("Drain\nsediment","Lake\nsediment","Saltmarsh\n",
+        "Flooded\nwoodland"), mgp=c(3,2,0), gap.axis=0)
+abline(h=0.98, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+with(afs1922_PAAS, boxplot(Nd ~ Type, xlab="", xaxt="n", cex.lab=1.8, 
+     ylab=expression(bold(paste(Nd[sample],"/Nd"[PAAS]))), ylim=c(0,3.8), 
+     col=c("royalblue","wheat","honeydew3","lightblue"), cex=1.5))
+axis(1, at=1:4, labels=c("Drain\nsediment","Lake\nsediment","Saltmarsh\n",
+        "Flooded\nwoodland"), mgp=c(3,2,0), gap.axis=0)
+abline(h=0.98, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+with(afs1922_PAAS, boxplot(Gd~Type, xlab="",xaxt="n", cex.lab=1.8, ylim=c(0,3.8), 
+     ylab=expression(bold(paste(Gd[sample],"/Gd"[PAAS]))), col=c("royalblue","wheat","honeydew3","lightblue"), cex=1.5))
+axis(1, at=1:4, labels=c("Drain\nsediment","Lake\nsediment","Saltmarsh\n",
+        "Flooded\nwoodland"), mgp=c(3,2,0), gap.axis=0)
+abline(h=0.98, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+with(afs1922_PAAS, boxplot(Y ~ Type, xlab="", xaxt="n", cex.lab=1.8, 
+     ylab=expression(bold(paste(Y[sample],"/Y"[PAAS]))), ylim=c(0,3.8), 
+     col=c("royalblue","wheat","honeydew3","lightblue"), cex=1.5))
+axis(1, at=1:4, labels=c("Drain\nsediment","Lake\nsediment","Saltmarsh\n",
+        "Flooded\nwoodland"), mgp=c(3,2,0), gap.axis=0)
+abline(h=0.98, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+```
+
+### ├ mean comparisons and pairwise tests
+
+```{r load-packs-}
+library(multcompView)
+library(rcompanion)
+```
+
+```{r REE-by-type, results='hold'}
+with(afs1922_PAAS, signif(tapply(REE, Type, mean, na.rm=TRUE),3))
+with(afs1922_PAAS, signif(tapply(REE, Type, sd, na.rm=TRUE),3))
+with(afs1922_PAAS, oneway.test(REE ~ Type))
+(pw0 <- with(afs1922_PAAS, pairwise.t.test(REE, Type)))
+fpw0 <- fullPTable(pw0$p.value)
+(multcompLetters(fpw0))
+```
+
+```{r}
+with(afs1922_PAAS, signif(tapply(La, Type, mean, na.rm=TRUE),2))
+with(afs1922_PAAS, signif(tapply(La, Type, sd, na.rm=TRUE),2))
+with(afs1922_PAAS, oneway.test(La ~ Type))
+(pw0 <- with(afs1922_PAAS, pairwise.t.test(La, Type)))
+fpw0 <- fullPTable(pw0$p.value)
+(multcompLetters(fpw0))
+```
+
+```{r}
+with(afs1922_PAAS, signif(tapply(Ce, Type, mean, na.rm=TRUE),2))
+with(afs1922_PAAS, signif(tapply(Ce, Type, sd, na.rm=TRUE),2))
+with(afs1922_PAAS, oneway.test(Ce ~ Type))
+(pw0 <- with(afs1922_PAAS, pairwise.t.test(Ce, Type)))
+fpw0 <- fullPTable(pw0$p.value)
+(multcompLetters(fpw0))
+```
+
+```{r}
+with(afs1922_PAAS, signif(tapply(Nd, Type, mean, na.rm=TRUE),2))
+with(afs1922_PAAS, signif(tapply(Nd, Type, sd, na.rm=TRUE),2))
+with(afs1922_PAAS, oneway.test(Nd ~ Type))
+(pw0 <- with(afs1922_PAAS, pairwise.t.test(Nd, Type)))
+fpw0 <- fullPTable(pw0$p.value)
+(multcompLetters(fpw0))
+```
+
+```{r}
+with(afs1922_PAAS, signif(tapply(Gd, Type, mean, na.rm=TRUE),2))
+with(afs1922_PAAS, signif(tapply(Gd, Type, sd, na.rm=TRUE),2))
+with(afs1922_PAAS, oneway.test(Gd ~ Type))
+(pw0 <- with(afs1922_PAAS, pairwise.t.test(Gd, Type)))
+fpw0 <- fullPTable(pw0$p.value)
+(multcompLetters(fpw0))
+```
+
+```{r}
+with(afs1922_PAAS, signif(tapply(Y, Type, mean, na.rm=TRUE),2))
+with(afs1922_PAAS, signif(tapply(Y, Type, sd, na.rm=TRUE),2))
+with(afs1922_PAAS, oneway.test(Y ~ Type))
+(pw0 <- with(afs1922_PAAS, pairwise.t.test(Y, Type)))
+fpw0 <- fullPTable(pw0$p.value)
+(multcompLetters(fpw0))
+```
+
+# By individual sample Type
+
+## ├ YREE/PAAS in drain sediments
+
+```{r normalized-REE-Drain_sed, fig.height=3.6, fig.width=6, results='hold'}
+PAAS_DrainSed <- subset(afs1922_PAAS, afs1922_PAAS$Type=="Drain_Sed")
+plotdata <- 
+  stack(st_drop_geometry(PAAS_DrainSed[,c("La","Ce","Nd","Gd","Y","REE")]))
+par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n", xlab="", 
+              ylab="Normalized REE = sample/PAAS", col = inferno(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Nd","Gd","Y","∑REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+mtext("Drain Sediment", side=3, line=-1.2, adj=0.98, font=2, cex = 1.2)
+```
+```{r}
+with(plotdata, oneway.test(values ~ ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+Drain sediments are depleted in REE relative to PAAS. Gd/PAAS is greatest but not different from La, Ce or Nd, only greater than Y/PAAS (lowest mean).
+
+## ├ YREE/PAAS in Lake sediments
+
+```{r normalized-REE-Lake_sed, fig.height=3.6, fig.width=6, results='hold'}
+require(viridis)
+PAAS_LakeSed <- subset(afs1922_PAAS, afs1922_PAAS$Type=="Lake_Sed")
+plotdata <- 
+  stack(st_drop_geometry(PAAS_LakeSed[,c("La","Ce","Nd","Gd","Y","REE")]))
+par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n", xlab="", 
+              ylab="Normalized REE = sample/PAAS", col = plasma(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Nd","Gd","Y","∑REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+mtext("Lake Sediment", side=3, line=-1.2, adj=0.98, font=2, cex = 1.2)
+```
+
+Wetland pond ("Lake") sediments are enriched relative to PAAS. Y is significantly less than La, Ce, Nd, and Gd.
+
+```{r}
+with(plotdata, oneway.test(values ~ ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+## ├ YREE/PAAS in Saltmarsh sediments
+
+```{r normalized-REE-Drain_sed, fig.height=3.6, fig.width=6, results='hold'}
+require(viridis)
+PAAS_SM <- subset(afs1922_PAAS, afs1922_PAAS$Type=="Saltmarsh")
+plotdata <- 
+  stack(st_drop_geometry(PAAS_SM[,c("La","Ce","Nd","Gd","Y","REE")]))
+par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n", xlab="", 
+              ylab="Normalized REE = sample/PAAS", col = viridis(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Nd","Gd","Y","∑REE"), font=2)
+abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+mtext("Saltmarsh Sediment", side=3, line=-1.2, adj=0.98, font=2, cex = 1.2)
+```
+```{r}
+with(plotdata, oneway.test(values ~ ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+Saltmarsh sediments are enriched in YREE relative to PAAS. Gd > all others
+except La. Y < all others.
+
+## ├ YREE/PAAS in Flooded woodland sediments
+
+```{r normalized-REE-Drain_sed, fig.height=3.6, fig.width=6, results='hold'}
+require(viridis)
+PAAS_Flooded <- subset(afs1922_PAAS, afs1922_PAAS$Type=="Flooded")
+plotdata <- 
+  stack(st_drop_geometry(PAAS_Flooded[,c("La","Ce","Nd","Gd","Y","REE")]))
+par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
+    lend=2, ljoin=1)
+meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
+with(plotdata, boxplot(values ~ ind, xaxt="n", xlab="", 
+              ylab="Normalized REE = sample/PAAS", col = mako(9, dir=1)[4:9]))
+points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
+points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
+axis(1, at=1:6, labels=c("La","Ce","Nd","Gd","Y","∑REE"), font=2)
+abline(h=0.995, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
+mtext("Flooded Woodland", side=3, line=-1.2, adj=0.75, font=2, cex = 1.2)
+```
+
+```{r}
+with(plotdata, oneway.test(values ~ ind))
+with(plotdata, pairwise.t.test(values, ind))
+```
+
+```{r}
+
+```
+
+```{r tidy up, message=FALSE, warning=FALSE, include=FALSE}
+rm(list = c("s0","ns0","d0","f0","p1","p2","varz","clrz","x0","x1","lm0","v0",
+            "data0","mcl0"))
+```
+
+#### end of file
