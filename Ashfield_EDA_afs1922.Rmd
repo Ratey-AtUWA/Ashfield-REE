@@ -37,9 +37,8 @@ library(ggpubr)
 ```
 
 ```{r define CRS, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
-LongLat <- CRS("+proj=longlat +ellps=WGS84 
-           +datum=WGS84 +no_defs") # uses Earth ellipsis specs from WGS84 datum
-UTM50S <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
+LongLat <- st_crs(4326) # uses Earth ellipsis specs from WGS84 datum
+UTM50S <- st_crs(32750) # just for Zone 50, S hemisphere!
 ```
 
 ```{r setup data, echo=FALSE}
@@ -69,6 +68,57 @@ pal4dark <- c("white", "pink1", "orange", "khaki1", "lightgreen", "cadetblue1",
               "deepskyblue", "plum", "gray80", "black")
 ```
 
+# Perth metro map centered on Ashfield
+
+```{r fig.height=8.1, fig.width=12}
+extent <- st_as_sf(x = data.frame(x = c(115.849,115.995), 
+                                  y = c(-31.98,-31.91)), 
+                   coords = c("x", "y"), crs = LongLat)
+PerthRast <- get_tiles(extent, provider = "Esri.WorldImagery", 
+                       crop = TRUE, zoom=14)
+
+s0 <- 1; par(oma=c(4,4,1,1)*s0, tcl = -0.2*s0, 
+    lend = "round", ljoin = "round", lheight=0.7)
+# layout(matrix(c(1,1,1,1,2),nrow = 1))
+plot(PerthRast) 
+axis(1, cex.axis=1.4*s0);axis(2, cex.axis=1.4*s0);box(which="plot")
+mtext("Longitude (\u2211E)",1,2.6*s0,font=2,cex = 1.2*s0)
+mtext("Latitude (\u2211S)",2,2.6*s0,font=2,cex = 1.2*s0)
+addnortharrow(border = 10, text.col=10, scale = 1.25*s0)
+addscalebar(plotepsg = 32750, linecol=10, label.col=10, htin=0.2*s0, 
+            label.cex=1.8*s0, widthhint = 0.15)
+text(400360,6468120, labels = "Saltmarsh",
+              font = 4, cex=6*s0, srt=43, col="#FFFFFF30")
+text(400145,6468189, labels = "Sedge\nmarsh",
+     font = 4, cex=4.5*s0, srt=43, col="#FFFFFF30")
+shadowtext(399920,6468100, labels = "Kitchener\nDrain",
+           font = 3, cex=1.6*s0, srt=305, col="lightblue")
+shadowtext(400060,6468240, labels = "Woolcock\nDrain", pos = 4,
+           font = 3, cex=1.6*s0, col="lightblue")
+shadowtext(400537,6468370, labels = "Chapman\nDrain",
+           font = 3, cex=1.6*s0, srt=61, col="lightblue")
+with(afr_map, lines(wetland_E, wetland_N, col="lightblue", lty="32", lend="round",lwd=1.4*s0))
+with(afr_map, lines(drain_E, drain_N, col = "#8080FFB0", lwd=3*s0))
+with(afr_map, polygon(veg_E, veg_N, border = "#B0FFB040", lwd = 5*s0))
+with(afs1922, points(Easting, Northing, col = 10, bg = c(2,3,7,1)[Year],
+        lwd=2, pch = c(21,22,23,24)[Year], cex = s0*c(2.2,1.8,1.8,1.8)[Year]))
+plot(c(0,1),c(0,1),type="n",ann=F,xaxt="n",yaxt="n",bty="n",xlab="",ylab="")
+legend("top", bg="grey33", cex = 1.5*s0, text.col = 10, y.intersp = 1.4, 
+       legend = levels(afs1922$Year), 
+       title = expression(bold("     Sampling Year      ")), 
+       pch = c(21,22,23,24), pt.bg = c(2,3,7,1), col = 10,
+       pt.cex = c(2.2,1.8,1.8,1.8)*s0, pt.lwd=2)
+text(0.0,0.6,pos=4,labels="Ashfield Flats Reserve", font=2, cex=1.3*s0)
+text(rep(0.0,2),c(0.5,0.4),pos=4,labels=c("Map tiles:\nESRI World Imagery",
+     "Projection: UTM Zone 50S,\nWGS84 (EPSG:32750)"), cex = 1.25*s0)
+legend("bottom", bg="grey33", cex = 1.5*s0, text.col = 10, y.intersp = 1.4, 
+    legend = c("Seasonal\nwetland ponds","Drains",
+               "Extent of native\nvegetation"), 
+       title = expression(bold("Map key")), 
+    pch = c(NA,NA,NA), lty = c(2,1,1), lwd = c(1.4,3,5)*s0,
+    col = c("lightblue","#8080FFB0","#B0FFB040"))
+```
+
 # Sample map
 
 ```{r sample-map, echo=FALSE, fig.align='center', fig.cap="Map of sediment sample locations at Ashfield Flats for all sampling years 2019-2022.", fig.height=9.1, fig.width=15, message=FALSE, warning=FALSE}
@@ -80,6 +130,7 @@ extent <- st_as_sf(x = data.frame(x = c(399860,400670),
 aftiles <- get_tiles(extent, provider = "Esri.WorldImagery", crop = TRUE, zoom=17)
 
 s0 <- 1.5
+png(filename="afs1922-sample-loc-map.png", width=768*s0, height=478*s0)
 par(oma=c(4,4,1,1)*s0, tcl = -0.2*s0, 
     lend = "round", ljoin = "round", lheight=0.7)
 layout(matrix(c(1,1,1,1,2),nrow = 1))
@@ -120,6 +171,7 @@ legend("bottom", bg="grey33", cex = 1.5*s0, text.col = 10, y.intersp = 1.4,
        title = expression(bold("Map key")), 
     pch = c(NA,NA,NA), lty = c(2,1,1), lwd = c(1.4,3,5)*s0,
     col = c("lightblue","#8080FFB0","#B0FFB040"))
+
 ```
 
 Samples were taken each year from 2019 to 2022 (Figure \@ref(fig:sample-map)). Different sampling designs were implemented each year depending on the perceived gaps in understanding of the site and the learning objectives desired for the students involved. Apart from three soil/sediment depth profiles in 2019, all samples were subaqueous or subaerial surface sediments (0-10cm) from stormwater drains, wetland ponds (with or without water), saltmarsh, or seasonally flooded woodland.
