@@ -97,17 +97,17 @@ UTM50 <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!
 extent <- st_as_sf(x = data.frame(x = c(399860,400580), 
                                   y = c(6467870,6468350)), 
                    coords = c("x", "y"), crs = UTM50)
-aftiles <- get_tiles(extent, provider = "OpenStreetMap.HOT", 
+afstiles <- get_tiles(extent, provider = "OpenTopoMap", 
                      crop = TRUE, zoom = 17) # make map object
 palette(pal4liteTransp)
 par(oma=c(3,3,1,1), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), 
     lend=2, ljoin=1, tcl=0.3)
-plot(aftiles)
+plot(afstiles)
 axis(1)
-mtext(side=1, line=2, text="Easting (UTM Zone 50, m)",
+mtext(side=1, line=1.7, text="Easting (UTM Zone 50, m)",
       font=2, cex=1.2)
 axis(2)
-mtext(side=2, line=2, text="Northing (UTM Zone 50, m)",
+mtext(side=2, line=1.8, text="Northing (UTM Zone 50, m)",
       font=2, cex=1.2)
 with(afr_map, polygon(wetland_E, wetland_N, border="steelblue", col="lightblue"))
 with(afs_pyr_coords, points(pyrE, pyrN, cex = c(1.5,1.2)[Type], 
@@ -136,7 +136,8 @@ ls(pattern = "CP_")
 allTreats <- ls(pattern="CP_")
 claySamples <- unique(substr(allTreats,1,6))
 
-palette(c("#000000", "#BA55D380", "#1E90FF80", "#20B2AA80", "#FFD70080"))
+# palette(c("#000000", "#BA55D380", "#1E90FF80", "#20B2AA80", "#FFD70080"))
+palette(c("black",colorRampPalette(c("blue2","gold2"))(4)))
 par(mfrow=c(length(claySamples),1), mar=c(3,3,1,1), mgp = c(1.6,0.3,0), font.lab = 2)
 i <- 1
 for (i in 1:length(claySamples)){
