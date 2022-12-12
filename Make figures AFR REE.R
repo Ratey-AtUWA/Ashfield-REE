@@ -31,12 +31,92 @@ library(plotrix)
 
 # -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
 
+# Perth area Map ####
+palette(pal4lite)
+extent <- st_as_sf(x = data.frame(x = c(115.849,115.995),
+                                  y = c(-31.98,-31.91)),
+                   coords = c("x", "y"), crs = LongLat)
+PerthRast <- get_tiles(extent, provider = "Esri.WorldImagery",
+                       crop = TRUE, zoom=14)
+
+s0 <- 4
+png(filename = "Perth_area_map.png", width=768*s0, height=486*s0)
+par(oma=c(4,4,1,1)*s0, mar=c(4,4,1,1)*s0, tcl = 0.25*s0,
+    lend = "square", ljoin = "mitre", lheight=0.7)
+plot(PerthRast)
+axis(1, cex.axis=1.2*s0, mgp=c(2.2,0.9,0)*s0, tcl = -0.25*s0, lwd=s0)
+axis(2, cex.axis=1.2*s0, mgp=c(2.2,0.7,0)*s0, tcl = -0.25*s0, lwd=s0)
+box(which="plot", lwd=s0)
+mtext("Longitude (\u00B0E)",1,2.6*s0,font=2,cex = 1.2*s0)
+mtext("Latitude (\u00B0S)",2,2.6*s0,font=2,cex = 1.2*s0)
+addnortharrow(border = 1, text.col=1, scale = 1.25*s0, lwd=s0,
+              padin = c(0.135,0.165)*s0)
+addnortharrow(border = 10, text.col=10, scale = 1.25*s0, lwd=s0,
+              padin = c(0.15,0.15)*s0)
+addscalebar(plotepsg = 4326, linecol=1, label.col=1, htin=0.2*s0,
+            label.cex=1.5*s0, widthhint = 0.25, lwd=s0,
+            padin = c(0.165,0.135)*s0)
+addscalebar(plotepsg = 4326, linecol=10, label.col=10, htin=0.2*s0,
+            label.cex=1.5*s0, widthhint = 0.25, lwd=s0,
+            padin = c(0.15,0.15)*s0)
+polygon(afr_map$bound_lon, afr_map$bound_lat,
+        border = 1, col = "gold", lwd = 2)
+polygon(afr_map$bound_lon, afr_map$bound_lat,
+        border = 1, col = 1, lwd = s0, density = 16/s0)
+shadowtext(115.939,-31.92,pos=2,labels="Ashfield\nFlats\nReserve",
+           col="gold", bg=1, font=2, cex=1.3*s0)
+shadowtext(115.97,-31.93, labels="Perth\nAirport",
+           col="white", bg=1, font=2, cex=1.3*s0)
+shadowtext(115.865,-31.955, labels="Perth\nCBD",
+           col="white", bg=1, font=2, cex=1.3*s0)
+text(115.863,-31.965, labels="Derbarl Yerrigan",
+     col="lightblue", font=3, cex=1.2*s0)
+text(115.863,-31.968, labels="(Swan River)",
+     col="lightblue", font=3, cex=1.*s0)
+legend("bottomright", bg="#FFFFFFC0", cex=0.8*s0, text.col=1, y.intersp=0.5,
+  legend = "Map tiles: ESRI World Imagery.   Projection: WGS84 (EPSG:4326)",
+  box.col="#FFFFFF00", x.intersp = 0.5)
+par(new=TRUE, mfrow=c(1,1), fig=c(0.01,0.25,0.7,0.98),
+    mar=c(1,1,.5,.5), font.lab=2, mgp=c(2,0.2,0),
+    tcl=0.2)
+plot(aust_map, asp=1.1, type = "l", xaxt="n", xlab="",
+     yaxt="n", ylab="", xlim=c(102,154))
+rect(par("usr")[1], par("usr")[3],
+     par("usr")[2], par("usr")[4],
+     col = "lightblue", border = "white", lwd=0.5*s0)
+polygon(aust_map, col = "khaki", border="darkgreen", lwd=s0)
+points(115.8567, -31.941, pch = 21, col = 1,
+       bg = "gold", cex = 0.85*s0, lwd=1.5*s0, ljoin="mitre")
+text(115,-31, labels = "Perth", cex=s0, pos = 2,
+     offset = 0.2, font = 3)
+text(133,-25, labels = "Australia", cex=1.1*s0, font=2, col="sienna")
+dev.off()
+
+# -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
+
 # Sample Map ####
 palette(c(pal4lite,"transparent"))
 extent <- st_as_sf(x = data.frame(x = c(399860,400670),
                                   y = c(6467920,6468500)),
                    coords = c("x", "y"), crs = UTM50S)
 aftiles <- get_tiles(extent, provider = "Esri.WorldImagery", crop=T, zoom=17)
+
+smallmap <-
+  get_tiles(st_as_sf(x = data.frame(x = c(391000,405300),
+                                    y = c(6460900,6469300)),
+                     coords = c("x", "y"), crs = UTM50S),
+                      provider = "Stamen.TerrainBackground", crop=T, zoom=12)
+png(filename = "inset.png", width = 768, height=470)
+    plot(smallmap, asp=1);box(lwd=3, col=1)
+    rect(399860,6467920,400670,6468500,lwd=10, border="white", lend=2, ljoin=1)
+    rect(399860,6467920,400670,6468500,lwd=4, col="#FFFFFF00", lend=2, ljoin=1)
+    text(c(400290,392400),c(6467600,6464800), pos=1, font=4, cex=4,
+               labels=c("Ashfield\nFlats","Perth\nCBD"))
+    addscalebar(plotepsg = 32750, linecol=1, label.col=1, htin=0.3,
+                label.cex=3.6, widthhint = 0.25, lwd=2,
+                padin = c(0.3,0.3))
+dev.off()
+
 s0 <- 4
 png(filename = "afsed1922_sample_map.png", width=768*s0, height=464*s0)
 par(oma=c(4,4,1,1)*s0, tcl = -0.25*s0,
@@ -49,30 +129,33 @@ mtext("Easting (m)",1,2.6*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,2.6*s0,font=2,cex = 1.2*s0)
 addnortharrow(border = 10, text.col=10, scale = 1.25*s0, lwd = s0,
               padin=c(0.15,0.15)*s0)
-# addscalebar(plotepsg = 32750, linecol=11, label.col=1, htin=0.2*s0,
-#             label.cex=1.8*s0, widthhint = 0.15, padin=c(0.12,0.12)*s0,
-#             pos = "bottomright", bar.cols = c(11,11))
 addscalebar(plotepsg = 32750, linecol=10, label.col=11, htin=0.2*s0,
     lwd=0.667*s0, widthhint = 0.15, padin=c(0.15,0.15)*s0, pos="bottomright")
-TeachingDemos::shadowtext(400580,6467918,labels="100 m", pos=2, cex=1.8*s0)
-text(400360,6468120, labels = "Saltmarsh",
-     font = 4, cex=6*s0, srt=43, col="#FFFFFF30")
-text(400145,6468189, labels = "Sedge\nmarsh",
-     font = 4, cex=4.5*s0, srt=43, col="#FFFFFF30")
+shadowtext(400580,6467918,labels="100 m", pos=2, cex=1.8*s0)
+with(afr_map, polygon(wetland_E, wetland_N, border="lightblue",
+                      col="#8080FF60", lty="33", lend="round", lwd=1.2*s0))
+with(afr_map, lines(drain_E, drain_N, col = "#8080FFB0", lwd=2.4*s0))
+with(afr_map, polygon(veg_E, veg_N, border = "#B0FFB040", lwd = 5*s0))
 shadowtext(399920,6468100, labels = "Kitchener\nDrain",
            font = 3, cex=1.6*s0, srt=305, col="lightblue")
 shadowtext(400060,6468240, labels = "Woolcock\nDrain", pos = 4,
            font = 3, cex=1.6*s0, col="lightblue")
-shadowtext(400537,6468370, labels = "Chapman\nDrain",
+shadowtext(c(400210),c(6468140), labels = c("Chapman Drain"),
+           font = 3, cex=1.6*s0, srt=45, col="lightblue")
+shadowtext(c(400537),c(6468370), labels = c("Chapman\nDrain"),
            font = 3, cex=1.6*s0, srt=61, col="lightblue")
-with(afr_map, lines(wetland_E, wetland_N, col="lightblue", lty="33",
-                    lend="round", lwd=1.2*s0))
-with(afr_map, lines(drain_E, drain_N, col = "#8080FFB0", lwd=2.4*s0))
-with(afr_map, polygon(veg_E, veg_N, border = "#B0FFB040", lwd = 5*s0))
+shadowtext(c(400075,400330,400430,400065,400145,400430,400340,400000,399990),
+   c(6468305,6468285,6468310,6468170,6468040,6468210,6468050,6468050,6467995),
+           labels = c("Flooded\nwoodland","\u2193N Lake","NE Lake \u2192",
+                      "NW Lake","SE\n  Lake","Saltmarsh","Saltmarsh",
+                      "    S\nwetlands","SW Lake"),
+           pos=c(4,2,2,4,4,1,1,4,2), font = 3, cex=1.6*s0, col="lightblue")
 with(afs1922, points(Easting, Northing, col = 10, bg = c(2,3,7,1)[Year],
                      lwd=1.33*s0, pch = c(21,22,23,24)[Year],
                      cex = s0*c(2.2,1.8,1.8,1.8)[Year],
                      ljoin="mitre"))
+inset <- png::readPNG("inset.png")
+addImg(inset, x=399990, y=6468420, width=280)
 plot(c(0,1),c(0,1),type="n",ann=F,xaxt="n",yaxt="n",bty="n",xlab="",ylab="")
 legend("top", bg="grey33", cex = 1.6*s0, text.col = 10, y.intersp = 1.4,
        legend = levels(afs1922$Year),
@@ -81,7 +164,7 @@ legend("top", bg="grey33", cex = 1.6*s0, text.col = 10, y.intersp = 1.4,
        pt.cex = c(2.2,1.8,1.8,1.8)*s0, pt.lwd=1.33*s0)
 text(0.0,0.6,pos=4,labels="Ashfield Flats Reserve", font=2, cex=1.3*s0)
 text(rep(0.0,2),c(0.5,0.4),pos=4,labels=c("Map tiles:\nESRI World Imagery",
-                                          "Projection: UTM Zone 50S,\nWGS84 (EPSG:32750)"), cex = 1.25*s0)
+                "Projection: UTM Zone 50S,\nWGS84 (EPSG:32750)"), cex = 1.25*s0)
 legend("bottom", bg="grey33", cex = 1.6*s0, text.col = 10, y.intersp = 1.4,
        legend = c("Seasonal\nwetland ponds","Drains",
                   "Extent of native\nvegetation"),
@@ -177,10 +260,10 @@ with(afs1922surf,
 axis(2, mgp=c(1.6,0.3,0)*s0, las=1)
 mtext(paste(varz[11],"(mg/kg)"),side=2, line=2, font=2, cex=1*s0,las=0)
   with(afs1922surf,
-       boxplot(log10(afs1922surf[,which(colnames(afs1922surf)==varz[12])]) ~ Type,
-               varwidth=T, names=c("DS","LS","SM","FW"), xlab="",
-               yaxt="n", ylab = "", cex=1*s0,
-               col=c("royalblue","wheat","honeydew3","lightblue")))
+     boxplot(log10(afs1922surf[,which(colnames(afs1922surf)==varz[12])]) ~ Type,
+             varwidth=T, names=c("DS","LS","SM","FW"), xlab="",
+             yaxt="n", ylab = "", cex=1*s0,
+             col=c("royalblue","wheat","honeydew3","lightblue")))
   axis(2, at=log10(c(10,50,200,1000,5000)),
        labels=c(10,50,200,1000,5000),
        mgp=c(1.6,0.3,0)*s0, las=1)
@@ -671,6 +754,48 @@ text(c(399840,399880,399880), c(6468240,6468030,6468210), pos=c(4,4,4),
      labels=c("\u2211REE/PAAS",round(min(afs1922_PAAS$REE[DrainAnom],na.rm=T),2),
               round(max(afs1922_PAAS$REE[DrainAnom],na.rm=T),2)),
      offset = 0.4, cex=1.2*s0, font=c(2,1,1), col = 1)
+dev.off()
+
+# -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
+
+# map samples containing pyrite ####
+afr_map <- read.csv("afr_map_v3.csv", stringsAsFactors = TRUE)
+afs_pyr_coords <- read.csv("afs_pyr_coords.csv")
+afs_pyr_coords$Type <- as.factor(afs_pyr_coords$Type)
+afs_pyr_coords$Type <- factor(afs_pyr_coords$Type,
+                              levels = c("Surface","Deep core"))
+UTM50S <- st_crs(32750) # just for Zone 50, S hemisphere!
+extent <- st_as_sf(x = data.frame(x = c(399860,400580),
+                                  y = c(6467870,6468350)),
+                   coords = c("x", "y"), crs = UTM50)
+afstiles <- get_tiles(extent, provider = "OpenTopoMap",
+                      crop = TRUE, zoom = 17) # make map object
+palette(pal4liteTransp)
+s0 <- 4
+png(filename="afs1922-pyrite-locations.png", width=768*s0, height=530*s0)
+par(oma=c(3,3,1,1)*s0, mar=c(4,4,1.5,1.75)*s0, mgp=c(1.4,0.3,0)*s0,
+    lend=2, ljoin=1, tcl=0.3*s0, lwd=s0)
+plot(afstiles)
+axis(1, cex.axis=1.25*s0, mgp=c(1.4,0.7,0)*s0)
+mtext(side=1, line=1.9*s0, text="Easting (UTM Zone 50, m)",
+      font=2, cex=1.5*s0)
+axis(2, cex.axis=1.25*s0, mgp=c(1.4,0.4,0)*s0)
+mtext(side=2, line=1.9*s0, text="Northing (UTM Zone 50, m)",
+      font=2, cex=1.5*s0)
+with(afr_map, polygon(wetland_E, wetland_N, border="steelblue",
+                      col="lightblue", lwd=s0))
+with(afs_pyr_coords, points(pyrE, pyrN, cex = c(2*s0,1.6*s0)[Type],
+                            pch = c(21,25)[Type],
+                            bg = c(8,6)[Type]))
+addnortharrow(lwd=s0, scale=1.2*s0, padin = c(0.2,0.2)*s0)
+addscalebar(plotepsg=32750, pos="topleft", htin=0.22*s0, label.cex=1.4*s0,
+            padin = c(0.15,0.15)*s0, lwd=s0)
+box(lwd=s0)
+legend("bottomright", bty = "o", inset = 0.05, cex = 1.5*s0,
+       bg="#FFFFFF80", box.col = NA,
+       legend = c("Surface (0-10 cm)","Core (\u2265 3 m)"),
+       pch = c(21,25), pt.cex = c(2,1.6)*s0, pt.bg=c(8,6),
+       title = expression(italic("Sample type")))
 dev.off()
 
 # end of code ####
