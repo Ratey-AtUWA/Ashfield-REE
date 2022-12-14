@@ -1,0 +1,18 @@
+# with(prakongkep, tapply(REE, Horizon, mean, na.rm=T))
+A-horizon  A2-horizon       Peaty   E-horizon   B-horizon coffee-rock   C-horizon
+15.30556    12.20000    53.26000     5.68500    18.67552    11.20259    12.92000
+# with(prakongkep, tapply(REEY, Horizon, mean, na.rm=T))
+A-horizon  A2-horizon       Peaty   E-horizon   B-horizon coffee-rock   C-horizon
+19.508235   19.570000   60.080000    6.896316   21.710000   12.415926   22.625000
+# with(prakongkep, tapply(Fe, Horizon, mean, na.rm=T))
+A-horizon  A2-horizon       Peaty   E-horizon   B-horizon coffee-rock   C-horizon
+2974.5556   4991.0000  20466.6667    818.8209   7882.1538   1351.7778    741.3333
+# with(prakongkep, tapply(Ca, Horizon, mean, na.rm=T))
+A-horizon  A2-horizon       Peaty   E-horizon   B-horizon coffee-rock   C-horizon
+1251.7059   1669.0000   7023.0000    486.3788  17448.5128    163.2222  47227.0000
+# with(prakongkep, tapply(S, Horizon, mean, na.rm=T))
+A-horizon  A2-horizon       Peaty   E-horizon   B-horizon coffee-rock   C-horizon
+64.88889   493.00000 23922.33333   200.56716  2695.38462   579.40741   163.00000
+# with(prakongkep, tapply(P, Horizon, mean, na.rm=T))
+A-horizon  A2-horizon       Peaty   E-horizon   B-horizon coffee-rock   C-horizon
+74.000000  109.000000   68.333333    6.940299   39.538462   32.259259   28.333333
