@@ -26,6 +26,11 @@ Ashfield-geostatistics-using-gstat.html
 
 *.xlsx
 
+*.pptx
+
+*.pdf
+
+
 *.docx
 
 /Ashfield-geostatistics-using-gstat_files/*
