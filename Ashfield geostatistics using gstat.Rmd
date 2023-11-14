@@ -11,6 +11,18 @@ output:
     smart: no
 ---
 
+```{css, echo=FALSE}
+table {
+  margin: auto;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+.striped tr:nth-child(even) { background: #eee; }
+```
+
 ```{r load packages and environment but do not show, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
 library(sf)
 library(lctools)
@@ -19,45 +31,45 @@ library(maptiles)
 library(prettymapr)
 library(fields)
 library(viridis)
+library(scico)
+library(TeachingDemos)
 library(ncf)
 library(flextable)
-  set_flextable_defaults(font.family = 'sans', theme_fun = "theme_zebra", 
+  set_flextable_defaults(font.family = "sans", theme_fun = "theme_zebra", 
         font.size = 11, text.align = "right",padding.left = 1, padding.right = 1,
         padding.top = 2, padding.bottom = 2)
-```
-
-```{r message=FALSE, warning=FALSE, include=FALSE}
-git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
+knitr::opts_chunk$set(comment="")
 ```
 
 ```{r importing the data, message=FALSE, warning=FALSE, results='hold', echo=FALSE}
-afs1922 <- read.csv(paste0(git,"afs1922.csv"), stringsAsFactors = TRUE)
-afs1922$Year <- as.factor(afs1922$Year)
+git <- "https://raw.githubusercontent.com/Ratey-AtUWA/Ashfield-REE/main/"
+afs1923 <- read.csv(paste0(git,"afs1923.csv"), stringsAsFactors = TRUE)
+afs1923$Year <- as.factor(afs1923$Year)
 af_border <- read.csv(paste0(git,"afr_hull.csv"))
-afs1922surf <- afs1922[-which(afs1922$Depth_upper_cm > 1 & 
-                                           afs1922$Type=="Soil"),]
-afs1922surf[which(afs1922surf$Type=="Soil"),"Type"] <- 
-  rep("Saltmarsh",length(which(afs1922surf$Type=="Soil")))
-afs1922surf <- droplevels(afs1922surf)
-afs1922surf$Type <- factor(afs1922surf$Type, 
-                 levels = c("Drain_Sed", "Lake_Sed", "Saltmarsh", "Flooded"))
-afs1922utm <- st_as_sf(afs1922surf, coords = c("Easting","Northing"), 
+afs1923surf <- afs1923[-which(afs1923$Depth_upper_cm > 1),]
+afs1923surf[which(afs1923surf$Type=="Soil"),"Type"] <- 
+  rep("Saltmarsh",length(which(afs1923surf$Type=="Soil")))
+afs1923surf <- droplevels(afs1923surf)
+afs1923surf$Type <- factor(afs1923surf$Type, 
+                 levels = c("Drain_Sed", "Lake_Sed", "Saltmarsh", "Other"))
+afs1923utm <- st_as_sf(afs1923surf, coords = c("Easting","Northing"), 
                        crs = st_crs(32750))
-afs1922ll <- st_transform(afs1922utm, crs = st_crs(4326))
+afs1923ll <- st_transform(afs1923utm, crs = st_crs(4326))
+afr_map <- read.csv(paste0(git,"afr_map_v3.csv"))
 ```
 
 # Making our base map of Ashfield Flats
 
 ### Define coordinate reference systems
 
-```{r define CRS, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+```{r define-CRS, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
 LongLat <- st_crs(4326) # uses Earth ellipsis specs from WGS84 datum
 UTM50S <- st_crs(32750) # just for Zone 50, S hemisphere!
 ```
 
 ### ├ Map extent object
 
-```{r make map extent object, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+```{r make-map-extent-object, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
 extent <- st_as_sf(x = data.frame(x = c(399860,400580),
                                   y = c(6467870,6468350)),
                    coords = c("x", "y"), crs = UTM50S)
@@ -67,8 +79,8 @@ st_coordinates(extent)
 ### ├ Getting and plotting the map tile data
 
 ```{r basemap, fig.height=5.85, fig.width=8, fig.align='center', fig.cap="Map of Ashfield Flats Reserve and adjacent area (UTM projection, Zone 50S, EPSG:32750) used subsequently as the base map for spatial analyses. Generated using the maptiles R package, with OpenStreetMap tiles.", out.width="75%", warning=FALSE, message=FALSE, results='hide', echo=FALSE}
-require(sp)
-afstiles <- get_tiles(extent, provider = "OpenTopoMap",
+afstiles <- get_tiles(extent, provider="Thunderforest.OpenCycleMap",
+             apikey="03b0375e8e7c47d0a03018a9001de439",
                       crop = TRUE, zoom = 17) # make map object
 
 par(oma=c(3,3,1,1), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), 
@@ -80,26 +92,27 @@ mtext(side=1, line=2, text="Easting (UTM Zone 50, m)",
 axis(2)
 mtext(side=2, line=2, text="Northing (UTM Zone 50, m)",
       font=2, cex=1.2)
-with(afs1922surf, points(Easting, Northing, pch = 3, cex = 0.75, col = "navy"))
+with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
+with(afs1923surf, points(Easting, Northing, pch = 3, cex = 0.75, col = "navy"))
 with(af_border, lines(Easting,Northing, lty = 3, col = "darkgreen"))
 addnortharrow()
-addscalebar(plotepsg = 32750, pos = "topleft")
+addscalebar(plotepsg = 32750, pos = "bottomleft")
 box()
 ```
 
 #### **Note**: in this document REE (&equiv; &sum;REE) = Ce + La + Nd + Gd.
 &sum;REE does not include yttrium (Y) at present, but it could... using <br>
-`afs1922$YREE <- afs1922$REE + afs1922$Y`.
+`afs1923$YREE <- afs1923$REE + afs1923$Y`.
 
 ## Spatial Autocorrelation
 
 ### ├ Calculate Global Moran's I
 
-```{r global Moran, echo=TRUE, message=FALSE, warning=FALSE, results='hold', echo=FALSE}
+```{r global-Moran, echo=TRUE, message=FALSE, warning=FALSE, results='hold', echo=FALSE}
 var0 <- "REE" # choose the variable of interest
 
 # Calculate global Moran's I
-data_temp <- na.omit(afs1922surf[,c("Easting", "Northing", var0)])
+data_temp <- na.omit(afs1923surf[,c("Easting", "Northing", var0)])
 Coords <- cbind(data_temp$Easting, data_temp$Northing)
 bw <- 8 # bw = bandwidth, = number of nearest point for calculation
 mI <- moransI(Coords, bw, data_temp[,3])
@@ -112,7 +125,7 @@ rm(list = c("data_temp","Coords","bw","mI","var0")) # remove temporary objects
 
 ```{r local-Moran, message=FALSE, warning=FALSE, fig.height=5.85, fig.width=8, fig.align='center', out.width="80%", fig.cap="Map of Local Moran's I for REE concentrations in Ashfield Flats sediments 2019-2022. The Global Moran's I parameter is also shown beneath the legend.", results='hide', echo=FALSE}
 var0 <- "REE" # choose the variable of interest
-data_temp <- na.omit(afs1922surf[,c("Easting", "Northing", var0)])
+data_temp <- na.omit(afs1923surf[,c("Easting", "Northing", var0)])
 Coords <- cbind(data_temp$Easting, data_temp$Northing)
 mI <- moransI(Coords, 8, log10(data_temp[,3])) # log10 minimises skewness
 local_moran <- l.moransI(Coords, 8, log10(data_temp[,3]), scatter.plot = FALSE)
@@ -124,6 +137,7 @@ neg0 <- subset(plotdata, plotdata$MoranI<0 & plotdata$p_value<=0.05)
 par(oma=c(3,3,1,1), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), 
     lend=2, ljoin=1, tcl=0.3, tcl = 0.5, lwd = 1)
 plot(afstiles)
+with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
 axis(1)
 mtext(side=1, line=2, text="Easting (UTM Zone 50, m)",
       font=2, cex=1.2)
@@ -144,7 +158,7 @@ legend("bottomright", bty = "o", cex = 1, title.cex = 0.9,
        legend = c("Positive I", "Negative I",
                   "", NA),
        title = paste0("Local Moran's I for log(",var0, 
-                      ") in\nafs1922 (p \u2264 0.05 only)"),
+                      ") in afs1923\n(p \u2264 0.05 only)"),
        pch = c(21, 22,NA,NA), pt.cex = c(2, 1.7,NA,NA),
        col = c("blue3", "red3"), pt.bg = c("#00008080", "#80000080"),
        title.col = "navy", y.intersp = 0.9)
@@ -157,8 +171,8 @@ text(400600,6467860,
 ### ├ Plot 'LISA'
 
 ```{r lisa-plot, message=FALSE, warning=FALSE, fig.height=5.85, fig.width=8, fig.align='center', out.width="80%", fig.cap="Map of LISA for REE concentrations in the Ashfield Flats sediment data, 2019-2022.", results='hide',echo=FALSE}
-data_temp <- na.omit(as.data.frame(cbind(afs1922surf$Easting,afs1922surf$Northing,
-                                         afs1922surf$REE)))
+data_temp <- na.omit(as.data.frame(cbind(afs1923surf$Easting,afs1923surf$Northing,
+                                         afs1923surf$REE)))
 colnames(data_temp) <- c("Easting","Northing","REE")
 
 
@@ -180,6 +194,7 @@ par(oma=c(3,3,1,1), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0),
 palette(c("black","#400000","blue3","orange","skyblue",
           "#FF8080","#8080FF","#FFA50040","#87CEEB40","white"))
 plot(afstiles)
+with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
 axis(1)
 mtext(side=1, line=1.6, text="Easting (UTM Zone 50, m)",
       font=2, cex=1.2)
@@ -211,15 +226,15 @@ legend("bottomright", bty = "o", inset = 0.015, cex = 1, ncol = 3,
 
 ### ├ LISA maps for multiple variables
 
-```{r multi-LISA, fig.height=10.6, fig.width=8, fig.align='center', fig.cap="LISA autocorrelation maps for REE, Al, Fe, S, As, Cu, Pb, and Zn concentrations in the Ashfield Flats sediment data, 2019-2022.", message=FALSE, warning=FALSE, echo=FALSE}
+```{r multi-LISA, fig.height=15.96, fig.width=12, fig.align='center', fig.cap="LISA autocorrelation maps for REE, Al, Fe, S, As, Cu, Pb, and Zn concentrations in the Ashfield Flats sediment data, 2019-2022.", message=FALSE, warning=FALSE, echo=FALSE}
 par(mfrow=c(4,2), mar=c(0,0,0,0), oma=c(3,3,0.5,1.5), mgp=c(1.6,0.2,0), 
     tcl=0.3,lend="square", ljoin="mitre")
 palette(c("black","#400000","blue3","orange","skyblue",
           "#FF8080","#8080FF","#FFA50040","#87CEEB40","white"))
 varz <- c("REE","Al","Fe","S","As","Cu","Pb","Zn")
 for (i in 1:length(varz)){
-  data_temp <- na.omit(as.data.frame(cbind(afs1922$Easting,afs1922$Northing,
-                                         afs1922[,varz[i]])))
+  data_temp <- na.omit(as.data.frame(cbind(afs1923$Easting,afs1923$Northing,
+                                         afs1923[,varz[i]])))
   colnames(data_temp) <- c("Easting","Northing",varz[i])
 
   Coords <- cbind(data_temp$Easting, data_temp$Northing)
@@ -236,6 +251,7 @@ for (i in 1:length(varz)){
   LoHi <- subset(LISA, LISA$p_value<=0.05&LISA$MoranI<0&LISA[,var0]<medREE)
 
   plot(afstiles)
+  with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
   if(i > 6.5) {
     axis(1, at = seq(399900,400500,100), 
      labels = c("399900","400000","400100","400200","400300","400400","400500"))
@@ -247,8 +263,8 @@ for (i in 1:length(varz)){
   }
   axis(1, labels=F); axis(2, labels = F)
   addnortharrow(pos="topleft", border=1, lwd=1, text.col=1,  
-              padin=c(0.05,0.05), scale = 0.7)
-  addscalebar(plotepsg = 32750, label.cex = 1.2)
+              padin=c(0.08,0.08), scale = 0.7)
+  addscalebar(plotepsg = 32750, label.cex = 1.6)
   box()
   with(data_temp, points(Easting, Northing, pch=3, cex = 0.7, col="grey"))
   with(HiHi, points(Northing ~ Easting, pch = 22,
@@ -259,24 +275,24 @@ for (i in 1:length(varz)){
                   col = 2, bg = 7, lwd = 3, cex = 1.4))
   with(LoHi, points(Northing ~ Easting, pch = 24,
                   col = 3, bg = 6, lwd = 3, cex = 1.4))
-  mtext(varz[i],3,-1.5,adj=0.98,font=2,cex=1.5)
+  mtext(varz[i],3,-2,adj=0.98,font=2,cex=1.5)
 }
 rect(400090,6467855,400590,6467930,col="#FFFFFF80", border = "#B0B0B080")
-legend("bottomright", bty = "n", cex = 1.2, ncol=3,
+legend("bottomright", bty = "n", cex = 1.6, ncol=3,
        legend = c("High-High", "Low-Low","High-Low","Low-High","Samples"),
        pch = c(22, 21, 25,24,3), pt.cex = c(1.8,2,1.4,1.4,0.7), 
        pt.lwd = c(2,2,2,2,1),
        col = c(2,3,2,3,"grey"), pt.bg = c(6,7,7,6,NA), text.col = 1,
        box.col = "#b0b0b0", box.lwd = 1.3, bg = "#E8E8E8",
-       x.intersp = 0.8)
-text(400340,6467930,pos=3,labels="Spatial autocorrelation key", font=3,
-     cex=1.2, offset = 0.15)
+       x.intersp = 0.8, inset=c(0.04,0))
+text(400340,6467935,pos=3,labels="Spatial autocorrelation key", font=3,
+     cex=1.6, offset = 0.15)
 par(mfrow=c(1,1), mar=c(3,3,0.5,0.5), oma=c(0,0,0,0), mgp=c(1.6,0.2,0), 
     tcl=0.3,lend="square", ljoin="mitre")
 
 ```
 
-```{r remove temps 2, message=FALSE, warning=FALSE, include=FALSE}
+```{r remove-temps-2, message=FALSE, warning=FALSE, include=FALSE}
 rm(list = c("data_temp","Coords","mI","locMI", "plotdata", "pos0", "neg0",
             "LISA","medREE","HiHi","LoLo","HiLo","LoHi","bw","i","local_moran",
             "var0","varz"))
@@ -292,8 +308,8 @@ In this example (as for Moran's I) we log~~10~~-transform our variable as its
 distribution is highly positively skewed. (Using the untransformed variable
 would result in too many apparent upper outliers.)
 
-```{r make sf object, paged.print=FALSE, results='hold', echo=FALSE}
-data0 <- na.omit(afs1922surf[,c("Easting","Northing","REE")])
+```{r make-sf-object, paged.print=FALSE, results='hold', echo=FALSE}
+data0 <- na.omit(afs1923surf[,c("Easting","Northing","REE")])
 colnames(data0) <- c("Easting","Northing","REE"); row.names(data0) <- NULL
 
 # remove duplicate coordinates befoe converting to sf
@@ -314,16 +330,29 @@ To quickly check our data, we use the function `plot()` from the
 `sp` package to make a *colour-gradient map* of our variable.
 
 ```{r spplot-spdf, fig.height=5, fig.width=8, fig.align='center', out.width="80%", fig.cap="Visualization of sf point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022.", message=FALSE, warning=FALSE, results='hold', echo=FALSE}
-plot(REE_sf[,1], pch=15, cex=1.4, pal=viridis::plasma(11, alpha=0.7), key.pos=1)
+plot(afstiles)
+with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
+axis(1)
+mtext(side=1, line=1.6, text="Easting (UTM Zone 50, m)",
+      font=2, cex=1.2)
+axis(2)
+mtext(side=2, line=1.6, text="Northing (UTM Zone 50, m)",
+      font=2, cex=1.2)
+addnortharrow(pos="topright", border=1, lwd=1, text.col=1,  
+              padin=c(0.1,0.2), scale=1.2)
+addscalebar(plotepsg = 32750)
+box()
+
+plot(REE_sf[,1], add=T, pch=19, cex=1.5, pal=viridis::plasma(11, alpha=0.7), key.pos=1, axes=T)
 ```
 
 ### ├ Plot a map with range-class symbols
 
 ```{r ree-tukey-plot, echo=2:19, fig.width=8, fig.height=5.85, fig.align='center', fig.cap="Map of REE concentrations expressed as symbols for concentration ranges (UQR is 75th percentile, upWsk is upper whisker, med is median, LQR is 25th percentile, loWsk is lower whisker). Data are from Ashfield Flats sediments 2019-2022.", out.width="80%", message=FALSE, warning=FALSE,echo=FALSE}
-palette(c("black",rev(c("#EE0000C0", "#EE7621C0", "#EEC900C0", "#40E0D0C0", 
-                        "#4870F0C0", "#9932CCC0")),"grey92", "white"))
+palette(c("black",plasma(6, alpha=0.5, dir=-1),"grey92", "white"))
 par(oma=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), lend=2, ljoin=1, tcl=0.3)
-plot(afstiles)
+plot_tiles(afstiles)
+with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
 axis(1)
 mtext(side=1, line=2, text="Easting (UTM Zone 50, m)",
       font=2, cex=1.2)
@@ -340,38 +369,44 @@ REE_sf$tukey <- cut(REE_sf$REE,
 polygon(af_border$Easting, af_border$Northing, lty=3, lwd=2,
         border="olivedrab")
 plot(REE_sf, add=T, pch = 21,
-       cex=(c(.5,.65,.85,1,1.4,1.8)*2)[REE_sf$tukey], 
-       bg=seq(2,7)[REE_sf$tukey])
+       cex=(c(.4,.52,.68,0.8,1.12,1.44)*2)[REE_sf$tukey], 
+       bg=seq(2,7)[REE_sf$tukey], col=seq(2,7)[REE_sf$tukey])
      
-legend(399870, 6468370, legend = rev(c("-outliers","loWsk to LQR","LQR to med",
+legend("topleft", legend = rev(c("-outliers","loWsk to LQR","LQR to med",
                                 "med to UQR","UQR to upWsk","+outliers")), 
-       cex = 1., pch=21, pt.cex=rev(c(.5,.65,.85,1,1.4,1.8))*2, inset = 0.07, 
-       bty="n", y.intersp=1.15, pt.bg=seq(7,2,-1), x.intersp = .9)
+       cex = 1., pch=21, pt.cex=rev(c(.4,.52,.68,0.8,1.12,1.44))*2, inset = 0.01, 
+       bty="n", y.intersp=1.15, pt.bg=seq(7,2,-1), col=plasma(7), 
+       x.intersp = .9)
 text(399870, 6468410, 
      labels=expression(bold("REE ranges")), pos = 4, cex = 1)
 box()
-par(new=TRUE, fig=c(0,0.07,0.68,0.92), mar=c(0,0,0,0), 
-    col.lab=1, col.axis=1, mgp=c(.9,0.2,0), xaxt="n", yaxt="n", bty = "n", ann = F) 
-boxplot(REE_sf$REE, col = "#A0A0A080");box(which = "plot")
+# par(new=TRUE, fig=c(0,0.07,0.68,0.92), mar=c(0,0,0,0), 
+#     col.lab=1, col.axis=1, mgp=c(.9,0.2,0), xaxt="n", yaxt="n", bty = "n", ann = F) 
+# boxplot(REE_sf$REE, col = "#A0A0A080");box(which = "plot")
 ```
 
 Bins for boxplot-categorised-point map in Figure \@ref(fig:ree-tukey-plot):
 
-```{r tukey-map-bins, echo=FALSE}
+```{r tukey-map-bins, echo=FALSE, paged.print=FALSE, results='asis'}
 tukbins <- data.frame(bins=c("-outliers","loWsk to LQR","LQR to med",
                                 "med to UQR","UQR to upWsk","+outliers"),
       logfrom=signif(c(-4,log10(boxplot.stats(REE_sf$REE)$stats)),3),
       logto=signif(c(log10(boxplot.stats(REE_sf$REE)$stats),Inf),3),
       from=round(c(-4,boxplot.stats(REE_sf$REE)$stats),1),
       to=round(c(boxplot.stats(REE_sf$REE)$stats,Inf),1))
-knitr::kable(tukbins)
+knitr::kable(tukbins, table.attr = "class=\"striped\"",format="html",
+             caption="Tukey boxplot bins defining ranges for range-class map above.")
 ```
+
+<p>&nbsp;</p>
+
+----------------------
 
 ## Variograms and Kriging
 
 ### ├ Make a binned simple variogram object
 
-```{r make variogram object, message=FALSE, warning=FALSE, echo=FALSE, fig.align='center', fig.cap="Plot of experimental binned variogram for REE in Ashfield Flats sediments 2019-2022.", fig.height=3.5, fig.width=4.5, out.width="50%"}
+```{r make-variogram-object, message=FALSE, warning=FALSE, echo=FALSE, fig.align='center', fig.cap="Plot of experimental binned variogram for REE in Ashfield Flats sediments 2019-2022.", fig.height=3.5, fig.width=4.5, out.width="50%"}
 par(mar = c(3,3,1,1), mgp = c(1.7,0.3,0), font.lab=2, tcl=0.3)
 variog_REE <- variogram(REE~1, REE_sf, cutoff=150) # , cressie = TRUE
 attz <- attributes(variog_REE)
@@ -390,7 +425,7 @@ vgr[,1:3]; rm(vgr)
 
 ### ├ Fit a variogram model using weighted least squares
 
-```{r fit variogram model, fig.height=3, fig.width=4, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold', echo=FALSE}
+```{r fit-variogram-model, fig.height=3, fig.width=4, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold', echo=FALSE}
 vmodel_REE <- fit.variogram(variog_REE, 
                               model = vgm(psill = NA, model = "Gau", 
                                           nugget = 0.1, 
@@ -407,11 +442,11 @@ with(variog_REE, plot(dist, gamma, ylim = c(0, max(gamma)), cex.lab=1.2,
 x0 <- variog_REE$dist
 y0 <- vmodel_REE$psill[1] + 
   vmodel_REE$psill[2]*(1 - exp(-1*x0/vmodel_REE$range[2]))
-lines(x0,y0,col=2)
+lines(x0,y0,col=6)
 legend("bottomleft", bty = "n", cex=1, pch=c(1,NA), pt.lwd=2, lwd=c(NA,1), 
        col=c(1,2), pt.cex=1.1,legend = c("Empirical variogram",
                   paste(vmodel_REE$model[2],"variogram model")))
-text(150,5e3,pos=2,offset=0, cex=0.95, font=2, family='mono', col = 2,
+text(150,5e3,pos=2,offset=0, cex=0.95, font=2, family='mono', col = 6,
      labels=paste(
        " nugget =",signif(vmodel_REE$psill[1],3),"\n",
        "partial sill =", signif(vmodel_REE$psill[2],3),"\n",
@@ -429,7 +464,7 @@ text(150,5e3,pos=2,offset=0, cex=0.95, font=2, family='mono', col = 2,
 
 ### ├ first make a grid mask
 
-```{r make grid masked to AFR sampling zones, message=FALSE, warning=FALSE, results='hold', echo=FALSE}
+```{r make-grid-masked-to-AFR-sampling-zones, message=FALSE, warning=FALSE, results='hold', echo=FALSE}
 afgrid <- st_make_grid(REE_sf, cellsize = c(5,5), what="corners")
 # afgrid <- SpatialPoints(grid0, proj4string = UTM50S)
 
@@ -447,8 +482,9 @@ kriged_REE <- krige(formula = REE~1, locations = REE_sf,
                       newdata = af_interp_grid, model = vmodel_REE)
 summary(kriged_REE)
 cat("_____________________________________________________________________\n\n")
+idwt <- 1.8
 idw_REE <- idw(formula = REE~1, locations = REE_sf, 
-                      newdata = af_interp_grid, idp = 1.8)
+                      newdata = af_interp_grid, idp = idwt)
 idw_REE$var1.var <- NULL
 summary(idw_REE)
 ```
@@ -465,30 +501,33 @@ plot(kriged_REE, pch=15, nbreaks=32,
 
 ### ├ Plot a map with overlay of the kriging predictions
 
-```{r map-krig-mod-pred, fig.height=15.9, fig.width=12, fig.align='center', fig.cap="Map showing kriging predictions for REE in Ashfield Flats sediments 2019-2022 by (a) kriging, (b) iverse distance weighted interpolation. Sample points are tiny dots.", message=FALSE, warning=FALSE, echo=FALSE}
+```{r map-krig-mod-pred, fig.height=15.9, fig.width=12, fig.align='center', fig.cap="Map showing kriging predictions for REE in Ashfield Flats sediments 2019-2022 by (a) kriging, (b) inverse distance weighted interpolation. Sample points are tiny dots.", message=FALSE, warning=FALSE, echo=FALSE}
 par(mfrow=c(2,1), oma=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), lend=2, ljoin=1, tcl=0.3)
-plot(afstiles)
+plot_tiles(afstiles)
+with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
 axis(1, mgp=c(2, 0.3, 0), labels=F)
 axis(2, mgp=c(2, 0.3, 0), cex.axis = 1.5)
 mtext(side=2, line=1.5, text="Northing (UTM Zone 50, m)",
       font=2, cex=1.8)
-plot(kriged_REE, add=T, pch=15, breaks=32, pal=inferno(32))
+plot(kriged_REE, add=T, pch=15, cex=0.925, breaks=52, pal=magma(52,alpha=0.6))
 addnortharrow(border=1, lwd=1, text.col=1, padin=c(0.1,0.1), scale = 1.4)
 addscalebar(plotepsg = 32750, pos = "bottomleft",htin=0.22, label.cex = 1.8)
-points(afs1922surf[,c("Easting","Northing")], pch=19, cex=0.3, col = "white")
-box() ; mtext("(a) Kriging",3,-2,font=2,cex=2.2,adj=0.025)
+points(afs1923surf[,c("Easting","Northing")], pch=19, cex=0.3, col = "white")
+box() ; mtext(paste0("(a) Kriging (",vmodel_REE$model[2]," model)"),3,-2,
+              font=2,cex=1.8,adj=0.025)
 
-plot(afstiles)
+plot_tiles(afstiles)
+with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
 axis(1, mgp=c(2, 0.3, 0), cex.axis = 1.5)
 mtext(side=1, line=1.5, text="Easting (UTM Zone 50, m)",
       font=2, cex=1.8)
 axis(2, mgp=c(2, 0.3, 0), cex.axis = 1.5)
 mtext(side=2, line=1.5, text="Northing (UTM Zone 50, m)",
       font=2, cex=1.8)
-plot(idw_REE, add=T, pch=15, breaks=32, pal=inferno(32))
+plot(idw_REE, add=T, pch=15, cex=0.925, breaks=32, pal=magma(32,alpha=0.6))
 addnortharrow(border=1, lwd=1, text.col=1, padin=c(0.1,0.1), scale = 1.4)
 addscalebar(plotepsg = 32750, pos = "bottomleft",htin=0.22, label.cex = 1.8)
-points(afs1922surf[,c("Easting","Northing")], pch=19, cex=0.3, col="white")
-box() ; mtext("(b) IDW",3,-2,font=2,cex=2.2,adj=0.025)
+points(afs1923surf[,c("Easting","Northing")], pch=19, cex=0.3, col="white")
+box() ; mtext(paste0("(b) IDW (weight ",idwt,")"),3,-2,font=2,cex=1.8,adj=0.025)
 ```
 

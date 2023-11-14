@@ -9,7 +9,7 @@ ylabs <- seq(-31.920,-31.916,.001)
 library(prettymapr)
 library(ggmap)
 library(sf)
-library(sp)
+# library(sp)
 library(maptiles)
 library(TeachingDemos)
 library(geosphere)
@@ -36,14 +36,15 @@ palette(pal4lite)
 extent <- st_as_sf(x = data.frame(x = c(115.849,115.995),
                                   y = c(-31.98,-31.91)),
                    coords = c("x", "y"), crs = LongLat)
-PerthRast <- get_tiles(extent, provider = "Esri.WorldImagery",
+PerthRast <- get_tiles(extent, provider="Thunderforest.Neighbourhood",
+                       apikey="03b0375e8e7c47d0a03018a9001de439",
                        crop = TRUE, zoom=14)
 
 s0 <- 4
-png(filename = "Perth_area_map.png", width=768*s0, height=486*s0)
+png(filename = "Perth_area_map_nophoto.png", width=768*s0, height=486*s0)
 par(oma=c(4,4,1,1)*s0, mar=c(4,4,1,1)*s0, tcl = 0.25*s0,
     lend = "square", ljoin = "mitre", lheight=0.7)
-plot(PerthRast)
+plot_tiles(PerthRast)
 axis(1, cex.axis=1.2*s0, mgp=c(2.2,0.9,0)*s0, tcl = -0.25*s0, lwd=s0)
 axis(2, cex.axis=1.2*s0, mgp=c(2.2,0.7,0)*s0, tcl = -0.25*s0, lwd=s0)
 box(which="plot", lwd=s0)
@@ -374,7 +375,7 @@ text(-0.15,0.21,pos=4,cex=1.2,
 # -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
 
 # multiple LISA-type maps ####
-aftiles <- get_tiles(extent, provider = "OpenTopoMap",
+aftiles <- get_tiles(extent, provider = "CartoDB.Voyager",
                      crop = TRUE, zoom=17)
 par(mfrow=c(1,2), mar=c(0,0,0,0), oma=c(3,3,0.5,1.5), mgp=c(1.6,0.2,0),
       tcl=0.3,lend="square", ljoin="mitre")
