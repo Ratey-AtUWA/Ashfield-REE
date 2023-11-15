@@ -330,22 +330,11 @@ To quickly check our data, we can simply use the generic `plot()` function
 (including the `add=TRUE` option) to look at the spatial location and value of
 our variable.
 
-```{r spplot-spdf, fig.height=5.8, fig.width=8, fig.align='center', out.width="80%", fig.cap="Visualization of sf point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022.", message=FALSE, warning=FALSE, results='hold', echo=FALSE}
-par(oma=c(3,3,1,1), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), 
+```{r spplot-spdf, fig.height=5.8, fig.width=8.4, fig.align='center', out.width="80%", fig.cap="Visualization of sf point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022.", message=FALSE, warning=FALSE, results='hold', echo=FALSE}
+par(oma=c(3,4,1,2), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), 
     lend=2, ljoin=1, tcl=0.3)
-plot_tiles(afstiles)
+plot_tiles(afstiles, axes=T)
 with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
-axis(1)
-mtext(side=1, line=1.6, text="Easting (UTM Zone 50, m)",
-      font=2, cex=1.2)
-axis(2)
-mtext(side=2, line=1.6, text="Northing (UTM Zone 50, m)",
-      font=2, cex=1.2)
-addnortharrow(pos="topright", border=1, lwd=1, text.col=1,  
-              padin=c(0.1,0.2), scale=1.2)
-addscalebar(plotepsg = 32750)
-box()
-
 plot(REE_sf, add=T, pch=19, cex=1.5, pal=viridis::plasma(11, alpha=0.7))
 ```
 
@@ -512,12 +501,11 @@ summary(idw_REE)
 
 ### ├ Simple plot of kriging output
 
-We can then us the `spplot()` function from sp to visualise the 
+We can quickly use the `plot()` function on our `sf` object to visualise the 
 kriging predictions and variance, but without a background map.
 
 ```{r spplot-kriging-output, fig.width=8, fig.height=5.85, fig.align='center', echo=2, fig.cap="Plots of simple kriging predictions and variance for log-transformed REE in Ashfield Flats sediments 2019-2022.", out.width="75%", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
-plot(kriged_REE, pch=15, nbreaks=32, 
-     pal=mako(32))
+plot(kriged_REE, pch=15, nbreaks=32, pal=mako(32))
 ```
 
 ### ├ Plot a map with overlay of the kriging predictions
