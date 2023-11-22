@@ -4,7 +4,7 @@ library(prettymapr)
 library(viridis);library(scico)
 library(stringr)
 
-afxrd2123 <- read.csv("afxrd2123.csv", stringsAsFactors = T)
+afxrd2123 <- read.csv("afxrd2123corr.csv", stringsAsFactors = T)
 afxrd2123$Sample <- as.character(afxrd2123$Sample)
 
 extent <- st_as_sf(x = data.frame(x = c(399880,400520),
@@ -96,14 +96,13 @@ with(afr_map, lines(drain_E, drain_N, col="steelblue"))
 with(afxrd2123, text(Easting, Northing, labels=row.names(afxrd2123), cex=0.75))
 
 afxrd_clr <- afxrd2123
-afxrd_clr[,8:47] <- t(apply(afxrd_clr[,8:47], MARGIN = 1,
+afxrd_clr[,8:38] <- t(apply(afxrd_clr[,8:38], MARGIN = 1,
                             FUN = function(x){log(x) - mean(log(x),na.rm=T)}))
-plot(afxrd_clr)
-summary(afxrd_clr)
 # replace NAs with nominal (low) value
-for(i in 8:47){
+for(i in 8:38){
   afxrd_clr[which(is.na(afxrd_clr[,i])),i] <- -7
 }
+summary(afxrd_clr)
 
 af_min_pca <- prcomp(afxrd_clr[,c(8:47)], scale. = TRUE)
 summary(af_min_pca)

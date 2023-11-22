@@ -330,7 +330,7 @@ To quickly check our data, we can simply use the generic `plot()` function
 (including the `add=TRUE` option) to look at the spatial location and value of
 our variable.
 
-```{r spplot-spdf, fig.height=5.8, fig.width=8.4, fig.align='center', out.width="80%", fig.cap="Visualization of sf point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022.", message=FALSE, warning=FALSE, results='hold', echo=FALSE}
+```{r spplot-spdf, fig.height=5.8, fig.width=8.4, fig.align='center', out.width="80%", fig.cap="Quick visualization of sf point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022.", message=FALSE, warning=FALSE, results='hold', echo=FALSE}
 par(oma=c(3,4,1,2), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), 
     lend=2, ljoin=1, tcl=0.3)
 plot_tiles(afstiles, axes=T)

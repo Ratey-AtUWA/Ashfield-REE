@@ -106,12 +106,13 @@ smallmap <-
   get_tiles(st_as_sf(x = data.frame(x = c(391000,405300),
                                     y = c(6460900,6469300)),
                      coords = c("x", "y"), crs = UTM50S),
-                      provider = "Stamen.TerrainBackground", crop=T, zoom=12)
+                     provider = "Thunderforest.Neighbourhood",
+            apikey=ThunderKey, crop=T, zoom=13)
 png(filename = "inset.png", width = 768, height=470)
     plot(smallmap, asp=1);box(lwd=3, col=1)
     rect(399860,6467920,400670,6468500,lwd=10, border="white", lend=2, ljoin=1)
     rect(399860,6467920,400670,6468500,lwd=4, col="#FFFFFF00", lend=2, ljoin=1)
-    text(c(400290,392400),c(6467600,6464800), pos=1, font=4, cex=4,
+    text(c(400600,392400),c(6467500,6464800), pos=c(4,1), font=4, cex=4,
                labels=c("Ashfield\nFlats","Perth\nCBD"))
     addscalebar(plotepsg = 32750, linecol=1, label.col=1, htin=0.3,
                 label.cex=3.6, widthhint = 0.25, lwd=2,
@@ -119,7 +120,7 @@ png(filename = "inset.png", width = 768, height=470)
 dev.off()
 
 s0 <- 4
-png(filename = "afsed1922_sample_map.png", width=768*s0, height=464*s0)
+png(filename = "afsed1923_sample_map.png", width=768*s0, height=464*s0)
 par(oma=c(4,4,1,1)*s0, tcl = -0.25*s0,
     lend = "round", ljoin = "round", lheight=0.7)
 layout(matrix(c(1,1,1,1,2),nrow = 1))
@@ -131,7 +132,7 @@ mtext("Northing (m)",2,2.6*s0,font=2,cex = 1.2*s0)
 addnortharrow(border = 10, text.col=10, scale = 1.25*s0, lwd = s0,
               padin=c(0.15,0.15)*s0)
 addscalebar(plotepsg = 32750, linecol=10, label.col=11, htin=0.2*s0,
-    lwd=0.667*s0, widthhint = 0.15, padin=c(0.15,0.15)*s0, pos="bottomright")
+    lwd=0.667*s0, widthhint = 0.25, padin=c(0.15,0.15)*s0, pos="bottomright")
 shadowtext(400580,6467918,labels="100 m", pos=2, cex=1.8*s0)
 with(afr_map, polygon(wetland_E, wetland_N, border="lightblue",
                       col="#8080FF60", lty="33", lend="round", lwd=1.2*s0))
@@ -151,18 +152,18 @@ shadowtext(c(400075,400330,400430,400065,400145,400430,400340,400000,399990),
                       "NW Lake","SE\n  Lake","Saltmarsh","Saltmarsh",
                       "    S\nwetlands","SW Lake"),
            pos=c(4,2,2,4,4,1,1,4,2), font = 3, cex=1.6*s0, col="lightblue")
-with(afs1922, points(Easting, Northing, col = 10, bg = c(2,3,7,1)[Year],
-                     lwd=1.33*s0, pch = c(21,22,23,24)[Year],
-                     cex = s0*c(2.2,1.8,1.8,1.8)[Year],
+with(afs1923, points(Easting, Northing, col = 10, bg = c(2,3,7,1,8)[Year],
+                     lwd=1.33*s0, pch = c(21,22,23,24,25)[Year],
+                     cex = s0*c(2.2,1.8,1.8,1.8,1.8)[Year],
                      ljoin="mitre"))
 inset <- png::readPNG("inset.png")
 addImg(inset, x=399990, y=6468420, width=280)
 plot(c(0,1),c(0,1),type="n",ann=F,xaxt="n",yaxt="n",bty="n",xlab="",ylab="")
 legend("top", bg="grey33", cex = 1.6*s0, text.col = 10, y.intersp = 1.4,
-       legend = levels(afs1922$Year),
+       legend = levels(afs1923$Year),
        title = expression(bold("     Sampling Year      ")),
-       pch = c(21,22,23,24), pt.bg = c(2,3,7,1), col = 10,
-       pt.cex = c(2.2,1.8,1.8,1.8)*s0, pt.lwd=1.33*s0)
+       pch = c(21,22,23,24,25), pt.bg = c(2,3,7,1,8), col = 10,
+       pt.cex = c(2.2,1.8,1.8,1.8,1.8)*s0, pt.lwd=1.33*s0)
 text(0.0,0.6,pos=4,labels="Ashfield Flats Reserve", font=2, cex=1.3*s0)
 text(rep(0.0,2),c(0.5,0.4),pos=4,labels=c("Map tiles:\nESRI World Imagery",
                 "Projection: UTM Zone 50S,\nWGS84 (EPSG:32750)"), cex = 1.25*s0)
