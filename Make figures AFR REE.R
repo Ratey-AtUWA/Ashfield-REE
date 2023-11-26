@@ -133,7 +133,7 @@ addnortharrow(border = 10, text.col=10, scale = 1.25*s0, lwd = s0,
               padin=c(0.15,0.15)*s0)
 addscalebar(plotepsg = 32750, linecol=10, label.col=11, htin=0.2*s0,
     lwd=0.667*s0, widthhint = 0.25, padin=c(0.15,0.15)*s0, pos="bottomright")
-shadowtext(400580,6467918,labels="100 m", pos=2, cex=1.8*s0)
+shadowtext(400470,6467918,labels="200 m", pos=2, cex=1.8*s0)
 with(afr_map, polygon(wetland_E, wetland_N, border="lightblue",
                       col="#8080FF60", lty="33", lend="round", lwd=1.2*s0))
 with(afr_map, lines(drain_E, drain_N, col = "#8080FFB0", lwd=2.4*s0))

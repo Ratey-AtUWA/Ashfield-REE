@@ -104,7 +104,7 @@ for(i in 8:38){
 }
 summary(afxrd_clr)
 
-af_min_pca <- prcomp(afxrd_clr[,c(8:47)], scale. = TRUE)
+af_min_pca <- prcomp(afxrd_clr[,c(8:38)], scale. = TRUE)
 summary(af_min_pca)
 plot(af_min_pca)
 biplot(af_min_pca, choices = c(1,2))
@@ -159,7 +159,7 @@ ff <- 0.07
 with(af_min_pca, plot(x[,1]*ff, x[,2]*ff, cex=2, asp=1,
                       pch=c(21,22,23,24,25,21,22,23,24)[afxrd_clr$Zone],
                       bg=plasma(9, alpha=0.7)[afxrd_clr$Zone],
-                      xlim=c(-0.4,.7), ylim=c(-0.4,0.8),
+                      xlim=c(-0.4,.9), ylim=c(-0.65,0.35),
                       xlab="PC1", ylab="PC2", cex.lab=1.4))
 with(af_min_pca, arrows(0,0,rotation[,1],rotation[,2], len=0.1, ang=20, lwd=3,
                         col=varcols))

@@ -1,5 +1,5 @@
 ---
-title: "Ashfield 2019-2022 spatial analyses"
+title: "Ashfield 2019-2023 spatial analyses"
 output: 
   bookdown::html_document2:
     fig_width: 6.4
@@ -78,7 +78,7 @@ st_coordinates(extent)
 
 ### ├ Getting and plotting the map tile data
 
-```{r basemap, fig.height=5.85, fig.width=8, fig.align='center', fig.cap="Map of Ashfield Flats Reserve and adjacent area (UTM projection, Zone 50S, EPSG:32750) used subsequently as the base map for spatial analyses. Generated using the maptiles R package, with OpenStreetMap tiles.", out.width="75%", warning=FALSE, message=FALSE, results='hide', echo=FALSE}
+```{r basemap, fig.height=5.75, fig.width=8, fig.align='center', fig.cap="Map of Ashfield Flats Reserve and adjacent area (UTM projection, Zone 50S, EPSG:32750) used subsequently as the base map for spatial analyses. Generated using the maptiles R package, with OpenStreetMap tiles.", out.width="75%", warning=FALSE, message=FALSE, results='hide', echo=FALSE}
 afstiles <- get_tiles(extent, provider="Thunderforest.OpenCycleMap",
              apikey="03b0375e8e7c47d0a03018a9001de439",
                       crop = TRUE, zoom = 17) # make map object
@@ -116,14 +116,14 @@ data_temp <- na.omit(afs1923surf[,c("Easting", "Northing", var0)])
 Coords <- cbind(data_temp$Easting, data_temp$Northing)
 bw <- 8 # bw = bandwidth, = number of nearest point for calculation
 mI <- moransI(Coords, bw, data_temp[,3])
-cat("Global Moran's I for ",var0,"; from Ashfield Flats 2019-2022\n", sep="");
+cat("Global Moran's I for ",var0,"; from Ashfield Flats 2019-2023\n", sep="");
 t(as.matrix(mI[c(2,4:7)]))
 rm(list = c("data_temp","Coords","bw","mI","var0")) # remove temporary objects
 ```
 
 ### ├ Plot local Moran's I
 
-```{r local-Moran, message=FALSE, warning=FALSE, fig.height=5.85, fig.width=8, fig.align='center', out.width="80%", fig.cap="Map of Local Moran's I for REE concentrations in Ashfield Flats sediments 2019-2022. The Global Moran's I parameter is also shown beneath the legend.", results='hide', echo=FALSE}
+```{r local-Moran, message=FALSE, warning=FALSE, fig.height=5.75, fig.width=8, fig.align='center', out.width="80%", fig.cap="Map of Local Moran's I for REE concentrations in Ashfield Flats sediments 2019-2023. The Global Moran's I parameter is also shown beneath the legend.", results='hide', echo=FALSE}
 var0 <- "REE" # choose the variable of interest
 data_temp <- na.omit(afs1923surf[,c("Easting", "Northing", var0)])
 Coords <- cbind(data_temp$Easting, data_temp$Northing)
@@ -170,7 +170,7 @@ text(400600,6467860,
 
 ### ├ Plot 'LISA'
 
-```{r lisa-plot, message=FALSE, warning=FALSE, fig.height=5.85, fig.width=8, fig.align='center', out.width="80%", fig.cap="Map of LISA for REE concentrations in the Ashfield Flats sediment data, 2019-2022.", results='hide',echo=FALSE}
+```{r lisa-plot, message=FALSE, warning=FALSE, fig.height=5.75, fig.width=8, fig.align='center', out.width="80%", fig.cap="Map of LISA for REE concentrations in the Ashfield Flats sediment data, 2019-2023.", results='hide',echo=FALSE}
 data_temp <- na.omit(as.data.frame(cbind(afs1923surf$Easting,afs1923surf$Northing,
                                          afs1923surf$REE)))
 colnames(data_temp) <- c("Easting","Northing","REE")
@@ -226,7 +226,7 @@ legend("bottomright", bty = "o", inset = 0.015, cex = 1, ncol = 3,
 
 ### ├ LISA maps for multiple variables
 
-```{r multi-LISA, fig.height=15.96, fig.width=12, fig.align='center', fig.cap="LISA autocorrelation maps for REE, Al, Fe, S, As, Cu, Pb, and Zn concentrations in the Ashfield Flats sediment data, 2019-2022.", message=FALSE, warning=FALSE, echo=FALSE}
+```{r multi-LISA, fig.height=15.96, fig.width=12, fig.align='center', fig.cap="LISA autocorrelation maps for REE, Al, Fe, S, As, Cu, Pb, and Zn concentrations in the Ashfield Flats sediment data, 2019-2023.", message=FALSE, warning=FALSE, echo=FALSE}
 par(mfrow=c(4,2), mar=c(0,0,0,0), oma=c(3,3,0.5,1.5), mgp=c(1.6,0.2,0), 
     tcl=0.3,lend="square", ljoin="mitre")
 palette(c("black","#400000","blue3","orange","skyblue",
@@ -292,6 +292,72 @@ par(mfrow=c(1,1), mar=c(3,3,0.5,0.5), oma=c(0,0,0,0), mgp=c(1.6,0.2,0),
 
 ```
 
+### ├ LISA maps for REE, Al only
+
+```{r REE-Al-LISA, fig.height=6.6, fig.width=18, fig.align='center', fig.cap="LISA autocorrelation maps for (a) ∑REE and (b) Al concentrations in the Ashfield Flats sediment data, 2019-2023.", message=FALSE, warning=FALSE, echo=FALSE}
+par(mfrow=c(1,2), mar=c(0,0,0,0), oma=c(3,3,0.5,1.5), mgp=c(1.6,0.2,0), 
+    tcl=0.3,lend="square", ljoin="mitre")
+palette(c("black","#402000","blue3","#a58400","skyblue",
+                 "#ffd000","#8080FF","#FFA50040","#87CEEB40","white"))
+varz <- c("REE","Al") 
+for (i in 1:length(varz)){
+  data_temp <- na.omit(as.data.frame(cbind(afs1923$Easting,afs1923$Northing,
+                                         afs1923[,varz[i]])))
+  colnames(data_temp) <- c("Easting","Northing",varz[i])
+
+  Coords <- cbind(data_temp$Easting, data_temp$Northing)
+  bw <- 8
+  locMI <- l.moransI(Coords,bw,data_temp[,varz[i]], scatter.plot = F)
+  LISA <- as.data.frame(cbind(Coords[,1:2], log10(data_temp[,varz[i]]), 
+                            locMI$Ii, 
+                            locMI$p.value))
+  colnames(LISA) <- c("Easting", "Northing", var0, "MoranI", "p_value")
+  medREE <- median(LISA[,var0], na.rm = TRUE)
+  HiHi <- subset(LISA, LISA$p_value<=0.05&LISA$MoranI>0&LISA[,var0]>=medREE)
+  LoLo <- subset(LISA, LISA$p_value<=0.05&LISA$MoranI>0&LISA[,var0]<medREE)
+  HiLo <- subset(LISA, LISA$p_value<=0.05&LISA$MoranI<0&LISA[,var0]>=medREE)
+  LoHi <- subset(LISA, LISA$p_value<=0.05&LISA$MoranI<0&LISA[,var0]<medREE)
+
+  plot_tiles(afstiles)
+  with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
+  axis(1, cex.axis=1.4, at = seq(399900,400600,100), 
+       labels = c("399900","400000","400100","400200","400300","400400","400500",""))
+  mtext(side=1, line=1.6, text="Easting (UTM Zone 50, m)", font=2, cex=1.6)
+  if(round(i/2,0) != (i/2)) {
+    axis(2, cex.axis=1.4)
+    mtext(side=2, line=1.6, text="Northing (UTM Zone 50, m)", font=2, cex=1.6)
+  }
+  addnortharrow(pos="topleft", border=1, lwd=1, text.col=1,  
+              padin=c(0.08,0.08), scale = 1.25)
+  addscalebar(plotepsg = 32750, label.cex = 1.8, htin=0.2, widthhint=0.15)
+  box()
+  with(data_temp, points(Easting, Northing, pch=3, cex = 0.85, col="grey65"))
+  with(HiHi, points(Northing ~ Easting, pch = 22,
+                    col = 2, bg = 6, lwd = 2, cex = 1.8))
+  with(LoLo, points(Northing ~ Easting, pch = 21, 
+                    col = 3, bg = 7, lwd = 2, cex = 2))
+  with(HiLo, points(Northing ~ Easting, pch = 25,  
+                    col = 4, bg = 3, lwd = 3, cex = 1.4))
+  with(LoHi, points(Northing ~ Easting, pch = 24,
+                    col = 3, bg = 6, lwd = 3, cex = 1.4))
+  mtext(varz[i],3,-2,adj=0.5,font=2,cex=2)
+  mtext(paste0("(",letters[i],")"),3,-2,adj=0.98,font=2,cex=2)
+}
+rect(400090,6467855,400590,6467930,col="#FFFFFF80", border = "#B0B0B080")
+legend("bottomright", bty = "n", cex = 1.6, ncol=3,
+       legend = c("High-High", "Low-Low","High-Low","Low-High","Samples"),
+       pch = c(22, 21, 25,24,3), pt.cex = c(1.8,2,1.4,1.4,0.85), 
+       pt.lwd = c(2,2,2,2,1),
+       col = c(2,3,4,3,"grey65"), pt.bg = c(6,7,3,6,NA), text.col = 1,
+       box.col = "#b0b0b0", box.lwd = 1.3, bg = "#E8E8E8",
+       x.intersp = 0.8, inset=c(0.04,0))
+text(400340,6467935,pos=3,labels="Spatial autocorrelation key", font=3,
+     cex=1.6, offset = 0.15)
+par(mfrow=c(1,1), mar=c(3,3,0.5,0.5), oma=c(0,0,0,0), mgp=c(1.6,0.2,0), 
+    tcl=0.3,lend="square", ljoin="mitre")
+
+```
+
 ```{r remove-temps-2, message=FALSE, warning=FALSE, include=FALSE}
 rm(list = c("data_temp","Coords","mI","locMI", "plotdata", "pos0", "neg0",
             "LISA","medREE","HiHi","LoLo","HiLo","LoHi","bw","i","local_moran",
@@ -330,7 +396,7 @@ To quickly check our data, we can simply use the generic `plot()` function
 (including the `add=TRUE` option) to look at the spatial location and value of
 our variable.
 
-```{r spplot-spdf, fig.height=5.8, fig.width=8.4, fig.align='center', out.width="80%", fig.cap="Quick visualization of sf point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2022.", message=FALSE, warning=FALSE, results='hold', echo=FALSE}
+```{r spplot-spdf, fig.height=5.8, fig.width=8.4, fig.align='center', out.width="80%", fig.cap="Quick visualization of sf point data object for log10-transformed REE concentrations in Ashfield Flats sediments 2019-2023.", message=FALSE, warning=FALSE, results='hold', echo=FALSE}
 par(oma=c(3,4,1,2), mar=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), 
     lend=2, ljoin=1, tcl=0.3)
 plot_tiles(afstiles, axes=T)
@@ -340,7 +406,7 @@ plot(REE_sf, add=T, pch=19, cex=1.5, pal=viridis::plasma(11, alpha=0.7))
 
 ### ├ Plot a map with range-class symbols
 
-```{r ree-tukey-plot, echo=2:19, fig.width=10, fig.height=7.3, fig.align='center', fig.cap="Map of REE concentrations expressed as symbols for concentration ranges (UQR is 75th percentile, upWsk is upper whisker, med is median, LQR is 25th percentile, loWsk is lower whisker). Data are from Ashfield Flats sediments 2019-2022.", out.width="80%", message=FALSE, warning=FALSE,echo=FALSE}
+```{r ree-tukey-plot, echo=2:19, fig.width=10, fig.height=7.3, fig.align='center', fig.cap="Map of REE concentrations expressed as symbols for concentration ranges (UQR is 75th percentile, upWsk is upper whisker, med is median, LQR is 25th percentile, loWsk is lower whisker). Data are from Ashfield Flats sediments 2019-2023.", out.width="80%", message=FALSE, warning=FALSE,echo=FALSE}
 palette(c("black",plasma(6, alpha=0.65),"grey92", "white"))
 par(oma=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), lend=2, ljoin=1, tcl=0.3)
 plot_tiles(afstiles)
@@ -398,7 +464,7 @@ knitr::kable(tukbins, table.attr = "class=\"striped\"",format="html",
 
 ### ├ Make a binned simple variogram object
 
-```{r make-variogram-object, message=FALSE, warning=FALSE, echo=FALSE, fig.align='center', fig.cap="Plot of experimental binned variogram for REE in Ashfield Flats sediments 2019-2022.", fig.height=3.5, fig.width=4.5, out.width="50%"}
+```{r make-variogram-object, message=FALSE, warning=FALSE, echo=FALSE, fig.align='center', fig.cap="Plot of experimental binned variogram for REE in Ashfield Flats sediments 2019-2023.", fig.height=3.5, fig.width=4.5, out.width="50%"}
 par(mar = c(3,3,1,1), mgp = c(1.7,0.3,0), font.lab=2, tcl=0.3)
 variog_REE <- variogram(sqrt(REE)~1, REE_sf, cutoff=150) # , cressie = TRUE
 attz <- attributes(variog_REE)
@@ -425,7 +491,7 @@ vmodel_REE <- fit.variogram(variog_REE,
 vmodel_REE
 ```
 
-```{r plot-exp-model-variograms, fig.height=3.6, fig.width=5, fig.align='center', fig.cap="Plot of experimental binned variogram, and exponential variogram model, for REE in Ashfield Flats sediments 2019-2022.", out.width="50%", results='hide', echo=FALSE}
+```{r plot-exp-model-variograms, fig.height=3.6, fig.width=5, fig.align='center', fig.cap="Plot of experimental binned variogram, and exponential variogram model, for REE in Ashfield Flats sediments 2019-2023.", out.width="50%", results='hide', echo=FALSE}
 par(mar = c(4,4,1,1), mgp = c(1.7,0.3,0), tcl=0.25, font.lab=2)
 with(variog_REE, plot(dist, gamma, ylim = c(0, max(gamma)), cex.lab=1.2, 
                    lwd=2, xlab = "Distance (m)", 
@@ -504,13 +570,13 @@ summary(idw_REE)
 We can quickly use the `plot()` function on our `sf` object to visualise the 
 kriging predictions and variance, but without a background map.
 
-```{r spplot-kriging-output, fig.width=8, fig.height=5.85, fig.align='center', echo=2, fig.cap="Plots of simple kriging predictions and variance for log-transformed REE in Ashfield Flats sediments 2019-2022.", out.width="75%", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+```{r spplot-kriging-output, fig.width=8, fig.height=5.85, fig.align='center', echo=2, fig.cap="Plots of simple kriging predictions and variance for log-transformed REE in Ashfield Flats sediments 2019-2023.", out.width="75%", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
 plot(kriged_REE, pch=15, nbreaks=32, pal=mako(32))
 ```
 
 ### ├ Plot a map with overlay of the kriging predictions
 
-```{r map-krig-mod-pred, fig.height=16, fig.width=12, fig.align='center', fig.cap="Map showing kriging predictions for REE in Ashfield Flats sediments 2019-2022 by (a) kriging, (b) inverse distance weighted interpolation. Sample points are tiny dots, drains are shown with solid lines, and seasonal wetland pond outlines are semitransparent and dashed.", message=FALSE, warning=FALSE, echo=FALSE}
+```{r map-krig-mod-pred, fig.height=16, fig.width=12, fig.align='center', fig.cap="Map showing kriging predictions for REE in Ashfield Flats sediments 2019-2023 by (a) kriging, (b) inverse distance weighted interpolation. Sample points are tiny dots, drains are shown with solid lines, and seasonal wetland pond outlines are semitransparent and dashed.", message=FALSE, warning=FALSE, echo=FALSE}
 par(mfrow=c(2,1), oma=c(4,4,1.5,1.5), mgp=c(1.4,0.3,0), lend=2, ljoin=1, 
     tcl=0.3, new=FALSE)
 nclr <- 52

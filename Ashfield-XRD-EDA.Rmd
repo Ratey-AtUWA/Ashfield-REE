@@ -170,10 +170,17 @@ for (i in 1:length(claySamples)){
 }
 ```
 
+# Summary of random powder XRD data
+
 ```{r clay-table, results='hold', echo=FALSE}
-claytable <- read.csv(file="clay_mineralogy_S2_2022.csv")
-font(set_caption(flextable(claytable),
-            caption = "Summary of clay plate XRD for Ashfield Flats samples 2022. (S = strong, M = medium, W = weak, p = possible, - = absent)"), fontname = "Arial Narrow", part="all")
+afxrd2123 <- read.csv("afxrd2123corr.csv", stringsAsFactors = T)
+afxrd2123$Sample <- as.character(afxrd2123$Sample)
+
+flextable(afxrd2123) |>
+  rotate(j=6:38, rotation="btlr", part="header") |>
+  set_caption(caption = "Summary of clay plate XRD for Ashfield Flats samples 2021-2023. Values are percentages based on semiquantitiaive Rietveld refinement of XRD patterns.") |>
+  font(fontname = "Arial Narrow", part="all") |>
+  vline(border=officer::fp_border(color = "grey65", style = "solid", width = 0.5))
 ```
 
 ----------------------
