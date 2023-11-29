@@ -1,0 +1,344 @@
+---
+title: "Ashfield 2021-2023 XRD summaries and PCA"
+output: 
+  bookdown::html_document2:
+    fig_width: 6.4
+    fig_height: 4.8
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+```{r load packages and environment but do not show, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
+library(mgsub)
+library(stringr)
+library(flextable)
+  set_flextable_defaults(font.family = 'sans', theme_fun = "theme_zebra", 
+        font.size = 11, text.align = "right",padding.left = 1, padding.right = 1,
+        padding.top = 2, padding.bottom = 2)
+library(lctools)
+library(gstat)
+library(sf)
+library(maptiles)
+library(prettymapr)
+library(viridis)
+library(scico)
+```
+
+```{r more-setup, message=FALSE, warning=FALSE, echo=FALSE}
+git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
+afr_map <- read.csv(file=paste0(git,"afr_map_v3.csv"), stringsAsFactors = TRUE)
+pal4lite <- c("black", plasma(8), "white")
+pal4liteTransp <- 
+  c("black", scico(8, alpha=0.7, palette="hawaii", beg=0.1), "white")
+pal4dark <- c("white", turbo(8, beg=0.2, end=0.9,dir=1), "black")
+```
+
+Sediment samples were homogenised, and a 20 g subsample was taken for
+preparation for XRD analysis. Organic matter was removed from samples by
+suspending samples in 30% H~2~O~2~ with gentle heating, and the organic-free samples
+were dried at 60&nbsp;°C.
+
+Sub-samples for random powder XRD analysis were prepared from the organic-free
+material by The clay fraction of sediment samples was separated by sedimentation
+after dispersion in 0.01M sodium hexametaphosphate solution. Using Stokes Law to
+estimate sampling time and depth, the suspension containing only particles
+≤&nbsp;2&nbsp;µm was collected on a porous sample holder to provide an oriented
+sample for XRD analysis. After initial saturation with MgCl~2~, subsequent
+washing with H~2~O (to remove excess MgCl~2~), and air drying, powder
+diffraction patterns were acquired using a Panalytical Aeris X-ray
+Diffractometer. The same sample was similarly treated with 50% glycerol
+solution, and the diffraction pattern remeasured. Samples suspected to contain
+vermiculite and/or interstratified 2:1 phyllosilicates were heated at
+400&nbsp;°C and 550&nbsp;°C and remeasured after each heating step. Clay X-ray
+diffraction patterns were collected using Co-Kα1 radiation generated at
+40&nbsp;kV and 15&nbsp;mA using a Ni filter, with a goniometer range of
+3-30&nbsp;°2θ and step size of 0.00109&nbsp;°2θ, and a total scan time of 8
+minutes. XRD patterns were analysed using High Score Plus software (Degen, 2014)
+in conjunction with the USGS clay mineral identification key (Poppe, 2004).
+
+<p>&nbsp;</p>
+
+# Summary of random powder XRD data
+
+```{r clay-table, results='hold', echo=FALSE}
+afxrd2123 <- read.csv("afxrd2123corr.csv", stringsAsFactors = T)
+afxrd2123$Sample <- as.character(afxrd2123$Sample)
+
+flextable(afxrd2123) |>
+  rotate(j=6:38, rotation="btlr", part="header") |>
+  valign(valign="bottom", part="header") |>
+  set_caption(caption = "Summary of random powder XRD for Ashfield Flats samples 2021-2023. Values are percentages based on semiquantitative Rietveld refinement of XRD patterns. Feldspars (mainly albite, microcline, orthoclase, and anorthite) have been combined into a single category.") |>
+  font(fontname = "Arial Narrow", part="all") |>
+  vline(border=officer::fp_border(color = "grey65", style = "solid", width = 0.5))
+```
+
+<p>&nbsp;</p>
+
+```{r map-pyrite-jarosite, fig.width=10.4, fig.height=7, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Locations at Ashfield Flats where pyrite and jarosite were detected by XRD in sediment samples.", results='hold'}
+extent <- st_as_sf(x = data.frame(x = c(399880,400520),
+                                  y = c(6467960,6468360)),
+                   coords = c("x", "y"), crs = st_crs(32750))
+aftiles <- get_tiles(extent, provider="Thunderforest.OpenCycleMap",
+             apikey="03b0375e8e7c47d0a03018a9001de439",
+                      crop = TRUE, zoom = 17) # make map object
+par(mfrow=c(1,1), mar=c(0,0,0,0), oma=c(3,3,0.5,1.5), mgp=c(1.6,0.2,0),
+    tcl=0.3,lend="square", ljoin="mitre")
+plot_tiles(aftiles)
+axis(1);axis(2);box()
+mtext(side=1, line=1.6, text="Easting (UTM Zone 50, m)", font=2, cex=1)
+mtext(side=2, line=1.6, text="Northing (UTM Zone 50, m)", font=2, cex=0.9)
+addnortharrow(pos="topleft", border=1, lwd=1, text.col=1,
+padin=c(0.05,0.05), scale = 0.7)
+addscalebar(plotepsg = 32750, label.cex = 1.2)
+with(afr_map, polygon(wetland_E, wetland_N, col="skyblue",
+border="steelblue"))
+with(afr_map, lines(drain_E, drain_N, col="steelblue"))
+with(subset(afxrd2123,afxrd2123$Type!="Core"),
+     points(Easting, Northing, cex=sqrt(Jarosite),
+                       pch=22, bg="#fff08080"))
+with(subset(afxrd2123,afxrd2123$Type!="Core"),
+     points(Easting, Northing, cex=sqrt(Pyrite),
+            pch=21, bg="#8000c080"))
+legend("bottomright", legend = c("10%","1%",NA,"Pyrite","Jarosite"),
+       bty="n", inset=0.02, title=expression(bold("Mineral content")),
+       pt.cex=c(3.16,1,NA,2,2), pch=c(21,21,NA,21,22),
+       pt.bg=c("#80808080","#80808080",NA,"#8000c080","#fff08080"))
+
+```
+
+```{r map-calcite-gypsum, fig.width=10.4, fig.height=7, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Locations at Ashfield Flats where calcite and gypsum were detected by XRD in sediment samples.", echo=FALSE, results='hold'}
+# calcite & gypsum
+par(mfrow=c(1,1), mar=c(0,0,0,0), oma=c(3,3,0.5,1.5), mgp=c(1.6,0.2,0),
+    tcl=0.3,lend="square", ljoin="mitre")
+plot_tiles(aftiles)
+axis(1);axis(2);box()
+mtext(side=1, line=1.6, text="Easting (UTM Zone 50, m)", font=2, cex=1)
+mtext(side=2, line=1.6, text="Northing (UTM Zone 50, m)", font=2, cex=0.9)
+addnortharrow(pos="topleft", border=1, lwd=1, text.col=1,
+              padin=c(0.05,0.05), scale = 0.7)
+addscalebar(plotepsg = 32750, label.cex = 1.2)
+with(afr_map, polygon(wetland_E, wetland_N, col="skyblue",
+                      border="steelblue"))
+with(afr_map, lines(drain_E, drain_N, col="steelblue"))
+with(subset(afxrd2123,afxrd2123$Type!="Core"),
+     points(Easting, Northing, cex=sqrt(Calcite),
+            pch=21, bg="#ffffff80"))
+with(subset(afxrd2123,afxrd2123$Type!="Core"),
+     points(Easting, Northing, cex=sqrt(Gypsum),
+            pch=22, bg="#ff808080"))
+legend("bottomright", legend = c("10%","1%",NA,"Calcite","Gypsum"),
+       bty="n", inset=0.02, title=expression(bold("Mineral content")),
+       pt.cex=c(3.16,1,NA,2,2), pch=c(21,21,NA,21,22),
+       pt.bg=c("#b0b0b080","#b0b0b080",NA,"#ffffff80","#ff808080"))
+
+```
+
+# Pricipal Components Analysis using mineral percentages
+
+```{r clr-transform-mineral-data, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+afxrd_clr <- afxrd2123
+afxrd_clr[,8:38] <- t(apply(afxrd_clr[,8:38], MARGIN = 1,
+                            FUN = function(x){log(x) - mean(log(x),na.rm=T)}))
+# replace NAs with nominal (low) value
+for(i in 8:38){
+  afxrd_clr[which(is.na(afxrd_clr[,i])),i] <- -7
+}
+```
+
+```{r do-pca, message=FALSE, warning=FALSE, results='hold'}
+af_min_pca <- prcomp(afxrd_clr[,c(8:38)], scale. = TRUE)
+summary(af_min_pca)
+```
+
+<p>&nbsp;</p>
+
+```{r show-variables-influencing-PCs, message=FALSE, warning=FALSE, paged.print=FALSE, echo=FALSE, results='hold'}
+x0 <- 1      # ■■■ CHOOSE THE PRINCIPAL COMPONENT TO BE MAPPED ■■■
+varwts1 <- data.frame(PC1.var=row.names(af_min_pca$rotation),
+                      PC1=round(af_min_pca$rotation[,x0],3),
+                      PC1abs=abs(af_min_pca$rotation[,x0]))
+varwts1 <- varwts1[rev(order(varwts1$PC1abs)),] ; row.names(varwts1) <- NULL
+x0 <- 2      # ■■■ CHOOSE THE PRINCIPAL COMPONENT TO BE MAPPED ■■■
+varwts2 <- data.frame(PC2.var=row.names(af_min_pca$rotation),
+                      PC2=round(af_min_pca$rotation[,x0],3),
+                      PC2abs=abs(af_min_pca$rotation[,x0]))
+varwts2 <- varwts2[rev(order(varwts2$PC2abs)),] ; row.names(varwts2) <- NULL
+x0 <- 3      # ■■■ CHOOSE THE PRINCIPAL COMPONENT TO BE MAPPED ■■■
+varwts3 <- data.frame(PC3.var=row.names(af_min_pca$rotation),
+                      PC3=round(af_min_pca$rotation[,x0],3),
+                      PC3abs=abs(af_min_pca$rotation[,x0]))
+varwts3 <- varwts3[rev(order(varwts3$PC3abs)),] ; row.names(varwts3) <- NULL
+x0 <- 4      # ■■■ CHOOSE THE PRINCIPAL COMPONENT TO BE MAPPED ■■■
+varwts4 <- data.frame(PC4.var=row.names(af_min_pca$rotation),
+                      PC4=round(af_min_pca$rotation[,x0],3),
+                      PC4abs=abs(af_min_pca$rotation[,x0]))
+varwts4 <- varwts4[rev(order(varwts4$PC4abs)),] ; row.names(varwts4) <- NULL
+summwts <- cbind(varwts1[,1:2],varwts2[,1:2],varwts3[,1:2],varwts4[,1:2])
+flextable(summwts[1:8,]) |>
+  set_caption(caption="Minerals having the greatest absolute weightings for each principal component for the Ashfield Flats sediment data. Feldspars (mainly albite, microcline, orthoclase, and anorthite) have been combined into a single category.") |>
+  flextable::set_header_labels(values=list(PC1.var="Mineral", 
+                                           PC1="PC1 weighting", 
+                                           PC2.var="Mineral", 
+                                           PC2="PC2 weighting", 
+                                           PC3.var="Mineral", 
+                                           PC3="PC3 weighting", 
+                                           PC4.var="Mineral", 
+                                           PC4="PC4 weighting")) |>
+  vline(j=c(2,4,6), border=officer::fp_border(color = "grey65", style = "solid", width = 0.5)) |>
+  valign(valign="bottom", part="header") |>
+  padding(j=c(1,3,5,7), padding.left=8, part="all") |>
+  padding(j=c(2,4,6,8), padding.right=8, part="all") |>
+  width(j=c(2,4,6,8), width=2.5, unit="cm") |>
+  width(j=c(1,3,5,7), width=3.5, unit="cm")
+```
+
+<p>&nbsp;</p>
+
+## PCA biplot
+
+```{r xrd-pca-biplot, fig.width=14, fig.height=7, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Biplots summarising principal components analysis for centered-logratio transformed mineral contents in Ashfield Flats sediments. Feldspars (mainly albite, microcline, orthoclase, and anorthite) have been combined into a single category.", results='hold'}
+par(mfrow=c(1,2), oma=c(0,0,0,0), mar=c(3.5,3.5,3,3), mgp=c(1.7,0.3,0), tcl=0.25, 
+    font.lab=2, font.axis=1)
+biplot(af_min_pca, choices = c(1,2), col=c("#00000000","grey35"),
+       scale=.4, xlab="PC1", ylab="PC2", cex.lab=1.4, font.lab=2,
+       xlim=c(-0.8,2.3), ylim=c(-1,1.1)
+       )
+ff <- 0.25
+with(af_min_pca, points(x[,1]*ff, x[,2]*ff, cex=1.75,
+                        pch=c(21,22,23,24,25,21,22,23,24)[afxrd_clr$Zone],
+                        bg=plasma(9, alpha=0.7)[afxrd_clr$Zone]))
+legend("topright", bty="n", inset=0.005, cex=1.2, ncol=2, y.int=0.85,
+       title=expression(bold("Ashfield Zone")),
+       legend=levels(afxrd_clr$Zone),
+       pch=c(21,22,23,24,25,21,22,23,24), pt.cex=1.5,
+       pt.bg=plasma(9,alp=0.7))
+
+biplot(af_min_pca, choices = c(1,2), col=c("#00000000","grey35"),
+       scale=.7, xlab="PC1", ylab="PC2", cex.lab=1.4, font.lab=2,
+       xlim=c(-0.4,0.4), ylim=c(-0.2,0.32)
+       )
+ff <- 1.4
+with(af_min_pca, points(x[,1]*ff, x[,2]*ff, cex=1.75,
+                        pch=c(21,22,23,24,25,21,22,23,24)[afxrd_clr$Zone],
+                        bg=plasma(9, alpha=0.7)[afxrd_clr$Zone]))
+mtext("Zoomed in to show central\ncluster of observations",1,-1.5,adj=0.02, font=2)
+```
+
+The north pond, southwest saltmarsh, and some samples from the main saltmarsh
+have positive observation scores for both PC1 and PC2, consistent with greater
+pyrite and jarosite (PC1) and greater kaolinite and illite (*i.e*. clay) (PC2)
+(Table \@ref(tab:show-variables-influencing-PCs), Figure \@ref(fig:xrd-pca-biplot)).
+
+----------------------
+
+## Pricipal Components Analysis using only more common mineral percentages
+
+```{r clr-transform-reduced-mineral-data, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+afxrd_clr_min <- afxrd2123[,c("Easting","Northing","Type","Zone",
+                          "Quartz","Kaolinite","Illite","Feldspars","Halite",
+                          "Gypsum","Pyrite","Jarosite","Hornblende","Calcite","Rutile")]
+afxrd_clr_min[,5:15] <- t(apply(afxrd_clr_min[,5:15], MARGIN = 1,
+                            FUN = function(x){log(x) - mean(log(x),na.rm=T)}))
+# replace NAs with nominal (low) value
+for(i in 5:15){
+  afxrd_clr_min[which(is.na(afxrd_clr_min[,i])),i] <- -7
+}
+```
+
+```{r do-pca-reduced-data, message=FALSE, warning=FALSE, results='hold'}
+af_common_pca <- prcomp(afxrd_clr_min[,c(5:15)], scale. = TRUE)
+summary(af_common_pca)
+```
+
+<p>&nbsp;</p>
+
+```{r reduced-variables-influencing-PCs, message=FALSE, warning=FALSE, paged.print=FALSE, echo=FALSE, results='hold'}
+x0 <- 1      # ■■■ CHOOSE THE PRINCIPAL COMPONENT TO BE MAPPED ■■■
+varwts1 <- data.frame(PC1.var=row.names(af_common_pca$rotation),
+                      PC1=round(af_common_pca$rotation[,x0],3),
+                      PC1abs=abs(af_common_pca$rotation[,x0]))
+varwts1 <- varwts1[rev(order(varwts1$PC1abs)),] ; row.names(varwts1) <- NULL
+x0 <- 2      # ■■■ CHOOSE THE PRINCIPAL COMPONENT TO BE MAPPED ■■■
+varwts2 <- data.frame(PC2.var=row.names(af_common_pca$rotation),
+                      PC2=round(af_common_pca$rotation[,x0],3),
+                      PC2abs=abs(af_common_pca$rotation[,x0]))
+varwts2 <- varwts2[rev(order(varwts2$PC2abs)),] ; row.names(varwts2) <- NULL
+x0 <- 3      # ■■■ CHOOSE THE PRINCIPAL COMPONENT TO BE MAPPED ■■■
+varwts3 <- data.frame(PC3.var=row.names(af_common_pca$rotation),
+                      PC3=round(af_common_pca$rotation[,x0],3),
+                      PC3abs=abs(af_common_pca$rotation[,x0]))
+varwts3 <- varwts3[rev(order(varwts3$PC3abs)),] ; row.names(varwts3) <- NULL
+x0 <- 4      # ■■■ CHOOSE THE PRINCIPAL COMPONENT TO BE MAPPED ■■■
+varwts4 <- data.frame(PC4.var=row.names(af_common_pca$rotation),
+                      PC4=round(af_common_pca$rotation[,x0],3),
+                      PC4abs=abs(af_common_pca$rotation[,x0]))
+varwts4 <- varwts4[rev(order(varwts4$PC4abs)),] ; row.names(varwts4) <- NULL
+summwts <- cbind(varwts1[,1:2],varwts2[,1:2],varwts3[,1:2],varwts4[,1:2])
+flextable(summwts[1:5,]) |>
+  set_caption(caption="Minerals having the greatest absolute weightings for each principal component for the Ashfield Flats sediment data. Feldspars (mainly albite, microcline, orthoclase, and anorthite) have been combined into a single category.") |>
+  flextable::set_header_labels(values=list(PC1.var="Mineral", 
+                                           PC1="PC1 weighting", 
+                                           PC2.var="Mineral", 
+                                           PC2="PC2 weighting", 
+                                           PC3.var="Mineral", 
+                                           PC3="PC3 weighting", 
+                                           PC4.var="Mineral", 
+                                           PC4="PC4 weighting")) |>
+  vline(j=c(2,4,6), border=officer::fp_border(color = "grey65", style = "solid", width = 0.5)) |>
+  valign(valign="bottom", part="header") |>
+  padding(j=c(1,3,5,7), padding.left=8, part="all") |>
+  padding(j=c(2,4,6,8), padding.right=8, part="all") |>
+  width(j=c(2,4,6,8), width=2.5, unit="cm") |>
+  width(j=c(1,3,5,7), width=3.5, unit="cm")
+```
+
+<p>&nbsp;</p>
+
+## PCA 1-2 biplot
+
+```{r xrd-pca-biplot-reduced, fig.width=12, fig.height=6, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Biplots summarising principal components analysis for centered-logratio transformed proportions of the more common mineral phases in Ashfield Flats sediments. Feldspars (mainly albite, microcline, orthoclase, and anorthite) have been combined into a single category.", results='hold'}
+par(mfrow=c(1,2), oma=c(0,0,0,0), mar=c(3.5,3.5,1.5,0.5), mgp=c(1.7,0.3,0), tcl=0.25, 
+    font.lab=2, font.axis=1)
+biplot(af_common_pca, choices = c(1,2), col=c("#00000000","grey35"),
+       scale=.4, xlab="PC1", ylab="PC2", cex.lab=1.4, font.lab=2,
+       xlim=c(-0.55,0.8), ylim=c(-0.6,0.75)
+       )
+ff <- 0.24
+with(af_common_pca, points(x[,1]*ff, x[,2]*ff, cex=1.75,
+                        pch=c(21,22,23,24,25,21,22,23,24)[afxrd_clr_min$Zone],
+                        bg=plasma(9, alpha=0.7)[afxrd_clr_min$Zone]))
+
+plot(0:1,0:1, bty="n",axes=F,xlab="",ylab="",type="n")
+legend("left", bty="n", inset=0.005, cex=1.2, ncol=1, y.int=1,
+       title=expression(bold("Ashfield Zone")),
+       legend=levels(afxrd_clr_min$Zone),
+       pch=c(21,22,23,24,25,21,22,23,24), pt.cex=1.5,
+       pt.bg=plasma(9,alp=0.7))
+```
+
+```{r xrd-pca-biplot-34-reduced, fig.width=12, fig.height=6, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Biplots summarising principal components analysis for centered-logratio transformed proportions of the more common mineral phases in Ashfield Flats sediments. Feldspars (mainly albite, microcline, orthoclase, and anorthite) have been combined into a single category.", results='hold'}
+par(mfrow=c(1,2), oma=c(0,0,0,0), mar=c(3.5,3.5,1.5,0.5), mgp=c(1.7,0.3,0), tcl=0.25, 
+    font.lab=2, font.axis=1)
+biplot(af_common_pca, choices = c(3,4), col=c("#00000000","grey35"),
+       scale=.4, xlab="PC3", ylab="PC4", cex.lab=1.4, font.lab=2,
+       #xlim=c(-0.55,0.8), ylim=c(-0.6,0.75)
+       )
+ff <- 0.4
+with(af_common_pca, points(x[,3]*ff, x[,4]*ff, cex=1.75,
+                        pch=c(21,22,23,24,25,21,22,23,24)[afxrd_clr_min$Zone],
+                        bg=plasma(9, alpha=0.7)[afxrd_clr_min$Zone]))
+
+plot(0:1,0:1, bty="n",axes=F,xlab="",ylab="",type="n")
+legend("left", bty="n", inset=0.005, cex=1.2, ncol=1, y.int=1,
+       title=expression(bold("Ashfield Zone")),
+       legend=levels(afxrd_clr_min$Zone),
+       pch=c(21,22,23,24,25,21,22,23,24), pt.cex=1.5,
+       pt.bg=plasma(9,alp=0.7))
+```
+
+-------------------------
+
+That's it so far
