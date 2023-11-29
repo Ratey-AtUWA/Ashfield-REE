@@ -472,7 +472,7 @@ plot(variog_REE$dist, variog_REE$gamma, xlab = "Distance (m)", pch=19,
      col="blue2", ylab = expression(bold(paste("Semivariance (",gamma,")"))),
      ylim = c(0,max(variog_REE$gamma)))
 text(par("usr")[2], 0.015, pos=2,
-     labels=paste(attz$what,"with",length(attz$boundaries)-1,"bins"))
+     labels=paste(attz$what, "with", length(attz$boundaries)-1, "bins"))
 rm(attz)
 ```
 

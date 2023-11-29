@@ -157,6 +157,8 @@ text(115,-31, labels = "Perth", cex=s0, pos = 2,
 text(133,-25, labels = "Australia", cex=1.1*s0, font=2, col="sienna")
 ```
 
+<p>&nbsp;</p>
+
 # Sample map
 
 ```{r sample-map, echo=FALSE, fig.align='center', fig.cap="Map of sediment sample locations at Ashfield Flats for all sampling years 2019-2023.", fig.height=9.1, fig.width=15.2, message=FALSE, warning=FALSE, echo=FALSE}
@@ -214,6 +216,8 @@ legend("bottom", bg="grey33", cex = 1.5*s0, text.col = 10, y.intersp = 1.4,
     col = c("lightblue","#8080FFB0","#B0FFB040"))
 
 ```
+
+<p>&nbsp;</p>
 
 Samples were taken each year from 2019 to 2023 (Figure \@ref(fig:sample-map)). Different sampling designs were implemented each year depending on the perceived gaps in understanding of the site and the learning objectives desired for the students involved. Apart from three soil/sediment depth profiles in 2019, all samples were subaqueous or subaerial surface sediments (0-10cm) from stormwater drains, wetland ponds (with or without water), saltmarsh, or seasonally flooded woodland.
 
@@ -357,7 +361,7 @@ rm(list=c("names.of.cols","pt1","sw0","sw1","sw2","dt0","i","table","n0","k","co
 
 ----------------------
 
-Most variables except pH are not normally distributed (Table
+Most variables except pH are **not** normally distributed (Table
 \@ref(tab:distribution-tests)). No variables have normal distributions when
 log~10~-transformed. A few variables have normal distributions when
 power-transformed (pH, Ba). The non-normal distributions of variables, even
@@ -400,7 +404,7 @@ text(400050,6468240, labels = "Woolcock\nDrain", pos = 4,
 text(400235,6468154, labels = "Chapman\nDrain",
            font = 3, cex=1*s0, srt=45, col="steelblue")
 with(afr_map, polygon(wetland_E, wetland_N, col="lightblue", border=2, 
-                      lend="round",lwd=1.4*s0))
+                      lend="round",lwd=0.7*s0))
 with(afr_map, lines(drain_E, drain_N, col = "#6060B0B0", lwd=3*s0))
 with(afr_map, polygon(veg_E, veg_N, border = "#607F6080", lwd = 3*s0, 
                       lend="round", lty="12"))
@@ -419,6 +423,8 @@ with(afs1923, hist(log10(Mo), freq=F, breaks = "FD", main="", yaxt="n"))
 with(afs1923, lines(density(log10(Mo), na.rm=T), col = "#80700080", lwd = 2))
 afs1923$NaFac <- NULL
 ```
+
+<p>&nbsp;</p>
 
 # Additional explanatory maps
 
@@ -458,38 +464,43 @@ shadowtext(par("usr")[2],6468000, cex = 1.1, pos = 2, col="black", bg="white",
        labels = c("SW0x = DBCA names\n\n(xx) = UWA names"))
 ```
 
+<p>&nbsp;</p>
+
 ## ├ Sampling zones
 
 ```{r zone-map, echo=FALSE, fig.align='center', fig.cap="Map of sampling zones (strata) at Ashfield Flats.", fig.height=5.8, fig.width=8, message=FALSE, warning=FALSE, echo=FALSE}
 afr_zones <- read.csv(paste0(git,"afr_zones.csv"), stringsAsFactors = T)
 par(oma=c(4,4,1,1), mgp=c(1.7,0.3,0), tcl = 0.2, 
     lend = "round", ljoin = "round", lheight=0.7); s0 <- 1
-plot(aftiles) 
-with(afs1923, points(Easting, Northing, pch=3, cex=0.6,
-           col=turbo(nlevels(Zone))[Zone]))
-abline(v=seq(399900,400600,100), col="grey88", lty = 2)
-abline(h=seq(6467900,6468500,100), col="grey88", lty = 2)
-axis(1);axis(2);box(which="plot")
+plot(aftiles); axis(1);axis(2);box(which="plot")
 mtext("Easting (m)",1,1.7,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,1.7,font=2,cex = 1.2*s0)
 mtext("Projection: WGS84 UTM Zone 50 South, EPSG:32750",1,-1, cex=0.75, adj=0.98)
 addnortharrow(border = 1, text.col=1, scale = 0.9*s0)
 addscalebar(plotepsg = 32750, linecol=1, label.col=1, htin=0.15*s0, 
             label.cex=1.2*s0, widthhint = 0.15)
-palette(c("black", turbo(nlevels(afr_zones$zone), alpha=0.15)))
+# palette(c("black", turbo(nlevels(afr_zones$zone), alpha=0.15)))
+palette(c("black",scico(4,pal="batlow",alpha=0.65, end=0.75),"grey","white"))
 for (i in 1:nlevels(afr_zones$zone)){
   zdata <- subset(afr_zones, 
            afr_zones$zone == levels(afr_zones$zone)[i])
   polygon(zdata$zonesE, zdata$zonesN, border = "transparent", 
-        col=turbo(nlevels(afr_zones$zone), alpha = 0.33)[i])
+        col=c(2,2,5,3,3,3,5,3,4,4,3,2)[i])
 }
+with(afs1923, points(Easting, Northing, pch=3, cex=0.6,
+           col=c(7,7,1,7,7,7,1,7,1,1,7,7)[Zone]))
 shadowtext(c(400220,399963,400262,400284,400380,400053,
              400082,400206,400350,399955,399946,400045), 
      c(6468150,6468073,6468323,6468261,6468235,6468174,
        6468076,6468069,6468100,6467985,6468018,6468237),
-     labels = levels(afr_zones$zone), font = 2, bg="#FFFFFF",
-     col=turbo(nlevels(afr_zones$zone)))
+     labels = levels(afr_zones$zone), font = 1, bg=7,
+     col=1)
+legend("topleft", bty = "n", inset = 0.01, cex = 1.2, ncol=2, 
+       legend = c("Drain","Pond","Saltmarsh","Mixed/other"), pch = 22,
+       pt.bg = c(2,3,4,5), pt.cex = 2.5)
 ```
+
+<p>&nbsp;</p>
 
 # Means by Kruskal-Wallis
 
@@ -522,6 +533,36 @@ for (i in 1:length(varz)) {
                    mcl0$Letters)
   }
 set_caption(align(flextable(result0), align="center",part="all"), caption = "Mean comparisons and pairwise letter comparisons from Kruskal-Wallis and pairwise Conover test for selected elements including REEs (REE = \u2211REE), by simplified sampling zone, at Ashfield Flats 2019-2023.")
+```
+
+----------------------
+
+Comparing means (strictly mean rank sums) between sampling types (the factor 
+`Type`) as this seems most appropriate. As shown in Table 
+\@ref(tab:kruskal-Type), all overall effects are significant at p<0.001.
+Some post-hoc pairwise comparisons show significant differences (P&le;0.05), 
+differing for each variable.
+
+```{r kruskal-Type, message=FALSE, warning=FALSE, echo=FALSE}
+data0 <- st_drop_geometry(afs1923)
+varz <- c("Al","Ca","Fe","K","Na","S","P",
+          "As","Co","Cr","Cu","Ni","Pb","Th","Zn",
+          "La","Ce","Nd","Gd","Y","REE","REEY")
+col0 <- rep(NA,length(varz))
+result0 <- data.frame(Variable=col0, KW_chi=col0, KW_p=col0,
+                      Drain_Sed=col0, Lake_Sed=col0, Other=col0, Saltmarsh=col0)
+for (i in 1:length(varz)) {
+  kw0 <- with(data0, 
+              kruskal.test(data0[,which(colnames(data0)==varz[i])] ~ 
+                           Type))
+  pwc0 <- with(data0, 
+             kwAllPairsConoverTest(data0[,which(colnames(data0)==varz[i])] ~
+                                     Type))
+  mcl0 <- multcompLetters(fullPTable(pwc0$p.value))
+  result0[i,] <- c(varz[i],signif(kw0$statistic,4), signif(kw0$p.value,3),
+                   mcl0$Letters)
+  }
+set_caption(align(flextable(result0), align="center",part="all"), caption = "Mean comparisons and pairwise letter comparisons from Kruskal-Wallis and pairwise Conover test for selected elements including REEs (REE = \u2211REE), by sample type, at Ashfield Flats 2019-2023.")
 ```
 
 ----------------------
@@ -585,6 +626,8 @@ text(-0.1, 0.25, pos=4, cex=1.4, labels=paste0("CMD = Chapman Drain\n",
       "WD = Woolcock Drain"))
 ```
 
+<p>&nbsp;</p>
+
 # Aluminium boxplot by Zone
 
 ```{r Al-box, fig.height=5, fig.width=13, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Al concentrations by sampling zone at Ashfield Flats for all sampling years. Different colours show environment sub-types, and means are different (p<0.05, Kruskal-Wallis) if italic text below x-axis labels has no common letters.", echo=FALSE}
@@ -616,6 +659,8 @@ palette(pal4lite)
 layout(1)
 par(mar = c(3.5,3.5,1,1), mgp = c(1.7,0.3,0), xpd = FALSE)
 ```
+
+<p>&nbsp;</p>
 
 # Bubble maps
 
@@ -767,11 +812,38 @@ text(xy[1]+0.12*(xy[2]-xy[1]), xy[3]+0.96*(xy[4]-xy[3]),
 palette("default")
 ```
 
+<p>&nbsp;</p>
+
 # Boxplots by Type
 
-## ├ REE and Al, Ca, Fe, S
+## ├ Individual REE and Al, Ca, Fe, S
 
-```{r boxplots-by-type, fig.height=7.5, fig.width=10, fig.align='center',fig.cap="Boxplots of REEs and selected major and trace elements by sample type at Ashfield Flats for all sampling years (DS = Drain sediment; FW = Flooded woodland; LS = Lake Sediment; SM = Saltmarsh).", echo=FALSE}
+```{r ree-boxplots-by-type, fig.height=4, fig.width=5, fig.align='center',fig.cap="Boxplots of ∑REEs by sample type at Ashfield Flats for all sampling years (italic letters below axis labels are unique if a pairwise Conover test p value ≤ 0.05).", echo=FALSE}
+afs1923surf$REE <- with(afs1923surf, La+Ce+Nd+Gd)
+varz <- c("REE")
+par(mfrow = c(1,1), mar = c(3.5,3,0.5,0.5), mgp = c(1.6,0.15,0),
+    cex.lab = 1.25, cex.axis=1.2, font.lab = 2, tcl = 0.2, xpd=T)
+for(i in 1:length(varz)){
+  with(afs1923surf, boxplot(afs1923surf[,which(colnames(afs1923surf)==varz[i])] ~ Type, 
+                        varwidth=T, names=c("Drain","Lake","Saltmarsh","Other"),
+                        xlab="", ylab = paste(varz[i],"(mg/kg)"),
+                        col=scico(4,pal="batlow",alpha=0.65, end=0.75)))
+  kw0 <- with(afs1923surf, 
+              kruskal.test(afs1923surf[,which(colnames(afs1923surf)==varz[i])] ~ 
+                           Type))
+  pwc0 <- with(afs1923surf, 
+             kwAllPairsConoverTest(afs1923surf[,which(colnames(afs1923surf)==varz[i])] ~
+                                     Type))
+  mcl0 <- multcompLetters(fullPTable(pwc0$p.value))
+  shadowtext(1:4, rep(-70,4), labels=mcl0$Letters, col="#003087", bg="white",
+             font=4, cex=1.2, family="serif")
+  mtext("Type",1,2.2, font=2, cex=1.2)
+}
+```
+
+<p>&nbsp;</p>
+
+```{r boxplots-by-type, fig.height=7.5, fig.width=10, fig.align='center',fig.cap="Boxplots of REEs and selected major and trace elements by sample type at Ashfield Flats for all sampling years (DS = Drain sediment; LS = Lake Sediment; SM = Saltmarsh; Oth = Mixed/other). Italic letters above axis labels are unique if a pairwise t-test p value ≤ 0.05.", echo=FALSE}
 varz <- c("La","Ce","Gd","Nd","Y","Al","Ca","Fe","S","Cu","Pb","Zn")
 par(mfrow = c(3,4), mar = c(3,3,0.5,0.5), mgp = c(1.6,0.15,0),
     cex.lab = 1.5, cex.axis=1.2, font.lab = 2, tcl = 0.2)
@@ -780,14 +852,25 @@ for(i in 1:length(varz)){
                         varwidth=T, names=c("DS","LS","SM","Oth"),
                         ylab = paste(varz[i],"(mg/kg)"),
                         col=scico(4,pal="batlow",alpha=0.65, end=0.75)))
+  kw0 <- with(afs1923surf, 
+              kruskal.test(afs1923surf[,which(colnames(afs1923surf)==varz[i])] ~ 
+                           Type))
+  pwc0 <- with(afs1923surf, 
+             pairwise.t.test(afs1923surf[,which(colnames(afs1923surf)==varz[i])],
+                                     Type))
+  mcl0 <- multcompLetters(fullPTable(pwc0$p.value))
+  shadowtext(1:4, rep(0,4), labels=mcl0$Letters, col="#003087", bg="white",
+             font=4, cex=1.5, family="serif")
 }
 ```
+
+<p>&nbsp;</p>
 
 # Boxplots by Zone
 
 ## ├ Ce, La, Nd, Gd
 
-```{r boxplots-REE-zone, fig.width=9, fig.height=5, fig.align='center',fig.cap="Boxplots of REEs by sampling Zone at Ashfield Flats for all sampling years (DS = Drain sediment; Fl = Flooded; LS = Lake Sediment; SM = Saltmarsh; So = Soil).", echo=FALSE}
+```{r boxplots-REE-zone, fig.height=7.2, fig.width=12, fig.align='center',fig.cap="Boxplots of REEs by sampling Zone at Ashfield Flats for all sampling years (DS = Drain sediment; Fl = Flooded; LS = Lake Sediment; SM = Saltmarsh; So = Soil).", echo=FALSE}
 varz <- c("La","Ce","Gd","Nd")
 palette(c("black",scico(4,pal="batlow",alpha=0.65, end=0.75),"grey","white"))
 par(mfrow = c(1,1), mar = c(4,3.5,0.5,0.5), mgp = c(2,0.2,0),
@@ -813,7 +896,7 @@ text(0,0.32,pos=4,cex=1.2, labels=paste0("CMD = Chapman Drain\n",
 
 ## ├ Ce, La, Nd, Gd, + Y
 
-```{r boxplots-REEY-zone, fig.width=9, fig.height=5, fig.align='center',fig.cap="Boxplots of REE+Y by sampling Zone at Ashfield Flats for all sampling years.", echo=FALSE}
+```{r boxplots-REEY-zone, fig.height=7.2, fig.width=12, fig.align='center',fig.cap="Boxplots of REE+Y by sampling Zone at Ashfield Flats for all sampling years.", echo=FALSE}
 layout(matrix(1))
 varz <- c("La","Ce","Gd","Nd","Y")
 palette(c("black",scico(4,pal="batlow",alpha=0.65, end=0.75),"grey","white"))
@@ -828,7 +911,7 @@ plot(c(0,1),c(0,1),type="n",ann=F,xaxt="n",yaxt="n",bty="n",xlab="",ylab="",xaxs
 legend(-0.16,1.1, bty = "n", inset = 0, cex = 1.6, 
        legend = c("Drain","Pond","Saltmarsh","Mixed/other"), pch = 22,
        pt.bg = c(2,3,4,5), pt.cex = 3.6)
-text(-0.16,0.12,pos=4,cex=0.85, labels=paste0("CMD = Chapman Drain, ",
+text(-0.16,0.16,pos=4,cex=0.95, labels=paste0("CMD = Chapman Drain, ",
       "KMD = Kitchener Drain\n", "FW = Flooded woodland, ",
       "N = North wetland pond\n", "NE = North-east wetland pond, ",
       "NW = North-west wetland pond\n", "S = South wetlands / side drain, ",
@@ -868,7 +951,7 @@ legend(0,1, bty = "n", inset = 0.01, cex = 1.6,
 
 ## ├ Co, Cr, Cu, Ni, Pb, Zn
 
-```{r boxplots-trace-zone, fig.height=5, fig.width=12, fig.align='center',fig.cap="Boxplots of selected trace elements by sampling Zone at Ashfield Flats for all sampling years (CMD = Chapman Drain, KMD = Kitchener Drain, LP = Limestone path, N = North wetland pond, NE = North-east wetland pond, NW = North-west wetland pond, S = South wetlands / side drain, SE = South-east wetland pond, SM = Saltmarsh (east of CMD), SW = South-west wetland pond, WD = Woolcock Drain).", results='hold', echo=FALSE}
+```{r boxplots-trace-zone, fig.height=7.2, fig.width=16, fig.align='center',fig.cap="Boxplots of selected trace elements by sampling Zone at Ashfield Flats for all sampling years (CMD = Chapman Drain, KMD = Kitchener Drain, LP = Limestone path, N = North wetland pond, NE = North-east wetland pond, NW = North-west wetland pond, S = South wetlands / side drain, SE = South-east wetland pond, SM = Saltmarsh (east of CMD), SW = South-west wetland pond, WD = Woolcock Drain).", results='hold', echo=FALSE}
 varz <- c("Cr","Cu","Ni","Pb","Th","Zn")
 par(mfrow = c(1,1), mar = c(4,4,0.5,0.5), mgp = c(2.2,0.2,0),
     cex.lab = 1.4, font.lab = 2, tcl = 0.2, las = 2, xpd = F)
@@ -902,9 +985,85 @@ spm(~Al+Ca+Fe+S+P+La+Ce+Nd+Gd|Type, data = data0, smooth=F, regLine=T,
 
 # Scatter plots
 
+## ├ sum(REE) *vs*. Al
+
+```{r scatterplots-sumREE-Al, fig.height=10, fig.width=15, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Al relationships at Ashfield Flats for all sampling years. Plots (a) and (b) are of untransformed variables, plots (c) and (d) have both axes log~10~-transformed", results='hold', echo=FALSE}
+par(mfrow = c(2,2), mar = c(4,4,0.5,0.5), mgp = c(1.7,0.2,0),
+    cex.lab = 1.5, cex.axis = 1.25, font.lab = 2, tcl = 0.2, las = 1)
+afs1923$Al2 <- afs1923$Al/1e3
+clrz <- scico(4, pal="batlow", end=0.75, alp=0.5) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
+plot(afs1923$Al2, afs1923$REE,
+     bg = clrz[afs1923$Type], pch = seq(21,25)[afs1923$Type],
+     ylab = "∑REE (mg/kg)", cex = 1.4, xlab = "Al (g/kg)") 
+  for(j in 1:nlevels(afs1923$Type)){
+    lm0 <- lm(afs1923$REE ~ afs1923$Al2, 
+              subset=afs1923$Type==levels(afs1923$Type)[j])
+    v0 <- subset(afs1923$Al2,
+                 subset = afs1923$Type == levels(afs1923$Type)[j])
+    r0 <- range(v0, na.rm=T)
+    y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
+    lines(r0, y0, col = clrz[j], lwd = 3)
+  }
+mtext("(a)",3,-1.8,font=2,cex=1.4,adj=0.02)
+legend("left", bty="n", cex = 1.4, legend=levels(afs1923$Type),
+       pch=seq(21,25), pt.bg=clrz, pt.cex=1.8)
+clrz <- scico(12, pal="hawaii", end=0.85, alp=0.7) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
+plot(afs1923$Al2, afs1923$REE,
+     bg = clrz[afs1923$Zone], 
+     pch = c(21:25,21:25,21,22)[afs1923$Zone],
+     ylab = "∑REE (mg/kg)", cex = 1.4, xlab = "Al (g/kg)") 
+  for(j in 1:nlevels(afs1923$Zone)){
+    lm0 <- lm(afs1923$REE ~ afs1923$Al2,
+              subset = afs1923$Zone == levels(afs1923$Zone)[j])
+    v0 <- subset(afs1923$Al2,
+                 subset = afs1923$Zone == levels(afs1923$Zone)[j])
+    r0 <- range(v0, na.rm=T)
+    y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
+    lines(r0, y0, col = clrz[j], lwd = 3)
+  }
+mtext("(b)",3,-1.8,font=2,cex=1.4,adj=0.02)
+legend("left", bty="n", cex = 1.1, legend=levels(afs1923$Zone),
+       pch=seq(21,25), pt.bg=clrz, pt.cex=1.4)
+clrz <- scico(4, pal="batlow", end=0.75, alp=0.5) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
+plot(afs1923$Al/1e3, afs1923$REE,
+     log="xy", bg = clrz[afs1923$Type], pch = seq(21,25)[afs1923$Type],
+     ylab = "∑REE (mg/kg)", cex = 1.4, xlab = "Al (g/kg)") 
+  for(j in 1:nlevels(afs1923$Type)){
+    lm0 <- lm(log10(afs1923$REE) ~ log10(afs1923$Al/1e3),
+              subset = afs1923$Type == levels(afs1923$Type)[j])
+    v0 <- subset(afs1923$Al/1e3,
+                 subset = afs1923$Type == levels(afs1923$Type)[j])
+    r0 <- log10(range(v0, na.rm=T))
+    y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
+    lines(10^r0, 10^y0, col = clrz[j], lwd = 3)
+  }
+mtext("(c)",3,-1.8,font=2,cex=1.4,adj=0.02)
+legend("left", bty="n", cex = 1.4, legend=levels(afs1923$Type),
+       pch=seq(21,25), pt.bg=clrz, pt.cex=1.8)
+clrz <- scico(12, pal="hawaii", end=0.85, alp=0.7) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
+plot(afs1923$Al/1e3, afs1923$REE,
+     log="xy", bg = clrz[afs1923$Zone], 
+     pch = c(21:25,21:25,21,22)[afs1923$Zone],
+     ylab = "∑REE (mg/kg)", cex = 1.4, xlab = "Al (g/kg)") 
+  for(j in 1:nlevels(afs1923$Zone)){
+    lm0 <- lm(log10(afs1923$REE) ~ log10(afs1923$Al/1e3),
+              subset = afs1923$Zone == levels(afs1923$Zone)[j])
+    v0 <- subset(afs1923$Al/1e3,
+                 subset = afs1923$Zone == levels(afs1923$Zone)[j])
+    r0 <- log10(range(v0, na.rm=T))
+    y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
+    lines(10^r0, 10^y0, col = clrz[j], lwd = 3)
+  }
+mtext("(d)",3,-1.8,font=2,cex=1.4,adj=0.02)
+legend("left", bty="n", cex = 1.1, legend=levels(afs1923$Zone),
+       pch=seq(21,25), pt.bg=clrz, pt.cex=1.4)
+```
+
+<p>&nbsp;</p>
+
 ## ├ Ce, La, Nd, Gd *vs*. Al
 
-```{r scatterplots-Al, fig.height=7, fig.width=10, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Al relationships at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
+```{r scatterplots-Al, fig.height=7, fig.width=10, message=FALSE, warning=FALSE, fig.align='center',fig.cap="Individual REE-Al relationships at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
 varz <- c("La","Ce","Gd","Nd")
 clrz <- scico(4, pal="batlow", end=0.75, alp=0.5) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
 par(mfrow = c(2,2), mar = c(4,4,0.5,0.5), mgp = c(1.7,0.2,0),
@@ -930,7 +1089,7 @@ legend("topleft", bty="n", cex = 1.4, legend=levels(afs1923$Type),
 
 ## ├ Ce, La, Nd, Gd *vs*. Fe
 
-```{r scatterplots-Fe, fig.height=7, fig.width=10, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Fe relationships at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
+```{r scatterplots-Fe, fig.height=7, fig.width=10, message=FALSE, warning=FALSE, fig.align='center',fig.cap="Individual REE-Fe relationships at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
 varz <- c("La","Ce","Gd","Nd")
 clrz <- scico(4, pal="batlow", end=0.75, alp=0.5)
 par(mfrow = c(2,2), mar = c(4,4,0.5,0.5), mgp = c(2.6,0.2,0),
@@ -956,7 +1115,7 @@ legend("topleft", bty="n", cex = 1.4, legend=levels(afs1923$Type),
 
 ## ├ Ce, La, Nd, Gd *vs*. P
 
-```{r scatterplots-P, fig.height=8.4, fig.width=12, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-P relationships at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
+```{r scatterplots-P, fig.height=8.4, fig.width=12, message=FALSE, warning=FALSE, fig.align='center',fig.cap="Individual REE-P relationships at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
 varz <- c("La","Ce","Gd","Nd")
 clrz <- scico(4, pal="batlow", end=0.75, alp=0.65)
 par(mfrow = c(2,2), mar = c(4,4,0.5,0.5), mgp = c(2.6,0.2,0), lend=2, ljoin=1,
@@ -1011,6 +1170,8 @@ spm(~Al+Ca+Fe+S+P+Cu+Pb+Th+Zn|Type, data = data0, smooth=F, regLine=F,
     col=c("#0000ff80","#00b0b080","#a000c080","#b0b00080"))
 ```
 
+<p>&nbsp;</p>
+
 ## ├ Ce, La, Nd, Gd *vs*. Al
 
 ```{r clr-sp-Al, fig.height=8.4, fig.width=12, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Al relationships (concentrations CLR-transformed) at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
@@ -1038,9 +1199,11 @@ for(i in 1:length(varz)){
 }
 ```
 
+<p>&nbsp;</p>
+
 ## ├ CLR-transformed REE *vs*. Al, Ca, Fe, P
 
-```{r clr-sp-REE-Al-Ca-Fe-P, fig.height=8.4, fig.width=12, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Al relationships (concentrations CLR-transformed) at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
+```{r clr-sp-REE-Al-Ca-Fe-P, fig.height=8.4, fig.width=18, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Al relationships (concentrations CLR-transformed) at Ashfield Flats for all sampling years.", results='hold', echo=FALSE}
 # first make dataset with just sum-of-REE not individual REE...
 afs1923ree <- afs1923[,c(1:18,24:50)]
 afs1923ree$REE <- with(afs1923ree, La+Ce+Nd+Gd)
@@ -1055,14 +1218,14 @@ for(i in 19:42){
 afs1923clr2ree[,19:42] <- t(apply(afs1923clr2ree[,19:42], MARGIN = 1,
                             FUN = function(x){log(x) - mean(log(x),na.rm=T)}))
 
-varz <- c("Al","Ca","Fe","P")
+varz <- c("Al","Ca","Fe","P","S")
 clrz <- scico(4, pal="batlow", end=0.75, alp=0.65) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
-par(mfrow = c(2,2), mar = c(4,4,0.5,0.5), mgp = c(2,0.2,0), lend=2, ljoin=1,
+par(mfrow = c(2,3), mar = c(4,4,0.5,0.5), mgp = c(2,0.2,0), lend=2, ljoin=1,
     cex.lab = 1.5, cex.axis = 1.25, font.lab = 2, tcl = 0.3, las = 1)
 for(i in 1:length(varz)){
   with(afs1923clr2ree, plot(REE~afs1923clr2ree[,which(colnames(afs1923clr2ree)==varz[i])], 
-                        bg = clrz[Type], pch = seq(21,25)[Type],
-                     xlab = paste(varz[i],"(clr-transformed)"), cex = 1.4, 
+                        bg = clrz[Type], pch = seq(21,25)[Type], cex = 1.4,
+                     xlab = paste(varz[i],"(clr-transformed)"), cex.lab=2, 
                      ylab = ""))
   mtext("REE (clr-transformed)",2,1.6,font=2,cex = 1.4, las=0)
   for(j in 1:nlevels(afs1923clr2ree$Type)){
@@ -1075,9 +1238,12 @@ for(i in 1:length(varz)){
           col = clrz[j], lwd = 3)
   }
 }
-legend("bottomleft", bty="n", cex = 1.5, legend=levels(afs1923$Type),
-       pch=seq(21,25), pt.bg=clrz, y.intersp = 0.85)
+plot(0:1,0:1,type="n",bty="n",axes=F, xlab="",ylab="")
+legend("left", bty="n", cex = 2, pt.cex=2, legend=levels(afs1923$Type),
+       pch=seq(21,25), pt.bg=clrz, y.intersp = 1.25)
 ```
+
+<p>&nbsp;</p>
 
 # Fit linear models: ungrouped and grouped
 
@@ -1132,6 +1298,8 @@ anova(lmGdAl0,lmGdAl1)
 From the output we see that a grouped (by Type) model has significantly better
 predictive ability than ungrouped, based on ANOVA of nested models generated
 using the CLR-transformed concentrations.
+
+<p>&nbsp;</p>
 
 # Principal components analysis
 
@@ -1213,6 +1381,8 @@ legend("bottomleft", bty="n", inset=0.01,
        col="#808080a0", pt.bg=c(2:5))
 ```
 
+<p>&nbsp;</p>
+
 ```{r biplot12-byzone-base-r, fig.width=12, fig.height=6, fig.cap="PCA biplots in PC1-PC2 space with observations shown as (a) 99% standard error ellipses and (b) categorized points, both identified by sample zone.", echo=FALSE, results='hold'}
 require(scico); require(viridis)
 par(mfrow=c(1,2), oma=c(0,0,0,0), mar=c(3,3,3,3), mgp=c(1.6,0.2,0), tcl=0.25, font.lab=2)
@@ -1246,6 +1416,8 @@ legend("bottomleft", bty="o", inset=0, ncol=4, y.intersp=0.8,cex=1,
        pch=rep(c(21,22,23,24),3),   # 
        col="#808080a0", pt.bg=c(2:13)) ; box()
 ```
+
+<p>&nbsp;</p>
 
 ```{r biplot34-byzone-base-r, fig.width=12, fig.height=6, fig.cap="PCA biplots in PC3-PC4 space with observations shown as 99% standard error ellipses according to sample zone.", echo=FALSE, results='hold'}
 require(scico); require(viridis)
@@ -1281,6 +1453,8 @@ legend("bottomleft", bty="o", ncol=4, y.int=0.8, x.int=0.5,
        pch=rep(c(21,22,23,24),3),   # 
        col="#808080a0", pt.bg=c(2:13))  ; box()
 ```
+
+<p>&nbsp;</p>
 
 ## ├ Map principal component scores
 
@@ -1618,6 +1792,8 @@ text(xy[1]+0.04*(xy[2]-xy[1]), xy[3]+0.96*(xy[4]-xy[3]), font=2, pos=4,
 afs1923$bubcats <- NULL
 ```
 
+<p>&nbsp;</p>
+
 # REE normalization & pseudo-fractionation
 
 ## ├ make PAAS reference data
@@ -1627,13 +1803,14 @@ PAAS <- data.frame(Element=c("Y", "La","Ce","Pr","Nd","Sm","Eu","Gd",
                              "Tb","Dy","Ho","Er","Tm","Yb","Lu","REE"),
             PAAS=c(27,38,80,8.9,32,5.6,1.1,4.7,0.77,4.4,1,2.9,0.4,2.8,0.43,154.7))
 row.names(PAAS) <- PAAS$Element
-cat("Crustal average REE concentration in post-Archean Australian Shale (PAAS) proxy\n(Taylor & McLennan 1985). NOTE: in these data, REE=La+Ce+Nd+Gd. \n----------------\n")
 flextable(PAAS) |> 
   width(width=2) |>
   padding(padding.left=90, j=1, part="all") |>
   padding(padding.right=90, j=2, part="all") |>
   set_caption(caption="Crustal average REE concentration in the post-Archean Australian Shale (PAAS) proxy (Taylor & McLennan 1985). NOTE: in these data, REE=La+Ce+Nd+Gd.")
 ```
+
+<p>&nbsp;</p>
 
 ## ├ normalize YREE to PAAS and plot by element
 ```{r make-PAAS-normalised-data-and-plot, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Concentrations of YREE normalized to PAAS over all sediment sample zones and years at Ashfield Flats. ∑REE = La+Ce+Nd+Gd for both samples and PAAS.", results='hold', echo=FALSE}
@@ -1657,6 +1834,8 @@ axis(1, at=1:6, labels=c("La","Ce","Gd","Nd","Y","\u2211REE"), font=2)
 abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
 ```
 
+<p>&nbsp;</p>
+
 ## ├ over all data are REE fractionated?
 
 ```{r, echo=FALSE}
@@ -1666,6 +1845,8 @@ with(plotdata, oneway.test(values~ind))
 pwREE_pv <- fullPTable(pwREE$p.value)               # from rcompanion
 multcompLetters(pwREE_pv)                           # from multcompView
 ```
+
+<p>&nbsp;</p>
 
 ## ├ over all data is ∑REE fractionation different by sample Type?
 
@@ -1685,6 +1866,8 @@ text(seq(1,12), rep(-0.5,12), labels = paste0("(",mcl0$Letters,")"),
      col = "blue3", cex = 1, family = "serif", font = 3)
 ```
 
+<p>&nbsp;</p>
+
 ```{r compare-REE-PAAS-by-Type, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold', echo=FALSE}
 cat("Means for ∑REE/PAAS by sediment Type:\n"); print(meanz,digits=3)
 with(afs1923_PAAS, oneway.test(REE ~ Type))
@@ -1692,6 +1875,8 @@ with(afs1923_PAAS, oneway.test(REE ~ Type))
 pwPAAS_pv <- fullPTable(pwPAAS$p.value)              # from rcompanion
 multcompLetters(pwPAAS_pv)                           # from multcompView
 ```
+
+<p>&nbsp;</p>
 
 ## Over all data are REE fractionated by Zone?
 
@@ -1721,6 +1906,8 @@ text(-0.1, 0.25, pos=4, cex=1.4,
          "WD = Woolcock Drain"))
 ```
 
+<p>&nbsp;</p>
+
 ```{r compare-PAAS-REE-zone, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold', echo=FALSE}
 with(afs1923_PAAS, oneway.test(REE ~ Zone))
 pwPAAS <- with(afs1923_PAAS, pairwise.t.test(REE, Zone, pool.sd = F))
@@ -1736,6 +1923,8 @@ cat("------------\n");t(rslt)
 
 Based on these comparisons it seems there is some fractionation. 
 
+<p>&nbsp;</p>
+
 ## ├ are REE significantly different from PAAS?
 
 ```{r REE-PAAS-ssttests, echo=FALSE}
@@ -1748,6 +1937,8 @@ with(afs1923_PAAS, t.test(REE, mu=1))
 ```
 
 Based on these analyses all YREE differ significantly from PAAS - La, Ce, Nd, Gd greater and Y less. ∑REE is also significantly greater than PAAS.
+
+<p>&nbsp;</p>
 
 ## ├ REE/PAAS in drain sediments
 
@@ -1776,6 +1967,8 @@ multcompLetters(pwREE_pv)                           # from multcompView
 
 Drain sediments are depleted in REE relative to PAAS. Gd/PAAS is greatest but not different from La, Ce or Nd, only greater than Y/PAAS (lowest mean).
 
+<p>&nbsp;</p>
+
 ## ├ REE/PAAS in Lake sediments
 
 ```{r normalized-REE-Lake-sed, fig.height=3.6, fig.width=6, fig.cap="Concentrations of YREE normalized to PAAS in lake (seasonal wetland pond) sediments over all years at Ashfield Flats.", results='hold', echo=FALSE}
@@ -1803,6 +1996,8 @@ with(plotdata, oneway.test(values ~ ind))
 pwREE_pv <- fullPTable(pwREE$p.value)               # from rcompanion
 multcompLetters(pwREE_pv)                           # from multcompView
 ```
+
+<p>&nbsp;</p>
 
 ## ├ REE/PAAS in Saltmarsh sediments
 
@@ -1833,6 +2028,8 @@ multcompLetters(pwREE_pv)                           # from multcompView
 Saltmarsh sediments are enriched in YREE relative to PAAS. Gd > all others
 except La. Y < all others.
 
+<p>&nbsp;</p>
+
 ```{r normalized-REE-flooded, fig.height=3.6, fig.width=6, fig.cap="Concentrations of YREE normalized to PAAS in other (e.g. seasonally-flooded woodland) sediments over all years at Ashfield Flats.", results='hold', echo=FALSE}
 require(viridis)
 PAAS_Flooded <- subset(afs1923_PAAS, afs1923_PAAS$Type=="Other")
@@ -1861,6 +2058,8 @@ multcompLetters(pwREE_pv)                           # from multcompView
 rm(list = c("s0","ns0","d0","f0","p1","p2","varz","clrz","x0","x1","lm0","v0",
             "data0","mcl0"))
 ```
+
+<p>&nbsp;</p>
 
 # Water analyses to support acid sulfate
 
@@ -1896,6 +2095,8 @@ legend("topleft", bty="n", legend = levels(afwater1923$Zone),
    pch = c(seq(19,5,-1),25), box.col = "grey", inset = 0.01, pt.cex=1.5, 
    pt.bg=plasma(nlevels(afwater1923fresh$Zone)+1, end=0.8)[nlevels(afwater1923fresh$Zone)+1])
 ```
+
+<p>&nbsp;</p>
 
 ```{r boxplot-so4-cl, echo=FALSE, error=FALSE, fig.cap="Sulfate to chloride ratios (estimated) in Ashfield Flats fresh water samples 2019-2023 showing threshold values.", fig.height=4, fig.width=8, warning=FALSE, echo=FALSE}
 par(mar = c(3,8,1,1), mgp=c(1.8,0.4,0), las = 1, tcl = 0.2)
