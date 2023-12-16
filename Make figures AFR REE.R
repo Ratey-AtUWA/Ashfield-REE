@@ -27,6 +27,7 @@ library(factoextra)
 library(ggpubr)
 library(lctools)
 library(viridis)
+library(scico)
 library(plotrix)
 
 # -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
@@ -603,7 +604,7 @@ par(mfrow=c(1,1))
 # -=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=--=+=-
 
 # REE vs. Fe, P ####
-palette(c("black","navy","dodgerblue","gold","darkturquoise","transparent"))
+palette(c("black",scico(4, pal="batlow", end=0.75, alp=0.5),"transparent"))
 par(mfrow = c(1,2), mar = c(4,4,0.5,0.5), mgp = c(2.2,0.2,0),
     cex.lab = 1.4, cex.axis = 1.25, font.lab = 2, tcl = 0.2, las = 1,
     lend="square", ljoin="mitre")
@@ -613,7 +614,7 @@ plot(afs1922surf$Fe/1e3, afs1922surf$REE,
      pch = c(21,24,23,22)[afs1922surf$Type],
      cex = c(1.5, 1.4, 1.4, 1.4)[afs1922surf$Type],
      ylab = "\u2211REE (mg/kg)", xlab = "Fe (g/kg)")
-lcolz <- c(2,4,5,3)
+lcolz <- c(2:5)
 for (j in 1:nlevels(afs1922surf$Type)){
   lm0 <- lm(log10(afs1922surf$REE) ~ log10(afs1922surf$Fe/1e3),
                   subset = afs1922surf$Type == levels(afs1922surf$Type)[j])
@@ -637,7 +638,7 @@ plot(afs1922surf$P, afs1922surf$REE,
      pch = c(21,24,23,22)[afs1922surf$Type],
      cex = c(1.5, 1.4, 1.4, 1.4)[afs1922surf$Type],
      ylab = "\u2211REE (mg/kg)", xlab = "P (mg/kg)")
-lcolz <- c(2,4,5,3)
+lcolz <- c(2:5)
 for (j in 1:nlevels(afs1922surf$Type)){
   lm0 <- lm(log10(afs1922surf$REE) ~ log10(afs1922surf$P),
                   subset = afs1922surf$Type == levels(afs1922surf$Type)[j])

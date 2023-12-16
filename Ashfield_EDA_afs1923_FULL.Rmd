@@ -9,6 +9,8 @@ output:
     df_print: default
     fig_caption: yes
     smart: no
+  word_document: 
+    highlight: kate
 ---
 
 This document describes exploratory and some detailed data analysis
@@ -50,30 +52,39 @@ UTM50S <- st_crs(32750) # just for Zone 50, S hemisphere!
 git <- "https://github.com/Ratey-AtUWA/Ashfield-REE/raw/main/"
 afs1923 <- read.csv(paste0(git,"afs1923.csv"), stringsAsFactors = TRUE)
 afs1923$Year <- as.factor(afs1923$Year)
-afs1923$Type <- factor(afs1923$Type, levels=c("Drain_Sed", "Lake_Sed", "Saltmarsh","Other"))
+afs1923$Type <- factor(afs1923$Type, levels=c("Drain_Sed", "Pond_Sed", "Saltmarsh","Other"))
 
 afs1923surf <- afs1923[-which(afs1923$Depth_upper_cm > 1),]
 afs1923surf$Type <- as.character(afs1923surf$Type)
 isdrain <- which(afs1923surf$Zone=="CMD" | afs1923surf$Zone=="KMD" | afs1923surf$Zone=="WD")
 afs1923surf[isdrain,"Type"] <- rep("Drain_Sed", length(isdrain))
-islake <- with(afs1923surf, which(Zone=="N" | Zone=="NE" | Zone=="NW" | Zone=="SE" | Zone=="SW"))
-afs1923surf[islake,"Type"] <- rep("Lake_Sed", length(islake))
+ispond <- with(afs1923surf, which(Zone=="N" | Zone=="NE" | Zone=="NW" | Zone=="SE" | Zone=="SW"))
+afs1923surf[ispond,"Type"] <- rep("Pond_Sed", length(ispond))
 ismarsh <- with(afs1923surf, which(Zone=="S" | Zone=="SM" | Zone=="SM_SW"))
 afs1923surf[ismarsh,"Type"] <- rep("Saltmarsh", length(ismarsh))
 isother <- with(afs1923surf, which(Zone=="LP"))
 afs1923surf[isother,"Type"] <- rep("Other", length(isother))
 afs1923surf$Type <- as.factor(afs1923surf$Type)
-afs1923surf$Type <- factor(afs1923surf$Type, levels=c("Drain_Sed", "Lake_Sed", "Saltmarsh","Other"))
+afs1923surf$Type <- factor(afs1923surf$Type, levels=c("Drain_Sed", "Pond_Sed", "Saltmarsh","Other"))
 
 afs1923utm <- st_as_sf(afs1923surf, coords = c("Easting","Northing"), 
                        crs = st_crs(32750))
 afs1923ll <- st_transform(afs1923utm, crs = st_crs(4326))
+
+WQGF <- read.csv("WQ_guide_freshwater_modified.csv")
+row.names(WQGF) <- WQGF$Element; row.names(WQGF)[21:22] <- c("P","PO4.P") 
+ISQG <- read.csv("ISQG.csv"); row.names(ISQG) <- ISQG$Tox
 ```
 
-```{r annotation data and palettes, echo=FALSE}
+```{r annotation data and palettes, include=FALSE}
 afr_map <- read.csv(file=paste0(git,"afr_map_v3.csv"), stringsAsFactors = TRUE)
 afr_map$SW_DBCA <- as.factor(afr_map$SW_DBCA)
 afr_zones <- read.csv(file=paste0(git,"afr_zones.csv"), stringsAsFactors = TRUE)
+scpassLL <- st_read("../Learning R/Acid_Sulfate_Risk_Swan_Coastal_Plain_DWER_055.shp")
+scpassLL <- st_transform(scpassLL, crs=st_crs(4326))
+
+riverLL <- st_read("srpoly.shp")
+
 pal4lite <- c("black", viridis::plasma(8), "white")
 pal4liteTransp <- 
   c("black", scico::scico(8, alpha=0.7, palette="hawaii", beg=0.1), "white")
@@ -90,11 +101,6 @@ extent <- st_as_sf(x = data.frame(x = c(115.849,115.995),
 PerthRast <- get_tiles(extent, provider="Thunderforest.Neighbourhood", # Esri.WorldImagery
                        apikey="03b0375e8e7c47d0a03018a9001de439", 
                        crop = TRUE, zoom=14)
-
-scpassLL <- st_read("../Learning R/Acid_Sulfate_Risk_Swan_Coastal_Plain_DWER_055.shp")
-scpassLL <- st_transform(scpassLL, crs=st_crs(4326))
-
-riverLL <- st_read("srpoly.shp")
 ```
 
 ```{r overview-map, fig.height=12.8, fig.width=20, message=FALSE, warning=FALSE, fig.cap="Map showing location of Ashfield Flats Reserve in metropolitan Perth, Western Australia.", results='hold', echo=FALSE}
@@ -112,7 +118,7 @@ polygon(afr_map$bound_lon, afr_map$bound_lat,
 polygon(afr_map$bound_lon, afr_map$bound_lat,
         border = 1, col = 1, lwd = s0, density = 16/s0)
 plot(subset(scpassLL, scpassLL$risk_class==1)[4], pal=c("#ffb00080"), add=TRUE)
-plot(riverLL[1], col="royalblue", add=TRUE)
+plot(riverLL[1], col="#4D6EAB", add=TRUE)
 # addnortharrow(border = 1, text.col=1, scale = 1.1*s0, lwd=s0,
 #               padin = c(0.135,0.165)*s0)
 addnortharrow(border = 1, text.col=1, scale = 1.1*s0, lwd=s0,
@@ -149,7 +155,7 @@ plot(aust_map, asp=1.1, type = "l", xaxt="n", xlab="",
 rect(par("usr")[1], par("usr")[3],
      par("usr")[2], par("usr")[4],
      col = "lightblue", border = "gray50", lwd=2*s0)
-polygon(aust_map, col = "khaki", border="sienna4", lwd=s0)
+polygon(aust_map, col = "khaki", border="#4D6EAB", lwd=s0)
 points(115.8567, -31.941, pch = 21, col = 1,
        bg = "gold", cex = 0.85*s0, lwd=1.5*s0, ljoin="mitre")
 text(115,-31, labels = "Perth", cex=s0, pos = 2,
@@ -223,43 +229,77 @@ Samples were taken each year from 2019 to 2023 (Figure \@ref(fig:sample-map)). D
 
 # Data summaries
 
-## ├ pH, EC, Al-Cu
+## ├ pH, EC, Al, Ca, Fe, K, Mg, Na, P, and S
 
-```{r data-summaries-1, results='hold', echo=FALSE}
-ns0 <- numSummary(afs1923[,c(17:18,24:51)], 
+```{r data-summaries-pH-majors, results='hold', echo=FALSE}
+ns0 <- numSummary(afs1923[,c("pH","EC","Al","Ca","Fe","K","Mg","Na","P","S")], 
                   statistics = c("mean","sd","quantiles"), quantiles=c(0,0.5,1))
-ns1 <- signif(as.data.frame(ns0$table),4)
-ns1$rsd <- paste0(round(100*ns1$sd/ns1$mean,1),"%")
+ns1 <- signif(as.data.frame(ns0$table),6)
+ns1$rsd <- paste0(signif(100*ns1$sd/ns1$mean,3),"%")
 ns1 <- as.data.frame(cbind(ns1[,c("mean","sd","rsd","0%","50%","100%")],
                            ns0$NAs))
 colnames(ns1)[NCOL(ns1)] <- "NAs"
 f0 <- as.data.frame(cbind(colnames(ns1),t(ns1[1:10,])))
-colnames(f0)[1] <- "Stat"
-align(set_caption(flextable(f0), caption = "Statisitical summary of pH and EC, and Al, As, Ba, Ca, Ce, Co, and Cr concentrations in sediment."),
-      align="right",part="all")
+colnames(f0)[1] <- "Statistic"
+flextable(f0) |> 
+set_caption(caption = "Statistical summary of pH and EC, and Al, Ca, Fe, K, Mg, Na, P, and S
+            concentrations in sediment.") |>
+  align(align="right",part="all") 
 # similar code for other blocks of elements below
 ```
 
 -------------------------------------------------------
 
-## ├ Fe-Nd
+## ├ La, Ce, Nd, Gd, Y, and \u2211~4~REE
 
 ```{r data-summaries-2, results='hold', echo=FALSE}
-f0 <- as.data.frame(cbind(colnames(ns1),t(ns1[11:20,])))
-colnames(f0)[1] <- "Stat"
-align(set_caption(flextable(f0), caption = "Statisitical summary of Fe, Gd, K, LA, Li, Mg, Mn, Mo, Na, and Nd concentrations in sediment."),
-      align="right",part="all")
+ns0 <- numSummary(afs1923[,c("La","Ce","Nd","Gd","Y","REE")], 
+                  statistics = c("mean","sd","quantiles"), quantiles=c(0,0.5,1))
+ns1 <- signif(as.data.frame(ns0$table),4)
+ns1$rsd <- paste0(signif(100*ns1$sd/ns1$mean,3),"%")
+ns1 <- as.data.frame(cbind(ns1[,c("mean","sd","rsd","0%","50%","100%")],
+                           ns0$NAs))
+colnames(ns1)[NCOL(ns1)] <- "NAs"
+f0 <- as.data.frame(cbind(colnames(ns1),t(ns1[1:6,])))
+colnames(f0)[1] <- "Statistic"
+flextable(f0) |> 
+set_caption(caption = "Statistical summary of La, Ce, Nd, Gd, Y, and ∑REE
+            concentrations in Ashfield Flats sediment.") |>
+  align(align="right",part="all") |>
+  set_header_labels(REE="∑REE")
 ```
 
 ---------------------------------------------------
 
-## ├ Ni-REE
+## ├ As, Ba, Cr, Cu, Mn, Mo, Ni, Pb, Sr, Th, V, Zn
 
-```{r data-summaries-3, results='hold', echo=FALSE}
-f0 <- as.data.frame(cbind(colnames(ns1),t(ns1[21:30,])))
-colnames(f0)[1] <- "Stat"
-align(set_caption(flextable(f0), caption = "Statisitical summary of Ni, P, Pb, S, Sr, Th, V, Y, Zn, and ∑REE concentrations in sediment."),
-      align="right",part="all")
+```{r summary-traces-isqg, echo=FALSE}
+elem0 <- c("As","Ba","Cr","Cu","Mn","Mo","Ni","Pb","Sr","Th","V","Zn")
+summ0 <- numSummary(afs1923[,elem0], 
+                    statistics = c("mean","sd","quantiles"),
+                    quantiles = c(0,0.5,1))
+if(length(summ0$NAs)==0){
+  tabl0 <- data.frame(summ0$table,n=summ0$n,NAs=rep(0,length(summ0$n)))
+} else {
+  tabl0 <- data.frame(summ0$table,n=summ0$n,NAs=summ0$NAs)
+}
+tabl0$DGV <- rep(NA,length(elem0))
+tabl0$GV_high <- rep(NA,length(elem0))
+for(i in 1:length(elem0)){
+  if(elem0[i] %in% ISQG$Tox){
+  tabl0$DGV[i] <- 
+    length(which(afs1923[,elem0[i]] > ISQG[elem0[i],"DGV"]))
+  tabl0$GV_high[i] <- 
+    length(which(afs1923[,elem0[i]] > ISQG[elem0[i],"GV_high"]))}
+}
+colnames(tabl0)[c(3:5,8:9)] <- c("min","median","max","n > DGV","n > GV-high")
+ft <- as.data.frame(cbind(colnames(tabl0),t(signif(tabl0,4))))
+colnames(ft)[1] <- "Statistic"
+flextable(ft) |>
+  width(j=c(1:7), width=c(3,rep(1.75,6)), unit="cm") |>
+  set_header_labels(values=list(V1="")) |>
+  set_caption(caption="Summary statistics for trace element concentrations (mg/kg) in sediment at Ashfield Flats, 2019-2023. Abbreviations: n = number of valid observations; NAs = number of missing observations; n > DGV is number of samples exceeding Default Guideline Value; n > GV-high is number of samples exceeding the upper Guideline Value at which toxicity effects might be expected (Water Quality Australia, 2023).")
+
 ```
 
 <p>&nbsp;</p>
@@ -288,16 +328,16 @@ align(set_caption(flextable(f0), caption = "Basic statistics for Drain Sediment"
 
 ----------------------
 
-## ├ Lake sediment
+## ├ Pond sediment
 
-```{r summs-type-LS, results='hold', echo=FALSE}
-d0 <- subset(afs1923, afs1923$Type=="Lake_Sed")
+```{r summs-type-PS, results='hold', echo=FALSE}
+d0 <- subset(afs1923, afs1923$Type=="Pond_Sed")
 ns0<-numSummary(d0[,c("pH","EC","Al","Ca","Fe","P","S","La","Ce","Nd","Gd","Y")],
                   statistics = c("mean","sd","quantiles"), quantiles=c(0,.5,1))
 f0 <- cbind(colnames(ns0$table),as.data.frame(signif(t(ns0$table),3)))
 colnames(f0)[1] <- "Stat"
 align(set_caption(
-  flextable(f0), caption="Basic statistics for Lake Sediment"
+  flextable(f0), caption="Basic statistics for Pond Sediment"
   ), align="right",part="all")
 ```
 
@@ -550,7 +590,7 @@ varz <- c("Al","Ca","Fe","K","Na","S","P",
           "La","Ce","Nd","Gd","Y","REE","REEY")
 col0 <- rep(NA,length(varz))
 result0 <- data.frame(Variable=col0, KW_chi=col0, KW_p=col0,
-                      Drain_Sed=col0, Lake_Sed=col0, Other=col0, Saltmarsh=col0)
+                      Drain_Sed=col0, Pond_Sed=col0, Other=col0, Saltmarsh=col0)
 for (i in 1:length(varz)) {
   kw0 <- with(data0, 
               kruskal.test(data0[,which(colnames(data0)==varz[i])] ~ 
@@ -684,8 +724,8 @@ if(max(brk0)<max(afs1923$REE, na.rm=T)){
 }
 ff <- (0.03 * (par("usr")[4]-par("usr")[3]))/sqrt(max(afs1923$REE,na.rm=T))
 afs1923$bubcats <- cut(afs1923$REE, breaks = brk0)
-ppal <- scico::scico(length(brk0)-1, pal="imola", alpha=0.7, dir=-1)
-# ppal <- rev(UWAcolgrad(length(brk0)-1, alpha=0.7, sat=TRUE))
+# ppal <- rev(UWAcolgrad(length(brk0)-1, alpha=0.6, sat=F))
+ppal <- scico::scico(length(brk0)-1, pal="nuuk", alpha=0.8, dir=-1)
 with(afs1923, symbols(Easting, Northing, add=TRUE, circles = ff*sqrt(REE), inches=F,
      bg=ppal[bubcats], fg=ppal[floor(length(ppal)/1.5)]))
 xy <- par("usr")
@@ -721,7 +761,7 @@ axis(1);axis(2);box()
 mtext("Easting (m)",1,1.7*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,1.7*s0,font=2,cex = 1.2*s0)
 legend("bottomright", bty="o", cex=0.8,
-  legend="Map tiles: CartoDB Positron, Projection: UTM Zone 50S, WGS84 (EPSG:32750)",
+  legend="Map tiles: CartoDB Voyager, Projection: UTM Zone 50S, WGS84 (EPSG:32750)",
        box.col="#00000000", bg="#ffffff40", y.intersp = 0.5)
 addnortharrow()
 addscalebar(plotepsg=32750, htin=0.12, label.cex=1.2)
@@ -729,10 +769,9 @@ brk0 <- pretty(afs1923$REEY,20)
 if(max(brk0)<max(afs1923$REEY, na.rm=T)){
   brk0 <- append(brk0, 999999)
 }
-ff <- (0.03 * (par("usr")[4]-par("usr")[3]))/sqrt(max(afs1923$REEY,na.rm=T))
+ff <- (0.033 * (par("usr")[4]-par("usr")[3]))/sqrt(max(afs1923$REEY,na.rm=T))
 afs1923$bubcats <- cut(afs1923$REEY, breaks = brk0)
-# ppal <- scico::scico(length(brk0)-1, pal="imola", alpha=0.7, dir=-1)
-ppal <- rev(UWAcolgrad(length(brk0)-1, alpha=0.7, sat=TRUE))
+ppal <- scico::scico(length(brk0)-1, pal="lapaz", alpha=0.7, dir=-1)
 with(afs1923, symbols(Easting, Northing, add=TRUE, circles = ff*sqrt(REEY), inches=F,
      bg=ppal[bubcats], fg=ppal[floor(length(ppal)/1.5)]))
 xy <- par("usr")
@@ -768,7 +807,7 @@ axis(1);axis(2);box()
 mtext("Easting (m)",1,1.7*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,1.7*s0,font=2,cex = 1.2*s0)
 legend("bottomright", bty="o", cex=0.8,
-  legend="Map tiles: CartoDB Positron, Projection: UTM Zone 50S, WGS84 (EPSG:32750)",
+  legend="Map tiles: CartoDB Voyager, Projection: UTM Zone 50S, WGS84 (EPSG:32750)",
        box.col="#00000000", bg="#ffffff40")
 addnortharrow()
 addscalebar(plotepsg=32750, htin=0.12, label.cex=1.2)
@@ -808,6 +847,61 @@ text(xy[1]+0.12*(xy[2]-xy[1]), xy[3]+0.96*(xy[4]-xy[3]),
      labels="Al (mg/kg)", font=2)
 ```
 
+## ├ Cu, Zn, Pb
+
+```{r quantile-bubb-Cu-Zn-Pb, fig.height=10, fig.width=14.6, message=FALSE, warning=FALSE, fig.align='center',fig.cap="Map of Al concentrations by location at Ashfield Flats for all sampling years.", echo=FALSE}
+par(mfrow=c(2,2), oma=c(3,3,1,1), mar=c(0,0,0,0), mgp=c(1.7,0.2,0), tcl=0.25)
+varz=c("Cu","Pb","Zn","REE")
+symhues <- scico(6, pal="nuuk", alpha=0.8, dir=-1, begin=0.05)
+for(i in 1:length(varz)){
+  plot_tiles(aftiles)
+  with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
+  if(i %in% c(3,4)) {axis(1); mtext("E (m)",1,1.7,font=2,cex = 1.2)
+  } else {
+      axis(1, lab=F)
+    }
+  if(i %in% c(1,3)) {axis(2); mtext("N (m)",2,1.7,font=2,cex = 1.2)
+  } else {
+      axis(2, lab=F)
+    }
+  box()
+  legend("bottomright", bty="o", cex=0.8,box.col="#00000000", bg="#ffffff40",
+       legend="Map tiles: CartoDB Voyager, EPSG:32750")
+  addnortharrow(); addscalebar(plotepsg=32750, htin=0.12, label.cex=1.2)
+  afs1923$q0 <- cut(afs1923[,varz[i]],
+                    breaks=quantile(afs1923[,varz[i]], na.rm=T,
+                                    pro=c(0,0.05,0.25,0.5,0.75,0.95,1)),
+                                    lab=c("Min-5th","5-25th","25-50th",
+                                          "50-75th","75-95th","95th-Max"))
+  with(afs1923, points(Easting, Northing, pch=21,
+                       bg=symhues[q0], cex=c(0.6,0.9,1.2,1.5,1.9,2.4)[q0]))
+  mtext(paste0("(",letters[i],")"), 3, -2, cex=1.25, font=2, col=symhues[6])
+legend("topleft", pch=21, legend=levels(afs1923$q0), bty="n", cex=1.05, y.in=1.05,
+       pt.bg=symhues, pt.cex=c(0.6,0.9,1.2,1.5,1.9,2.4),
+       title = paste(varz[i],"percentiles"), title.cex=1.2, title.col="#003087")
+}
+```
+
+## ├ Are Cu, Pb, Zn related to Al?
+
+```{r corrplots-Al-REE-traces, fig.height=5, fig.width=10, message=FALSE, warning=FALSE, fig.align='center',fig.cap="Correlation heatmaps for Al, La, Ce, Nd, Gd, Cu, Pb, and Zn, for log-transformed (closed) concentrations (left) and CLR-transformed (non-closed) concentrations (right).", echo=FALSE}
+par(mfrow=c(1,2), mar=c(3,3,3,3), oma=c(3,3,3,3), mgp=c(1.7,0.2,0), tcl=0.25)
+corrplot::corrplot(cor(log10(afs1923[,c("Al","La","Ce","Nd","Gd","Cu","Pb","Zn")]), 
+                       use="pairwise.complete"),diag=F,
+                   tl.col=1); mtext("log-transformed",1,3)
+corrplot::corrplot(cor(afs1923clr[,c("Al","La","Ce","Nd","Gd","Cu","Pb","Zn")], 
+                       use="pairwise.complete"),diag=F,
+                   tl.col=1); mtext("CLR-transformed",1,3)
+```
+```{r corrmats-Al-REE-CuPbZn, echo=FALSE}
+cat("==== log10-transformed concentrations ====================\n")
+RcmdrMisc::rcorr.adjust(log10(afs1923[,c("Al","La","Ce","Nd","Gd","Cu","Pb","Zn")]), 
+                        use="pairwise.complete")
+cat("\n==== CLR-transformed concentrations ====================\n")
+RcmdrMisc::rcorr.adjust(afs1923clr[,c("Al","La","Ce","Nd","Gd","Cu","Pb","Zn")], 
+                        use="pairwise.complete")
+```
+
 ```{r reset palette, include=FALSE}
 palette("default")
 ```
@@ -825,7 +919,7 @@ par(mfrow = c(1,1), mar = c(3.5,3,0.5,0.5), mgp = c(1.6,0.15,0),
     cex.lab = 1.25, cex.axis=1.2, font.lab = 2, tcl = 0.2, xpd=T)
 for(i in 1:length(varz)){
   with(afs1923surf, boxplot(afs1923surf[,which(colnames(afs1923surf)==varz[i])] ~ Type, 
-                        varwidth=T, names=c("Drain","Lake","Saltmarsh","Other"),
+                        varwidth=T, names=c("Drain","Pond","Saltmarsh","Other"),
                         xlab="", ylab = paste(varz[i],"(mg/kg)"),
                         col=scico(4,pal="batlow",alpha=0.65, end=0.75)))
   kw0 <- with(afs1923surf, 
@@ -843,13 +937,15 @@ for(i in 1:length(varz)){
 
 <p>&nbsp;</p>
 
-```{r boxplots-by-type, fig.height=7.5, fig.width=10, fig.align='center',fig.cap="Boxplots of REEs and selected major and trace elements by sample type at Ashfield Flats for all sampling years (DS = Drain sediment; LS = Lake Sediment; SM = Saltmarsh; Oth = Mixed/other). Italic letters above axis labels are unique if a pairwise t-test p value ≤ 0.05.", echo=FALSE}
-varz <- c("La","Ce","Gd","Nd","Y","Al","Ca","Fe","S","Cu","Pb","Zn")
+```{r boxplots-by-type, fig.height=7.5, fig.width=10, fig.align='center',fig.cap="Boxplots of REEs and selected major and trace elements by sample type at Ashfield Flats for all sampling years (DS = Drain sediment; PS = Pond Sediment; SM = Saltmarsh; Oth = Mixed/other). Italic letters above axis labels are unique if a pairwise t-test p value ≤ 0.05.", echo=FALSE}
+varz <- c("La","Ce","Gd","Nd","Y","Al","Ca","Fe","S","Pb","Th","Zn")
+iflog <- c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,TRUE)
 par(mfrow = c(3,4), mar = c(3,3,0.5,0.5), mgp = c(1.6,0.15,0),
     cex.lab = 1.5, cex.axis=1.2, font.lab = 2, tcl = 0.2)
 for(i in 1:length(varz)){
+  if(iflog[i]==FALSE){
   with(afs1923surf, boxplot(afs1923surf[,which(colnames(afs1923surf)==varz[i])] ~ Type, 
-                        varwidth=T, names=c("DS","LS","SM","Oth"),
+                        varwidth=T, names=c("DS","PS","SM","Oth"),
                         ylab = paste(varz[i],"(mg/kg)"),
                         col=scico(4,pal="batlow",alpha=0.65, end=0.75)))
   kw0 <- with(afs1923surf, 
@@ -859,8 +955,27 @@ for(i in 1:length(varz)){
              pairwise.t.test(afs1923surf[,which(colnames(afs1923surf)==varz[i])],
                                      Type))
   mcl0 <- multcompLetters(fullPTable(pwc0$p.value))
-  shadowtext(1:4, rep(0,4), labels=mcl0$Letters, col="#003087", bg="white",
+  shadowtext(1:4, rep(min(afs1923surf[,varz[i]], na.rm=T),4), 
+             labels=mcl0$Letters, col="#003087", bg="white",
              font=4, cex=1.5, family="serif")
+  } else {
+  with(afs1923surf, boxplot(log10(afs1923surf[,which(colnames(afs1923surf)==varz[i])]) ~ Type, 
+                        varwidth=T, names=c("DS","PS","SM","Oth"),
+                        ylab = paste(varz[i],"(mg/kg)"), yaxt="n",
+                        col=scico(4,pal="batlow",alpha=0.65, end=0.75)))
+    axis(2, at=log10(c(1,2,5,10,20,50,100,200,500,1000,2000,5000,1e4,2e4,5e4)),
+         labels=c(1,2,5,10,20,50,100,200,500,1000,2000,5000,1e4,2e4,5e4))
+  kw0 <- with(afs1923surf, 
+              kruskal.test(afs1923surf[,which(colnames(afs1923surf)==varz[i])] ~ 
+                           Type))
+  pwc0 <- with(afs1923surf, 
+             pairwise.t.test(afs1923surf[,which(colnames(afs1923surf)==varz[i])],
+                                     Type))
+  mcl0 <- multcompLetters(fullPTable(pwc0$p.value))
+  shadowtext(1:4, rep(log10(min(afs1923surf[,varz[i]], na.rm=T)),4), 
+             labels=mcl0$Letters, col="#003087", bg="white",
+             font=4, cex=1.5, family="serif")
+  }
 }
 ```
 
@@ -870,7 +985,7 @@ for(i in 1:length(varz)){
 
 ## ├ Ce, La, Nd, Gd
 
-```{r boxplots-REE-zone, fig.height=7.2, fig.width=12, fig.align='center',fig.cap="Boxplots of REEs by sampling Zone at Ashfield Flats for all sampling years (DS = Drain sediment; Fl = Flooded; LS = Lake Sediment; SM = Saltmarsh; So = Soil).", echo=FALSE}
+```{r boxplots-REE-zone, fig.height=7.2, fig.width=12, fig.align='center',fig.cap="Boxplots of REEs by sampling Zone at Ashfield Flats for all sampling years (DS = Drain sediment; Fl = Flooded; PS = Pond Sediment; SM = Saltmarsh; So = Soil).", echo=FALSE}
 varz <- c("La","Ce","Gd","Nd")
 palette(c("black",scico(4,pal="batlow",alpha=0.65, end=0.75),"grey","white"))
 par(mfrow = c(1,1), mar = c(4,3.5,0.5,0.5), mgp = c(2,0.2,0),
@@ -987,43 +1102,10 @@ spm(~Al+Ca+Fe+S+P+La+Ce+Nd+Gd|Type, data = data0, smooth=F, regLine=T,
 
 ## ├ sum(REE) *vs*. Al
 
-```{r scatterplots-sumREE-Al, fig.height=10, fig.width=15, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Al relationships at Ashfield Flats for all sampling years. Plots (a) and (b) are of untransformed variables, plots (c) and (d) have both axes log~10~-transformed", results='hold', echo=FALSE}
+```{r scatterplots-sumREE-Al, fig.height=10, fig.width=15, message=FALSE, warning=FALSE, fig.align='center',fig.cap="REE-Al relationships at Ashfield Flats for all sampling years. Plots (a) and (b) are plotted on log~10~-transformed variables, plots (c) and (d) are of untransformed variables.", results='hold', echo=FALSE}
 par(mfrow = c(2,2), mar = c(4,4,0.5,0.5), mgp = c(1.7,0.2,0),
     cex.lab = 1.5, cex.axis = 1.25, font.lab = 2, tcl = 0.2, las = 1)
 afs1923$Al2 <- afs1923$Al/1e3
-clrz <- scico(4, pal="batlow", end=0.75, alp=0.5) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
-plot(afs1923$Al2, afs1923$REE,
-     bg = clrz[afs1923$Type], pch = seq(21,25)[afs1923$Type],
-     ylab = "∑REE (mg/kg)", cex = 1.4, xlab = "Al (g/kg)") 
-  for(j in 1:nlevels(afs1923$Type)){
-    lm0 <- lm(afs1923$REE ~ afs1923$Al2, 
-              subset=afs1923$Type==levels(afs1923$Type)[j])
-    v0 <- subset(afs1923$Al2,
-                 subset = afs1923$Type == levels(afs1923$Type)[j])
-    r0 <- range(v0, na.rm=T)
-    y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
-    lines(r0, y0, col = clrz[j], lwd = 3)
-  }
-mtext("(a)",3,-1.8,font=2,cex=1.4,adj=0.02)
-legend("left", bty="n", cex = 1.4, legend=levels(afs1923$Type),
-       pch=seq(21,25), pt.bg=clrz, pt.cex=1.8)
-clrz <- scico(12, pal="hawaii", end=0.85, alp=0.7) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
-plot(afs1923$Al2, afs1923$REE,
-     bg = clrz[afs1923$Zone], 
-     pch = c(21:25,21:25,21,22)[afs1923$Zone],
-     ylab = "∑REE (mg/kg)", cex = 1.4, xlab = "Al (g/kg)") 
-  for(j in 1:nlevels(afs1923$Zone)){
-    lm0 <- lm(afs1923$REE ~ afs1923$Al2,
-              subset = afs1923$Zone == levels(afs1923$Zone)[j])
-    v0 <- subset(afs1923$Al2,
-                 subset = afs1923$Zone == levels(afs1923$Zone)[j])
-    r0 <- range(v0, na.rm=T)
-    y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
-    lines(r0, y0, col = clrz[j], lwd = 3)
-  }
-mtext("(b)",3,-1.8,font=2,cex=1.4,adj=0.02)
-legend("left", bty="n", cex = 1.1, legend=levels(afs1923$Zone),
-       pch=seq(21,25), pt.bg=clrz, pt.cex=1.4)
 clrz <- scico(4, pal="batlow", end=0.75, alp=0.5) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
 plot(afs1923$Al/1e3, afs1923$REE,
      log="xy", bg = clrz[afs1923$Type], pch = seq(21,25)[afs1923$Type],
@@ -1037,7 +1119,7 @@ plot(afs1923$Al/1e3, afs1923$REE,
     y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
     lines(10^r0, 10^y0, col = clrz[j], lwd = 3)
   }
-mtext("(c)",3,-1.8,font=2,cex=1.4,adj=0.02)
+mtext("(a)",3,-1.8,font=2,cex=1.4,adj=0.02)
 legend("left", bty="n", cex = 1.4, legend=levels(afs1923$Type),
        pch=seq(21,25), pt.bg=clrz, pt.cex=1.8)
 clrz <- scico(12, pal="hawaii", end=0.85, alp=0.7) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
@@ -1053,6 +1135,39 @@ plot(afs1923$Al/1e3, afs1923$REE,
     r0 <- log10(range(v0, na.rm=T))
     y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
     lines(10^r0, 10^y0, col = clrz[j], lwd = 3)
+  }
+mtext("(b)",3,-1.8,font=2,cex=1.4,adj=0.02)
+legend("left", bty="n", cex = 1.1, legend=levels(afs1923$Zone),
+       pch=seq(21,25), pt.bg=clrz, pt.cex=1.4)
+clrz <- scico(4, pal="batlow", end=0.75, alp=0.5) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
+plot(afs1923$Al2, afs1923$REE,
+     bg = clrz[afs1923$Type], pch = seq(21,25)[afs1923$Type],
+     ylab = "∑REE (mg/kg)", cex = 1.4, xlab = "Al (g/kg)") 
+  for(j in 1:nlevels(afs1923$Type)){
+    lm0 <- lm(afs1923$REE ~ afs1923$Al2, 
+              subset=afs1923$Type==levels(afs1923$Type)[j])
+    v0 <- subset(afs1923$Al2,
+                 subset = afs1923$Type == levels(afs1923$Type)[j])
+    r0 <- range(v0, na.rm=T)
+    y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
+    lines(r0, y0, col = clrz[j], lwd = 3)
+  }
+mtext("(c)",3,-1.8,font=2,cex=1.4,adj=0.02)
+legend("left", bty="n", cex = 1.4, legend=levels(afs1923$Type),
+       pch=seq(21,25), pt.bg=clrz, pt.cex=1.8)
+clrz <- scico(12, pal="hawaii", end=0.85, alp=0.7) # c("#4040FF80","#40c0c080","#b000ff80","#CCA66680")
+plot(afs1923$Al2, afs1923$REE,
+     bg = clrz[afs1923$Zone], 
+     pch = c(21:25,21:25,21,22)[afs1923$Zone],
+     ylab = "∑REE (mg/kg)", cex = 1.4, xlab = "Al (g/kg)") 
+  for(j in 1:nlevels(afs1923$Zone)){
+    lm0 <- lm(afs1923$REE ~ afs1923$Al2,
+              subset = afs1923$Zone == levels(afs1923$Zone)[j])
+    v0 <- subset(afs1923$Al2,
+                 subset = afs1923$Zone == levels(afs1923$Zone)[j])
+    r0 <- range(v0, na.rm=T)
+    y0 <- c(lm0$coef[1]+lm0$coef[2]*r0[1],lm0$coef[1]+lm0$coef[2]*r0[2])
+    lines(r0, y0, col = clrz[j], lwd = 3)
   }
 mtext("(d)",3,-1.8,font=2,cex=1.4,adj=0.02)
 legend("left", bty="n", cex = 1.1, legend=levels(afs1923$Zone),
@@ -1253,46 +1368,56 @@ Maybe only Gd has significantly different slopes due to anthropogenic addition?
 ## ├ La-Al
 
 ```{r lm-La-Al-simple-grouped, results='hold', echo=FALSE}
-data0 <- na.omit(afs1923clr[,c("Type","Al","La")])
+data0 <- na.omit(afs1923clr[,c("Type","Zone","Al","La")])
 lmLaAl0 <- with(data0, lm(La ~ Al)) ; summary(lmLaAl0)
 cat(rep("-=-",20),sep="");lmLaAl1 <- with(data0, lm(La ~ Al * Type)) ; summary(lmLaAl1)
+cat(rep("-=-",20),sep="");lmLaAl2 <- with(data0, lm(La ~ Al * Zone)) ; summary(lmLaAl2)
 cat(rep("-=-",9),"\n");aovLaAlmods <- anova(lmLaAl0,lmLaAl1); print(aovLaAlmods, type="text")
+cat(rep("-=-",9),"\n");aovLaAlmods <- anova(lmLaAl0,lmLaAl2); print(aovLaAlmods, type="text")
 ```
 
 ## ├ Ce-Al
 
 ```{r lm-Ce-Al-simple-grouped, results='hold', echo=FALSE}
-data0 <- na.omit(afs1923clr[,c("Type","Al","Ce")])
+data0 <- na.omit(afs1923clr[,c("Type","Zone","Al","Ce")])
 lmCeAl0 <- with(data0, lm(Ce ~ Al)) ; summary(lmCeAl0)
-lmCeAl1 <- with(data0, lm(Ce ~ Al * Type)) ; summary(lmCeAl1)
-anova(lmCeAl0,lmCeAl1)
+cat(rep("-=-",20),sep="");lmCeAl1 <- with(data0, lm(Ce ~ Al * Type)) ; summary(lmCeAl1)
+cat(rep("-=-",20),sep="");lmCeAl2 <- with(data0, lm(Ce ~ Al * Zone)) ; summary(lmCeAl2)
+cat(rep("-=-",9),"\n");aovCeAlmods <- anova(lmCeAl0,lmCeAl1); print(aovCeAlmods, type="text")
+cat(rep("-=-",9),"\n");aovCeAlmods <- anova(lmCeAl0,lmCeAl2); print(aovCeAlmods, type="text")
 ```
 
 ## ├ Nd-Al
 
 ```{r lm-Nd-Al-simple-grouped, results='hold', echo=FALSE}
-data0 <- na.omit(afs1923clr[,c("Type","Al","Nd")])
+data0 <- na.omit(afs1923clr[,c("Type","Zone","Al","Nd")])
 lmNdAl0 <- with(data0, lm(Nd ~ Al)) ; summary(lmNdAl0)
-lmNdAl1 <- with(data0, lm(Nd ~ Al * Type)) ; summary(lmNdAl1)
-anova(lmNdAl0,lmNdAl1)
+cat(rep("-=-",20),sep="");lmNdAl1 <- with(data0, lm(Nd ~ Al * Type)) ; summary(lmNdAl1)
+cat(rep("-=-",20),sep="");lmNdAl2 <- with(data0, lm(Nd ~ Al * Zone)) ; summary(lmNdAl2)
+cat(rep("-=-",9),"\n");aovNdAlmods <- anova(lmNdAl0,lmNdAl1); print(aovNdAlmods, type="text")
+cat(rep("-=-",9),"\n");aovNdAlmods <- anova(lmNdAl0,lmNdAl2); print(aovNdAlmods, type="text")
 ```
 
 ## ├ Gd-Al
 
 ```{r lm-Gd-Al-simple-grouped, results='hold', echo=FALSE}
-data0 <- na.omit(afs1923clr[,c("Type","Al","Gd")])
+data0 <- na.omit(afs1923clr[,c("Type","Zone","Al","Gd")])
 lmGdAl0 <- with(data0, lm(Gd ~ Al)) ; summary(lmGdAl0)
-lmGdAl1 <- with(data0, lm(Gd ~ Al * Type)) ; summary(lmGdAl1)
-anova(lmGdAl0,lmGdAl1)
+cat(rep("-=-",20),sep="");lmGdAl1 <- with(data0, lm(Gd ~ Al * Type)) ; summary(lmGdAl1)
+cat(rep("-=-",20),sep="");lmGdAl2 <- with(data0, lm(Gd ~ Al * Zone)) ; summary(lmGdAl2)
+cat(rep("-=-",9),"\n");aovGdAlmods <- anova(lmGdAl0,lmGdAl1); print(aovGdAlmods, type="text")
+cat(rep("-=-",9),"\n");aovGdAlmods <- anova(lmGdAl0,lmGdAl2); print(aovGdAlmods, type="text")
 ```
 
-## ├ Y-Al
+## ├ \u2211~4~REE-Al
 
-```{r lm-Y-Al-simple-grouped, results='hold', echo=FALSE}
-data0 <- na.omit(afs1923clr[,c("Type","Al","Y")])
-lmGdAl0 <- with(data0, lm(Y ~ Al)) ; summary(lmGdAl0)
-lmGdAl1 <- with(data0, lm(Y ~ Al * Type)) ; summary(lmGdAl1)
-anova(lmGdAl0,lmGdAl1)
+```{r lm-REE-Al-simple-grouped, results='hold', echo=FALSE}
+data0 <- na.omit(afs1923clr2ree[,c("Type","Zone","Al","REE")])
+lmREEAl0 <- with(data0, lm(REE ~ Al)) ; summary(lmREEAl0)
+cat(rep("-=-",20),sep="");lmREEAl1 <- with(data0, lm(REE ~ Al * Type)) ; summary(lmREEAl1)
+cat(rep("-=-",20),sep="");lmREEAl2 <- with(data0, lm(REE ~ Al * Zone)) ; summary(lmREEAl2)
+cat(rep("-=-",9),"\n");aovREEAlmods <- anova(lmREEAl0,lmREEAl1); print(aovREEAlmods, type="text")
+cat(rep("-=-",9),"\n");aovREEAlmods <- anova(lmREEAl0,lmREEAl2); print(aovREEAlmods, type="text")
 ```
 
 From the output we see that a grouped (by Type) model has significantly better
@@ -1468,7 +1593,7 @@ axis(1);axis(2);box()
 mtext("Easting (m)",1,1.7*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,1.7*s0,font=2,cex = 1.2*s0)
 legend("bottomright", bty="o", cex=0.8, y.intersp = 0.5,
-  legend=expression(italic("Map tiles: CartoDB Positron, Projection: UTM Zone 50S, WGS84 (EPSG:32750)")),
+  legend=expression(italic("Map tiles: CartoDB Voyager, Projection: UTM Zone 50S, WGS84 (EPSG:32750)")),
        box.col="#00000000", bg="#ffffff40")
 addnortharrow()
 addscalebar(plotepsg=32750, htin=0.12, label.cex=1.2)
@@ -1553,7 +1678,7 @@ axis(1);axis(2);box()
 mtext("Easting (m)",1,1.7*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,1.7*s0,font=2,cex = 1.2*s0)
 legend("bottomright", bty="o", cex=0.8, y.intersp = 0.5,
-  legend=expression(italic("Map tiles: CartoDB Positron, Projection: UTM Zone 50S, WGS84 (EPSG:32750)")),
+  legend=expression(italic("Map tiles: CartoDB Voyager, Projection: UTM Zone 50S, WGS84 (EPSG:32750)")),
        box.col="#00000000", bg="#ffffff40")
 addnortharrow()
 addscalebar(plotepsg=32750, htin=0.12, label.cex=1.2)
@@ -1636,7 +1761,7 @@ axis(1);axis(2);box()
 mtext("Easting (m)",1,1.7*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,1.7*s0,font=2,cex = 1.2*s0)
 legend("bottomright", bty="o", cex=0.8, y.intersp = 0.5,
-  legend=expression(italic("Map tiles: CartoDB Positron, Projection: UTM Zone 50S, WGS84 (EPSG:32750)")),
+  legend=expression(italic("Map tiles: CartoDB Voyager, Projection: UTM Zone 50S, WGS84 (EPSG:32750)")),
        box.col="#00000000", bg="#ffffff40")
 addnortharrow()
 addscalebar(plotepsg=32750, htin=0.12, label.cex=1.2)
@@ -1718,7 +1843,7 @@ axis(1);axis(2);box()
 mtext("Easting (m)",1,1.7*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,1.7*s0,font=2,cex = 1.2*s0)
 legend("bottomright", bty="o", cex=0.8, y.intersp = 0.5,
-  legend=expression(italic("Map tiles: CartoDB Positron, Projection: UTM Zone 50S, WGS84 (EPSG:32750)")),
+  legend=expression(italic("Map tiles: CartoDB Voyager, Projection: UTM Zone 50S, WGS84 (EPSG:32750)")),
        box.col="#00000000", bg="#ffffff40")
 addnortharrow()
 addscalebar(plotepsg=32750, htin=0.12, label.cex=1.2)
@@ -1798,7 +1923,7 @@ afs1923$bubcats <- NULL
 
 ## ├ make PAAS reference data
 
-```{r make-reference-data, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+```{r make-reference-data, message=FALSE, warning=FALSE, paged.print=FALSE, echo=FALSE, results='hold'}
 PAAS <- data.frame(Element=c("Y", "La","Ce","Pr","Nd","Sm","Eu","Gd",
                              "Tb","Dy","Ho","Er","Tm","Yb","Lu","REE"),
             PAAS=c(27,38,80,8.9,32,5.6,1.1,4.7,0.77,4.4,1,2.9,0.4,2.8,0.43,154.7))
@@ -1830,7 +1955,8 @@ with(plotdata, boxplot(values ~ ind, xaxt="n",
                        col = viridis::mako(6, dir=-1, begin=0.33)))
 points(c(1:6), as.numeric(meanz), pch=3, col="white", lwd=4)
 points(c(1:6), as.numeric(meanz), pch=3, lwd=2)
-axis(1, at=1:6, labels=c("La","Ce","Gd","Nd","Y","\u2211REE"), font=2)
+axis(1, at=1:5, labels=c("La","Ce","Gd","Nd","Y"), font=2)
+axis(1, at=6, labels=expression(bold(paste(Sigma[4],"REE"))), font=2)
 abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
 ```
 
@@ -1839,10 +1965,12 @@ abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
 ## ├ over all data are REE fractionated?
 
 ```{r, echo=FALSE}
+cat("Means for ∑REE/PAAS by element:\n"); print(meanz,digits=3); cat("\n")
 with(plotdata, bartlett.test(values~ind))
 with(plotdata, oneway.test(values~ind))
 (pwREE <- with(plotdata, pairwise.t.test(values, ind, pool.sd = F)))
 pwREE_pv <- fullPTable(pwREE$p.value)               # from rcompanion
+cat("\nCompact letter comparison\n")
 multcompLetters(pwREE_pv)                           # from multcompView
 ```
 
@@ -1869,10 +1997,12 @@ text(seq(1,12), rep(-0.5,12), labels = paste0("(",mcl0$Letters,")"),
 <p>&nbsp;</p>
 
 ```{r compare-REE-PAAS-by-Type, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold', echo=FALSE}
-cat("Means for ∑REE/PAAS by sediment Type:\n"); print(meanz,digits=3)
+cat("Means for ∑REE/PAAS by sediment Type:\n"); print(meanz,digits=3); cat("\n")
+with(afs1923_PAAS, bartlett.test(REE ~ Type))
 with(afs1923_PAAS, oneway.test(REE ~ Type))
 (pwPAAS <- with(afs1923_PAAS, pairwise.t.test(REE, Type, pool.sd = F)))
 pwPAAS_pv <- fullPTable(pwPAAS$p.value)              # from rcompanion
+cat("\nCompact letter comparison\n")
 multcompLetters(pwPAAS_pv)                           # from multcompView
 ```
 
@@ -1969,13 +2099,13 @@ Drain sediments are depleted in REE relative to PAAS. Gd/PAAS is greatest but no
 
 <p>&nbsp;</p>
 
-## ├ REE/PAAS in Lake sediments
+## ├ REE/PAAS in Pond sediments
 
-```{r normalized-REE-Lake-sed, fig.height=3.6, fig.width=6, fig.cap="Concentrations of YREE normalized to PAAS in lake (seasonal wetland pond) sediments over all years at Ashfield Flats.", results='hold', echo=FALSE}
+```{r normalized-REE-Pond-sed, fig.height=3.6, fig.width=6, fig.cap="Concentrations of YREE normalized to PAAS in pond (seasonal wetland) sediments over all years at Ashfield Flats.", results='hold', echo=FALSE}
 require(viridis)
-PAAS_LakeSed <- subset(afs1923_PAAS, afs1923_PAAS$Type=="Lake_Sed")
+PAAS_PondSed <- subset(afs1923_PAAS, afs1923_PAAS$Type=="Pond_Sed")
 plotdata <- 
-  stack(st_drop_geometry(PAAS_LakeSed[,c("La","Ce","Gd","Nd","Y","REE")]))
+  stack(st_drop_geometry(PAAS_PondSed[,c("La","Ce","Gd","Nd","Y","REE")]))
 par(mfrow=c(1,1), mar = c(2,4,1,1), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2,
     lend=2, ljoin=1)
 meanz <- with(plotdata, tapply(values, ind, FUN=mean, na.rm=TRUE))
@@ -1987,10 +2117,10 @@ axis(1, at=1:6, labels=c("La","Ce","Gd","Nd","Y","∑REE"), font=2)
 abline(h=0.99, lty=3,col="sienna4");abline(h=1, lty=3, col="gold")
 ```
 
-Wetland pond ("Lake") sediments are enriched relative to PAAS. Y is significantly less than La, Ce, Nd, and Gd.
+Wetland pond ("Pond") sediments are enriched relative to PAAS. Y is significantly less than La, Ce, Nd, and Gd.
 
 ```{r, echo=FALSE}
-cat("Means for each element in Lake sediment:\n"); print(meanz,digits=3)
+cat("Means for each element in Pond sediment:\n"); print(meanz,digits=3)
 with(plotdata, oneway.test(values ~ ind))
 (pwREE <- with(plotdata, pairwise.t.test(values, ind, pool.sd = F)))
 pwREE_pv <- fullPTable(pwREE$p.value)               # from rcompanion
