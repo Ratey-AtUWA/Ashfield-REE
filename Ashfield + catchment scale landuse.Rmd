@@ -1,0 +1,112 @@
+---
+title: "Landuse from 2018 CLUM data around Ashfield"
+output: html_document
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(sf)
+library(maptiles)
+library(viridis)
+library(scico)
+library(prettymapr)
+```
+
+```{r read-CLUM-shapefile, message=FALSE, warning=FALSE}
+SwanLanduseLL <- st_read("../shapefiles/SwanLanduse/WA_CLUM_August2018_Swan.shp")
+# |>  st_transform(crs=st_crs(4326)) # don't transform, keep GDA94 / EPSG:4283
+str(SwanLanduseLL)
+```
+
+```{r show-all-possible-secondary-level-landuses, message=FALSE, warning=FALSE}
+unique(SwanLanduseLL$SECONDARY_)
+```
+
+```{r make-subsets-for-specified-landuses, message=FALSE, warning=FALSE}
+LU_conserv <- subset(SwanLanduseLL,
+                     SwanLanduseLL$PRIMARY_V8 == "1 Conservation and natural environments")
+
+LU_silv <- subset(SwanLanduseLL,
+                  SwanLanduseLL$SECONDARY_ == "3.1 Plantation forests" | SwanLanduseLL$SECONDARY_ == "4.1 Irrigated plantation forests")
+
+LU_transition <- subset(SwanLanduseLL,
+                        SwanLanduseLL$SECONDARY_ == "3.6 Land in transition" | SwanLanduseLL$SECONDARY_ == "4.6 Irrigated land in transition")
+
+LU_intensHort <- subset(SwanLanduseLL,
+                        SwanLanduseLL$SECONDARY_ == "5.1 Intensive horticulture")
+
+LU_intensAnim <- subset(SwanLanduseLL,
+                        SwanLanduseLL$SECONDARY_ == "5.2 Intensive animal production")
+
+LU_industry <- subset(SwanLanduseLL,
+                      SwanLanduseLL$SECONDARY_ == "5.3 Manufacturing and industrial")
+
+LU_residential <- subset(SwanLanduseLL,
+                         SwanLanduseLL$SECONDARY_ == "5.4 Residential and farm infrastructure")
+
+LU_services <- subset(SwanLanduseLL,
+                      SwanLanduseLL$SECONDARY_ == "5.5 Services")
+
+LU_util <- subset(SwanLanduseLL,
+                  SwanLanduseLL$SECONDARY_ == "5.6 Utilities")
+
+LU_transpComms <- subset(SwanLanduseLL,
+                         SwanLanduseLL$SECONDARY_ == "5.7 Transport and communication")
+
+LU_waste <- subset(SwanLanduseLL,
+                         SwanLanduseLL$SECONDARY_ == "5.9 Waste treatment and disposal")
+
+LU_wetland <- subset(SwanLanduseLL,
+                         SwanLanduseLL$SECONDARY_ == "6.5 Marsh/wetland")
+
+LU_water <- subset(SwanLanduseLL,
+                  SwanLanduseLL$PRIMARY_V8 == unique(SwanLanduseLL$PRIMARY_V8)[6])
+```
+
+```{r make-basemap, message=FALSE, warning=FALSE}
+extent <- st_as_sf(x = data.frame(x = c(115.849,115.995),
+                                  y = c(-31.965,-31.895)),
+                   coords = c("x", "y"), crs = st_crs(4283))
+
+PerthRast <- get_tiles(extent, provider="Thunderforest.Neighbourhood",
+                       apikey="03b0375e8e7c47d0a03018a9001de439",
+                       crop = TRUE, zoom=14)
+```
+
+```
+  _   _              _             _                    _        _      
+ | \ | |  ___ __  __| |_      ___ | |__   _   _  _ __  | | __   (_) ___ 
+ |  \| | / _ \\ \/ /| __|    / __|| '_ \ | | | || '_ \ | |/ /   | |/ __|
+ | |\  ||  __/ >  < | |_    | (__ | | | || |_| || | | ||   <    | |\__ \
+ |_| \_| \___|/_/\_\ \__|    \___||_| |_| \__,_||_| |_||_|\_\   |_||___/
+                                                                        
+      __     __ _____  ____ __   __         _                   _            
+      \ \   / /| ____||  _ \\ \ / /    ___ | |  ___ __      __ | |           
+       \ \ / / |  _|  | |_) |\ V /    / __|| | / _ \\ \ /\ / / | |           
+        \ V /  | |___ |  _ <  | |     \__ \| || (_) |\ V  V /  |_|           
+         \_/   |_____||_| \_\ |_|     |___/|_| \___/  \_/\_/   (_)           
+
+```
+
+```{r plot-the-map, fig.height=9.4, fig.width=15, message=FALSE, warning=FALSE}
+pal_order <- c(2,2,2,3,3,3,3,5,5,5,5,3,5,5,5,5,5,7,10,10,7,9,8,4,6,7,11,12,12,12,12,12,1,12)
+(lupal <- c(scico(11, pal="hawaii", alp=0.75),"#90DAF9C0")[pal_order])
+
+s0 <- 2
+par(mar=c(0,0,0,0)*s0, oma=c(3,3,1,1)*s0, mgp=c(1.7,0.3,0)*s0, tcl=0.25*s0, lwd=1*s0)
+# layout(matrix(c(1,1,2),nrow=1))
+plot_tiles(PerthRast)
+axis(1, cex.axis=s0); axis(2, cex.axis=s0); box(lwd=s0)
+mtext("Longitude (\u00b0E)", 1, 1.7*s0, font=2, cex = 1.2*s0)
+mtext("Latitude (\u00b0S)", 2, 1.7*s0, font=2, cex = 1.2*s0)
+plot(SwanLanduseLL[9], add=T, lwd=0.1*s0, border="#00000080",
+     pal=lupal)
+
+legend("topleft", inset=0.01, box.col="gray50", y.int=1,
+       legend=c("Conservation","Forests/grazing","Utilities","Crops/horticulture",
+                "Transport/comms","Industrial","Services","Residential",
+                "Intensive hort/agric","Waste management","Marsh/wetland","Water"),
+       pch=22, pt.cex=2*s0, cex=s0,
+       pt.bg= c(scico(11, pal="hawaii", alp=0.75),"#90DAF9C0")[c(2:11,1,12)])
+addscalebar(plotepsg=4283, label.cex=2, padin=c(1,1))
+```
+
