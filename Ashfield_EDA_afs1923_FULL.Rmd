@@ -20,17 +20,19 @@ load(".RData")
 library(prettymapr)
 library(ggmap)
 library(sf)
-library(sp)
+# library(sp)
 library(maptiles)
 library(TeachingDemos)
-library(geosphere)
+library(ggspatial)
+library(ggplot2)
 library(RcmdrMisc)
 library(viridis)
 library(scico)
 library(flextable)
-  set_flextable_defaults(font.family = 'sans', theme_fun = "theme_zebra", 
+  set_flextable_defaults(font.family = 'sans', theme_fun = "theme_booktabs", 
         font.size = 11, text.align = "right",padding.left = 1, padding.right = 1,
         padding.top = 2, padding.bottom = 2)
+library(officer)
 library(car)
 library(diptest)
 library(PMCMRplus)
@@ -39,8 +41,9 @@ library(multcompView)
 library(reshape2)
 library(factoextra)
 library(ggpubr)
-library(vegan)
-register_google(key=GoogleMapsKey)
+# library(vegan)
+register_google(key=read.csv("../gmapskey.csv")[1,1])
+register_stadiamaps(key=read.csv("../StadiaMaps-API.csv")[1,1])
 ```
 
 ```{r define CRS, warning=FALSE, error=FALSE, results='hold', echo=FALSE}
@@ -80,14 +83,14 @@ ISQG <- read.csv("ISQG.csv"); row.names(ISQG) <- ISQG$Tox
 afr_map <- read.csv(file=paste0(git,"afr_map_v3.csv"), stringsAsFactors = TRUE)
 afr_map$SW_DBCA <- as.factor(afr_map$SW_DBCA)
 afr_zones <- read.csv(file=paste0(git,"afr_zones.csv"), stringsAsFactors = TRUE)
-scpassLL <- st_read("../Learning R/Acid_Sulfate_Risk_Swan_Coastal_Plain_DWER_055.shp")
+scpassLL <- st_read("../Learn-R/Acid_Sulfate_Risk_Swan_Coastal_Plain_DWER_055.shp")
 scpassLL <- st_transform(scpassLL, crs=st_crs(4326))
 
 riverLL <- st_read("srpoly.shp")
 
 pal4lite <- c("black", viridis::plasma(8), "white")
 pal4liteTransp <- 
-  c("black", scico::scico(8, alpha=0.7, palette="hawaii", beg=0.1), "white")
+  c("black", scico::scico(8, alpha=0.8, palette="hawaii", beg=0.1), "white")
 pal4dark <- c("white", viridis::turbo(8, beg=0.2, end=0.9,dir=1), "black")
 ```
 
@@ -97,40 +100,36 @@ pal4dark <- c("white", viridis::turbo(8, beg=0.2, end=0.9,dir=1), "black")
 extent <- st_as_sf(x = data.frame(x = c(115.849,115.995), 
                                   y = c(-31.98,-31.91)), 
                    coords = c("x", "y"), crs = LongLat)
+tfkey <- readLines("../thunderforest-API-key.txt")
 
 PerthRast <- get_tiles(extent, provider="Thunderforest.Neighbourhood", # Esri.WorldImagery
-                       apikey="03b0375e8e7c47d0a03018a9001de439", 
+                       apikey=tfkey, 
                        crop = TRUE, zoom=14)
 ```
 
-```{r overview-map, fig.height=12.8, fig.width=20, message=FALSE, warning=FALSE, fig.cap="Map showing location of Ashfield Flats Reserve in metropolitan Perth, Western Australia.", results='hold', echo=FALSE}
+```{r overview-map, fig.height=13, fig.width=20, message=FALSE, warning=FALSE, fig.cap="Map showing location of Ashfield Flats Reserve in metropolitan Perth, Western Australia.", results='hold', echo=FALSE}
 palette(pal4lite)
-s0 <- 2; par(oma=c(4,4,1,1)*s0, mar=c(4,4,1,1)*s0, tcl = -0.2*s0,
-    lend = "square", ljoin = "mitre", lheight=0.7)
-plot_tiles(PerthRast)
-axis(1, cex.axis=1.*s0, mgp=c(2.2,0.45,0)*s0, tcl = 0.25*s0, lwd=s0)
-axis(2, cex.axis=1.*s0, mgp=c(2.2,0.2,0)*s0, tcl = 0.25*s0, lwd=s0)
-box(which="plot", lwd=s0)
-mtext("Longitude (\u00B0E)",1,2.2*s0,font=2,cex = 1.2*s0)
-mtext("Latitude (\u00B0S)",2,2.2*s0,font=2,cex = 1.2*s0)
-polygon(afr_map$bound_lon, afr_map$bound_lat,
-        border = 1, col = "gold", lwd = 2)
-polygon(afr_map$bound_lon, afr_map$bound_lat,
-        border = 1, col = 1, lwd = s0, density = 16/s0)
+s0 <- 2; par(oma=c(0,0,0,0)*s0, mar=c(4,4,2,1)*s0, tcl = -0.25*s0,
+             mgp=c(2,0.5,0)*s0, cex.axis=1.2*s0, cex.lab=1.2*s0,
+             lwd=s0, lend = "square", ljoin = "mitre", lheight=0.7,
+             font.lab=2)
+plot(st_coordinates(extent), asp=1.22, type="n", xaxs="i", yaxs="i", 
+     xlab="Longitude (\u00B0E)", 
+     ylab="Latitude (\u00B0S)")
+plot_tiles(PerthRast, add=T)
 plot(subset(scpassLL, scpassLL$risk_class==1)[4], pal=c("#ffb00080"), add=TRUE)
 plot(riverLL[1], col="#4D6EAB", add=TRUE)
-# addnortharrow(border = 1, text.col=1, scale = 1.1*s0, lwd=s0,
-#               padin = c(0.135,0.165)*s0)
 addnortharrow(border = 1, text.col=1, scale = 1.1*s0, lwd=s0,
               padin = c(0.15,0.15)*s0)
-# addscalebar(plotepsg = 4326, linecol=1, label.col=1, htin=0.2*s0,
-#             label.cex=1.25*s0, widthhint = 0.25, lwd=s0,
-#             padin = c(0.165,0.235)*s0)
 addscalebar(plotepsg = 4326, linecol=1, label.col=1, htin=0.2*s0,
             label.cex=1.25*s0, widthhint = 0.25, lwd=s0,
             padin = c(0.15,0.25)*s0)
+polygon(afr_map$bound_lon, afr_map$bound_lat,
+        border = "sienna", col = "sienna", lwd = 1.25*s0, density=8)
+points(115.945, -31.919, pch=19, cex=1.2*s0)
+lines(c(115.939, 115.945), c(-31.919,-31.919), lwd=2*s0)
 shadowtext(115.939,-31.92,pos=2,labels="Ashfield\nFlats\nReserve",
-           col="gold", bg=1, font=2, cex=1.3*s0)
+           col="sienna", bg="white", font=2, cex=1.3*s0)
 shadowtext(115.97,-31.93, labels="Perth\nAirport",
            col=1, bg=10, font=2, cex=1.3*s0)
 shadowtext(115.865,-31.955, labels="Perth\nCBD",
@@ -139,15 +138,15 @@ text(115.863,-31.9655, labels="Derbarl Yerrigan",
      col="#D6E0FF", font=3, cex=1.*s0)
 text(115.863,-31.9685, labels="(Swan River)",
      col="#D6E0FF", font=3, cex=0.85*s0)
-legend("bottomright", inset=c(0.02,0.02), 
+legend("bottomright", inset=c(0.02,0.05), 
        legend=c("High to moderate risk"),
-       cex=0.9*s0, pch=22, pt.cex=2*s0, pt.bg=c("#ffb00080"), 
+       cex=1.1*s0, pch=22, pt.cex=2*s0, pt.bg=c("#ffb00080"), 
        bg="grey88", box.col="grey50", pt.lwd=1*s0, 
        title=expression(italic("Acid sulfate risk category")))
 legend("bottomleft", bg="#ffffffb0", cex=0.6*s0, text.col=1, y.intersp=0.5,
   legend = "Map tiles: Thunderforest Neighbourhood.   Projection: WGS84 (EPSG:4326)",
-  box.col="#FFFFFF00", x.intersp = 0.5)
-par(new=TRUE, mfrow=c(1,1), fig=c(0.01,0.25,0.7,0.98),
+  box.col="#FFFFFF00", x.intersp = 0.5) ; box(lwd=s0)
+par(new=TRUE, mfrow=c(1,1), fig=c(0.08,0.3,0.68,0.92),
     mar=c(1,1,.5,.5), font.lab=2, mgp=c(2,0.2,0),
     tcl=0.2)
 plot(aust_map, asp=1.1, type = "l", xaxt="n", xlab="",
@@ -167,8 +166,8 @@ text(133,-25, labels = "Australia", cex=1.1*s0, font=2, col="sienna")
 
 # Sample map
 
-```{r sample-map, echo=FALSE, fig.align='center', fig.cap="Map of sediment sample locations at Ashfield Flats for all sampling years 2019-2023.", fig.height=9.1, fig.width=15.2, message=FALSE, warning=FALSE, echo=FALSE}
-palette(pal4liteTransp)
+```{r sample-map, echo=FALSE, fig.align='center', fig.cap="Map of sediment sample locations at Ashfield Flats for all sampling years 2019-2023.", fig.height=9.2, fig.width=15.2, message=FALSE, warning=FALSE, echo=FALSE}
+palette(pal4dark)
 
 extent <- st_as_sf(x = data.frame(x = c(399860,400670), 
                                   y = c(6467920,6468500)), 
@@ -178,13 +177,17 @@ aftiles <- get_tiles(extent, provider = "Esri.WorldImagery", crop = TRUE,
 
 s0 <- 1.5
 # png(filename="afs1923-sample-loc-map.png", width=768*s0, height=478*s0)
-par(oma=c(4,4,1,1)*s0, tcl = -0.2*s0, 
-    lend = "round", ljoin = "round", lheight=0.7)
+par(oma=c(0,0,0,0)*s0, mar=c(3.5,3.5,2,1)*s0, tcl = -0.25*s0,
+             mgp=c(2,0.5,0)*s0, cex.axis=1.2*s0, cex.lab=1.2*s0,
+             lwd=s0, lend = "square", ljoin = "mitre", lheight=0.7,
+             font.lab=2)
 layout(matrix(c(1,1,1,1,2),nrow = 1))
-plot(aftiles) 
-axis(1, cex.axis=1.4*s0);axis(2, cex.axis=1.4*s0);box(which="plot")
-mtext("Easting (m)",1,2.6*s0,font=2,cex = 1.2*s0)
-mtext("Northing (m)",2,2.6*s0,font=2,cex = 1.2*s0)
+plot(st_coordinates(extent), asp=1, type="n", xaxs="i", yaxs="i",
+     xlab="Easting (m)", ylab="Northing (m)")
+plot(aftiles, add=TRUE) 
+# axis(1, cex.axis=1.4*s0);axis(2, cex.axis=1.4*s0);box(which="plot")
+# mtext("Easting (m)",1,2.6*s0,font=2,cex = 1.2*s0)
+# mtext("Northing (m)",2,2.6*s0,font=2,cex = 1.2*s0)
 text(400360,6468120, labels = "Saltmarsh",
               font = 4, cex=6*s0, srt=43, col="#FFFFFF30")
 text(400145,6468189, labels = "Sedge\nmarsh",
@@ -197,30 +200,30 @@ shadowtext(400537,6468370, labels = "Chapman\nDrain",
            font = 3, cex=1.6*s0, srt=61, col="lightblue")
 with(afr_map, lines(wetland_E, wetland_N, col="lightblue", lty="32", lend="round",lwd=1.4*s0))
 with(afr_map, lines(drain_E, drain_N, col = "#8080FFB0", lwd=3*s0))
-with(afr_map, polygon(veg_E, veg_N, border = "#B0FFB040", lwd = 5*s0))
-addnortharrow(border = 10, text.col=10, scale = 1.25*s0)
+with(afr_map, polygon(veg_E, veg_N, border = "#D0FFB040", lwd = 5*s0))
+addnortharrow(border = 10, text.col=10, scale = 1.2*s0, padin=c(0.3,0.32))
 addscalebar(plotepsg = 32750, linecol=10, label.col=10, htin=0.182*s0, 
-            label.cex=1.8*s0, widthhint = 0.15)
+            label.cex=1.8*s0, widthhint = 0.15, padin=c(0.4,0.3))
 with(afs1923, points(Easting, Northing, 
-        col = 10, bg = c(2,3,4,7,1)[Year],
+        col = 1, bg = c(2,3,4,7,9)[Year],
         lwd=2, pch = c(21,22,23,24,25)[Year], 
-        cex = s0*c(2.2,1.8,1.8,1.8,1.8)[Year]))
+        cex = s0*c(2,1.7,1.7,1.7,1.7)[Year]))
+box(lwd=s0)
 plot(c(0,1),c(0,1),type="n",ann=F,xaxt="n",yaxt="n",bty="n",xlab="",ylab="")
-legend("top", bg="grey33", cex = 1.5*s0, text.col = 10, y.intersp = 1.4, 
+legend("top", bg="grey33", cex = 1.5*s0, text.col = 1, y.intersp = 1.4, 
        legend = levels(afs1923$Year), 
        title = expression(bold("     Sampling Year      ")), 
-       pch = c(21,22,23,24,25), pt.bg = c(2,3,4,7,1), col = 10,
+       pch = c(21,22,23,24,25), pt.bg = c(2,3,4,7,9), col = 1,
        pt.cex = c(2.2,1.8,1.8,1.8,1.8)*s0, pt.lwd=2)
-text(0.0,0.6,pos=4,labels="Ashfield Flats Reserve", font=2, cex=1.3*s0)
-text(rep(0.0,2),c(0.5,0.4),pos=4,labels=c("Map tiles:\nESRI World Imagery",
-     "Projection: UTM Zone 50S,\nWGS84 (EPSG:32750)"), cex = 1.25*s0)
-legend("bottom", bg="grey33", cex = 1.5*s0, text.col = 10, y.intersp = 1.4, 
+text(-0.05,0.55,pos=4,labels="Ashfield Flats Reserve", font=2, cex=1.*s0)
+text(rep(-0.05,2),c(0.45,0.35),pos=4,labels=c("Map tiles:\nESRI World Imagery",
+     "CRS: UTM Zone 50S,\nWGS84 (EPSG:32750)"), cex = 1.2*s0)
+legend("bottom", bg="grey33", cex = 1.25*s0, text.col = 1, y.intersp = 1.4, 
     legend = c("Seasonal\nwetland ponds","Drains",
                "Extent of native\nvegetation"), 
        title = expression(bold("Map key")), 
     pch = c(NA,NA,NA), lty = c(2,1,1), lwd = c(1.4,3,5)*s0,
-    col = c("lightblue","#8080FFB0","#B0FFB040"))
-
+    col = c("lightblue","#8080FFB0","#D0FFB040"))
 ```
 
 <p>&nbsp;</p>
@@ -235,16 +238,25 @@ Samples were taken each year from 2019 to 2023 (Figure \@ref(fig:sample-map)). D
 ns0 <- numSummary(afs1923[,c("pH","EC","Al","Ca","Fe","K","Mg","Na","P","S")], 
                   statistics = c("mean","sd","quantiles"), quantiles=c(0,0.5,1))
 ns1 <- signif(as.data.frame(ns0$table),6)
-ns1$rsd <- paste0(signif(100*ns1$sd/ns1$mean,3),"%")
-ns1 <- as.data.frame(cbind(ns1[,c("mean","sd","rsd","0%","50%","100%")],
+ns1$'rsd%' <- signif(100*ns1$sd/ns1$mean,3)
+ns1 <- as.data.frame(cbind(ns1[,c("mean","sd","rsd%","0%","50%","100%")],
                            ns0$NAs))
-colnames(ns1)[NCOL(ns1)] <- "NAs"
-f0 <- as.data.frame(cbind(colnames(ns1),t(ns1[1:10,])))
-colnames(f0)[1] <- "Statistic"
+colnames(ns1)[4:7] <- c("Minimum","Median","Maximum","NAs")
+f0 <- data.frame(Statistic=colnames(ns1),t(ns1[1:10,]))
 flextable(f0) |> 
-set_caption(caption = "Statistical summary of pH and EC, and Al, Ca, Fe, K, Mg, Na, P, and S
-            concentrations in sediment.") |>
-  align(align="right",part="all") 
+set_caption(caption = "Statistical summary of pH and EC, and Al, Ca, Fe, K, Mg, Na, P, and S concentrations in sediment.", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6)) |>
+  align(align="right",part="all") |> 
+    set_formatter(pH=function(x){sprintf("%.03g",x)},
+                EC=function(x){sprintf("%.0f",x)},
+                Al=function(x){sprintf("%.0f",x)},
+                Ca=function(x){sprintf("%.0f",x)},
+                Fe=function(x){sprintf("%.0f",x)},
+                K=function(x){sprintf("%.0f",x)},
+                Mg=function(x){sprintf("%.0f",x)},
+                Na=function(x){sprintf("%.0f",x)},
+                P=function(x){sprintf("%.0f",x)},
+                S=function(x){sprintf("%.0f",x)})
+
 # similar code for other blocks of elements below
 ```
 
@@ -256,17 +268,22 @@ set_caption(caption = "Statistical summary of pH and EC, and Al, Ca, Fe, K, Mg, 
 ns0 <- numSummary(afs1923[,c("La","Ce","Nd","Gd","Y","REE")], 
                   statistics = c("mean","sd","quantiles"), quantiles=c(0,0.5,1))
 ns1 <- signif(as.data.frame(ns0$table),4)
-ns1$rsd <- paste0(signif(100*ns1$sd/ns1$mean,3),"%")
-ns1 <- as.data.frame(cbind(ns1[,c("mean","sd","rsd","0%","50%","100%")],
+ns1$'rsd%' <- signif(100*ns1$sd/ns1$mean,3)
+ns1 <- as.data.frame(cbind(ns1[,c("mean","sd","rsd%","0%","50%","100%")],
                            ns0$NAs))
-colnames(ns1)[NCOL(ns1)] <- "NAs"
-f0 <- as.data.frame(cbind(colnames(ns1),t(ns1[1:6,])))
-colnames(f0)[1] <- "Statistic"
+colnames(ns1)[4:7] <- c("Minimum","Median","Maximum","NAs")
+f0 <- data.frame(Statistic=colnames(ns1),t(ns1[1:6,]))
 flextable(f0) |> 
+  set_header_labels(REE="∑REE") |>
+  align(align="right",part="all") |> 
+    set_formatter(La=function(x){sprintf("%.03g",x)},
+                Ce=function(x){sprintf("%.03g",x)},
+                Nd=function(x){sprintf("%.03g",x)},
+                Gd=function(x){sprintf("%.03g",x)},
+                Y=function(x){sprintf("%.03g",x)},
+                REE=function(x){sprintf("%.03g",x)}) |>
 set_caption(caption = "Statistical summary of La, Ce, Nd, Gd, Y, and ∑REE
-            concentrations in Ashfield Flats sediment.") |>
-  align(align="right",part="all") |>
-  set_header_labels(REE="∑REE")
+            concentrations in Ashfield Flats sediment.", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
 ```
 
 ---------------------------------------------------
@@ -293,12 +310,23 @@ for(i in 1:length(elem0)){
     length(which(afs1923[,elem0[i]] > ISQG[elem0[i],"GV_high"]))}
 }
 colnames(tabl0)[c(3:5,8:9)] <- c("min","median","max","n > DGV","n > GV-high")
-ft <- as.data.frame(cbind(colnames(tabl0),t(signif(tabl0,4))))
-colnames(ft)[1] <- "Statistic"
+ft <- data.frame(Statistic=colnames(tabl0),t(signif(tabl0,4)))
 flextable(ft) |>
   width(j=c(1:7), width=c(3,rep(1.75,6)), unit="cm") |>
-  set_header_labels(values=list(V1="")) |>
-  set_caption(caption="Summary statistics for trace element concentrations (mg/kg) in sediment at Ashfield Flats, 2019-2023. Abbreviations: n = number of valid observations; NAs = number of missing observations; n > DGV is number of samples exceeding Default Guideline Value; n > GV-high is number of samples exceeding the upper Guideline Value at which toxicity effects might be expected (Water Quality Australia, 2023).")
+  set_header_labels(values=list(V1="")) |> 
+    set_formatter(As=function(x){sprintf("%.03g",x)},
+                Ba=function(x){sprintf("%.03g",x)},
+                Cr=function(x){sprintf("%.03g",x)},
+                Cu=function(x){sprintf("%.04g",x)},
+                Mn=function(x){sprintf("%.04g",x)},
+                Mo=function(x){sprintf("%.03g",x)},
+                Ni=function(x){sprintf("%.03g",x)},
+                Pb=function(x){sprintf("%.03g",x)},
+                Sr=function(x){sprintf("%.03g",x)},
+                Th=function(x){sprintf("%.03g",x)},
+                V=function(x){sprintf("%.03g",x)},
+                Zn=function(x){sprintf("%.0f",x)}) |>
+  set_caption(caption="Summary statistics for trace element concentrations (mg/kg) in sediment at Ashfield Flats, 2019-2023. Abbreviations: n = number of valid observations; NAs = number of missing observations; n > DGV is number of samples exceeding Default Guideline Value; n > GV-high is number of samples exceeding the upper Guideline Value at which toxicity effects might be expected (Water Quality Australia, 2023).", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
 
 ```
 
@@ -314,15 +342,28 @@ The trace elements As, Cu, Pb, and Zn are included as common inorganic contamina
 
 ## ├ Drain sediment
 
-```{r summs-type-DS, results='hold', echo=FALSE}
+```{r summs-type-DS, results='hold', echo=FALSE, paged.print=FALSE}
 d0 <- subset(afs1923, afs1923$Type=="Drain_Sed")
 ns0<-numSummary(d0[,c("pH","EC","Al","Ca","Fe","P","S",
                         "La","Ce","Nd","Gd","Y")],
                   statistics = c("mean","sd","quantiles"), quantiles=c(0,.5,1))
-f0 <- as.data.frame(cbind(colnames(ns0$table),signif(t(ns0$table),3)))
-colnames(f0)[1] <- "Stat"
-align(set_caption(flextable(f0), caption = "Basic statistics for Drain Sediment"),
-      align="right",part="all")
+f0 <- data.frame(Stat=colnames(ns0$table),t(ns0$table))
+f0[3:5,1] <- c("Minimum","Median","Maximum")
+flextable(f0) |>
+  align(align="right",part="all") |> 
+    set_formatter(pH=function(x){sprintf("%.03g",x)},
+                EC=function(x){sprintf("%.0f",x)},
+                Al=function(x){sprintf("%.0f",x)},
+                Ca=function(x){sprintf("%.0f",x)},
+                Fe=function(x){sprintf("%.0f",x)},
+                P=function(x){sprintf("%.0f",x)},
+                S=function(x){sprintf("%.0f",x)},
+                La=function(x){sprintf("%.03g",x)},
+                Ce=function(x){sprintf("%.03g",x)},
+                Nd=function(x){sprintf("%.03g",x)},
+                Gd=function(x){sprintf("%.03g",x)},
+                Y=function(x){sprintf("%.03g",x)}) |> 
+  set_caption(caption="Basic statistics for Drain Sediment", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
 # similar code not shown for other sample types
 ```
 
@@ -330,15 +371,28 @@ align(set_caption(flextable(f0), caption = "Basic statistics for Drain Sediment"
 
 ## ├ Pond sediment
 
-```{r summs-type-PS, results='hold', echo=FALSE}
+```{r summs-type-PS, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
 d0 <- subset(afs1923, afs1923$Type=="Pond_Sed")
-ns0<-numSummary(d0[,c("pH","EC","Al","Ca","Fe","P","S","La","Ce","Nd","Gd","Y")],
+ns0<-numSummary(d0[,c("pH","EC","Al","Ca","Fe","P","S",
+                        "La","Ce","Nd","Gd","Y")],
                   statistics = c("mean","sd","quantiles"), quantiles=c(0,.5,1))
-f0 <- cbind(colnames(ns0$table),as.data.frame(signif(t(ns0$table),3)))
-colnames(f0)[1] <- "Stat"
-align(set_caption(
-  flextable(f0), caption="Basic statistics for Pond Sediment"
-  ), align="right",part="all")
+f0 <- data.frame(Stat=colnames(ns0$table),t(ns0$table))
+f0[3:5,1] <- c("Minimum","Median","Maximum")
+flextable(f0) |>
+  align(align="right",part="all") |> 
+    set_formatter(pH=function(x){sprintf("%.03g",x)},
+                EC=function(x){sprintf("%.0f",x)},
+                Al=function(x){sprintf("%.0f",x)},
+                Ca=function(x){sprintf("%.0f",x)},
+                Fe=function(x){sprintf("%.0f",x)},
+                P=function(x){sprintf("%.0f",x)},
+                S=function(x){sprintf("%.0f",x)},
+                La=function(x){sprintf("%.03g",x)},
+                Ce=function(x){sprintf("%.03g",x)},
+                Nd=function(x){sprintf("%.03g",x)},
+                Gd=function(x){sprintf("%.03g",x)},
+                Y=function(x){sprintf("%.03g",x)}) |> 
+  set_caption(caption="Basic statistics for Pond Sediment", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
 ```
 
 ----------------------
@@ -347,13 +401,26 @@ align(set_caption(
 
 ```{r summs-type-SM, results='hold', echo=FALSE}
 d0 <- subset(afs1923, afs1923$Type=="Saltmarsh")
-ns0<-numSummary(d0[,c("pH","EC","Al","Ca","Fe","P","S","La","Ce","Nd","Gd","Y")],
+ns0<-numSummary(d0[,c("pH","EC","Al","Ca","Fe","P","S",
+                        "La","Ce","Nd","Gd","Y")],
                   statistics = c("mean","sd","quantiles"), quantiles=c(0,.5,1))
-f0 <- cbind(colnames(ns0$table),as.data.frame(signif(t(ns0$table),3)))
-colnames(f0)[1] <- "Stat"
-align(set_caption(
-  flextable(f0), caption="Basic statistics for Saltmarsh"
-  ), align="right",part="all")
+f0 <- data.frame(Stat=colnames(ns0$table),t(ns0$table))
+f0[3:5,1] <- c("Minimum","Median","Maximum")
+flextable(f0) |>
+  align(align="right",part="all") |> 
+    set_formatter(pH=function(x){sprintf("%.03g",x)},
+                EC=function(x){sprintf("%.0f",x)},
+                Al=function(x){sprintf("%.0f",x)},
+                Ca=function(x){sprintf("%.0f",x)},
+                Fe=function(x){sprintf("%.0f",x)},
+                P=function(x){sprintf("%.0f",x)},
+                S=function(x){sprintf("%.0f",x)},
+                La=function(x){sprintf("%.03g",x)},
+                Ce=function(x){sprintf("%.03g",x)},
+                Nd=function(x){sprintf("%.03g",x)},
+                Gd=function(x){sprintf("%.03g",x)},
+                Y=function(x){sprintf("%.03g",x)}) |> 
+  set_caption(caption="Basic statistics for Saltmarsh", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
 ```
 
 ----------------------
@@ -394,7 +461,7 @@ for (i in colz) {
   k <- k + 1
 }
 align(set_caption(
-  flextable(table), caption = "Shapiro-Wilk statistics and p-values for untransformed (_orig) and transformed (_log, _pow) variables, power terms, and dip test of multimodality of log-transformed variable, from soil and sediment analysis at Ashfield Flats Reserve 2019-2023."
+  flextable(table), caption = "Shapiro-Wilk statistics and p-values for untransformed (_orig) and transformed (_log, _pow) variables, power terms, and dip test of multimodality of log-transformed variable, from soil and sediment analysis at Ashfield Flats Reserve 2019-2023.", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6)
   ), align="right",part="all")
 rm(list=c("names.of.cols","pt1","sw0","sw1","sw2","dt0","i","table","n0","k","colz"))
 ```
@@ -425,12 +492,11 @@ extent <- st_as_sf(x = data.frame(x = c(399860,400600),
 aftiles <- get_tiles(extent, provider = "CartoDB.Voyager", crop = TRUE, zoom=17)
 palette(pal4lite) ; s0 <- 1.5
 layout(matrix(c(1,1,2,1,1,3),ncol=3,byrow=T))
-par(oma=c(4,4,1,1)*s0, tcl = -0.2*s0, 
+par(oma=c(4,4,1,1)*s0, mar=c(0,0,0,0), mgp=c(1.7,0.3,0)*s0, tcl = -0.2*s0, 
     lend = "round", ljoin = "round", lheight=0.7)
 afs1923$NaFac <- cut(afs1923$Na, breaks = c(0,1000,999999), 
                      labels=c("Low_Na","High_Na"))
-plot(aftiles) 
-axis(1, cex.axis=1*s0);axis(2, cex.axis=1*s0);box(which="plot")
+plot(aftiles, axes=T) 
 mtext("Easting (m)",1,2.6*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,2.6*s0,font=2,cex = 1.2*s0)
 mtext("Projection: WGS84 UTM Zone 50 South, EPSG:32750",1,-1,cex=0.75,adj=0.99)
@@ -474,9 +540,9 @@ afs1923$NaFac <- NULL
 palette(pal4lite)
 
 s0 <- 1
-par(oma=c(4,4,1,1)*s0, tcl = -0.2*s0, 
+par(mar=c(0,0,0,0), oma=c(4,4,1,1)*s0, mgp=c(1.7,0.3,0)*s0, tcl = -0.2*s0, 
     lend = "round", ljoin = "round", lheight=0.7)
-plot(aftiles) 
+plot(aftiles, axes=TRUE) 
 axis(1, cex.axis=1*s0);axis(2, cex.axis=1*s0);box(which="plot")
 mtext("Easting (m)",1,2.6*s0,font=2,cex = 1.2*s0)
 mtext("Northing (m)",2,2.6*s0,font=2,cex = 1.2*s0)
@@ -572,7 +638,7 @@ for (i in 1:length(varz)) {
   result0[i,] <- c(varz[i],signif(kw0$statistic,4), signif(kw0$p.value,3),
                    mcl0$Letters)
   }
-set_caption(align(flextable(result0), align="center",part="all"), caption = "Mean comparisons and pairwise letter comparisons from Kruskal-Wallis and pairwise Conover test for selected elements including REEs (REE = \u2211REE), by simplified sampling zone, at Ashfield Flats 2019-2023.")
+set_caption(align(flextable(result0), align="center",part="all"), caption = "Mean comparisons and pairwise letter comparisons from Kruskal-Wallis and pairwise Conover test for selected elements including REEs (REE = \u2211REE), by simplified sampling zone, at Ashfield Flats 2019-2023.", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
 ```
 
 ----------------------
@@ -602,7 +668,7 @@ for (i in 1:length(varz)) {
   result0[i,] <- c(varz[i],signif(kw0$statistic,4), signif(kw0$p.value,3),
                    mcl0$Letters)
   }
-set_caption(align(flextable(result0), align="center",part="all"), caption = "Mean comparisons and pairwise letter comparisons from Kruskal-Wallis and pairwise Conover test for selected elements including REEs (REE = \u2211REE), by sample type, at Ashfield Flats 2019-2023.")
+set_caption(align(flextable(result0), align="center",part="all"), caption = "Mean comparisons and pairwise letter comparisons from Kruskal-Wallis and pairwise Conover test for selected elements including REEs (REE = \u2211REE), by sample type, at Ashfield Flats 2019-2023.", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
 ```
 
 ----------------------
@@ -711,8 +777,8 @@ par(oma=c(3,3,1,1), mar=c(0,0,0,0), mgp=c(1.7,0.2,0), tcl=0.25)
 plot_tiles(aftiles)
 with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
 axis(1);axis(2);box()
-mtext("Easting (m)",1,1.7*s0,font=2,cex = 1.2*s0)
-mtext("Northing (m)",2,1.7*s0,font=2,cex = 1.2*s0)
+mtext("Easting (m)",1,1.2*s0,font=2,cex = 1.2*s0)
+mtext("Northing (m)",2,1.2*s0,font=2,cex = 1.2*s0)
 legend("bottomright", bty="o", cex=0.8,
   legend="Map tiles: CartoDB Voyager, Projection: UTM Zone 50S, WGS84 (EPSG:32750)",
        box.col="#00000000", bg="#ffffff40", y.intersp = 0.5)
@@ -725,7 +791,7 @@ if(max(brk0)<max(afs1923$REE, na.rm=T)){
 ff <- (0.03 * (par("usr")[4]-par("usr")[3]))/sqrt(max(afs1923$REE,na.rm=T))
 afs1923$bubcats <- cut(afs1923$REE, breaks = brk0)
 # ppal <- rev(UWAcolgrad(length(brk0)-1, alpha=0.6, sat=F))
-ppal <- scico::scico(length(brk0)-1, pal="nuuk", alpha=0.8, dir=-1)
+ppal <- scico::scico(length(brk0)-1, pal="hawaii", alpha=0.8, dir=-1)
 with(afs1923, symbols(Easting, Northing, add=TRUE, circles = ff*sqrt(REE), inches=F,
      bg=ppal[bubcats], fg=ppal[floor(length(ppal)/1.5)]))
 xy <- par("usr")
@@ -753,8 +819,8 @@ text(xy[1]+0.12*(xy[2]-xy[1]), xy[3]+0.96*(xy[4]-xy[3]),
 
 ## ├ ∑REE+Y
 
-```{r bubbles-REEY, fig.height=7.2, fig.width=10.2, message=FALSE, warning=FALSE, fig.align='center',fig.cap="Map of REE+Y concentrations by location at Ashfield Flats for all sampling years.", echo=FALSE}
-par(oma=c(3,3,1,1), mar=c(0,0,0,0), mgp=c(1.7,0.2,0), tcl=0.25)
+```{r bubbles-REEY, fig.height=7.1, fig.width=10.2, message=FALSE, warning=FALSE, fig.align='center',fig.cap="Map of REE+Y concentrations by location at Ashfield Flats for all sampling years.", echo=FALSE}
+par(oma=c(3,3,1,1), mar=c(0,0,0,0), mgp=c(1.7,0.2,0), tcl=0.25)  ;  s0 <- 1
 plot_tiles(aftiles)
 with(afr_map, polygon(wetland_E, wetland_N, border = "steelblue", col="#87CEEB80"))
 axis(1);axis(2);box()

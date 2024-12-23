@@ -11,10 +11,17 @@ library(scico)
 library(prettymapr)
 ```
 
+```{r load-modified-addscalebar-function}
+source("https://github.com/Ratey-AtUWA/Learn-R/raw/main/scalebar_use_sf_prettymapr.R")
+# This will replace the function in the `prettymapr` package with a
+# modified version that uses the `sf` package for coordinate
+# conversions instead of `sp` and `rgdal`.
+```
+
 ```{r read-CLUM-shapefile, message=FALSE, warning=FALSE}
 SwanLanduseLL <- st_read("../shapefiles/SwanLanduse/WA_CLUM_August2018_Swan.shp")
 # |>  st_transform(crs=st_crs(4326)) # don't transform, keep GDA94 / EPSG:4283
-str(SwanLanduseLL)
+str(st_drop_geometry(SwanLanduseLL)) # str(SwanLanduseLL)
 ```
 
 ```{r show-all-possible-secondary-level-landuses, message=FALSE, warning=FALSE}
@@ -67,29 +74,34 @@ extent <- st_as_sf(x = data.frame(x = c(115.849,115.995),
                                   y = c(-31.965,-31.895)),
                    coords = c("x", "y"), crs = st_crs(4283))
 
-PerthRast <- get_tiles(extent, provider="Thunderforest.Neighbourhood",
+(PerthRast <- get_tiles(extent, provider="Thunderforest.Neighbourhood",
                        apikey="03b0375e8e7c47d0a03018a9001de439",
-                       crop = TRUE, zoom=14)
+                       crop = TRUE, zoom=14))
 ```
 
 ```
-  _   _              _             _                    _        _      
- | \ | |  ___ __  __| |_      ___ | |__   _   _  _ __  | | __   (_) ___ 
- |  \| | / _ \\ \/ /| __|    / __|| '_ \ | | | || '_ \ | |/ /   | |/ __|
- | |\  ||  __/ >  < | |_    | (__ | | | || |_| || | | ||   <    | |\__ \
- |_| \_| \___|/_/\_\ \__|    \___||_| |_| \__,_||_| |_||_|\_\   |_||___/
+              _   _              _
+             | \ | |  ___ __  __| |_
+             |  \| | / _ \\ \/ /| __|
+             | |\  ||  __/ >  < | |_ 
+             |_| \_| \___|/_/\_\ \__|
+            _                    _        _      
+       ___ | |__   _   _  _ __  | | __   (_) ___ 
+      / __|| '_ \ | | | || '_ \ | |/ /   | |/ __|
+     | (__ | | | || |_| || | | ||   <    | |\__ \
+      \___||_| |_| \__,_||_| |_||_|\_\   |_||___/
                                                                         
-      __     __ _____  ____ __   __         _                   _            
-      \ \   / /| ____||  _ \\ \ / /    ___ | |  ___ __      __ | |           
-       \ \ / / |  _|  | |_) |\ V /    / __|| | / _ \\ \ /\ / / | |           
-        \ V /  | |___ |  _ <  | |     \__ \| || (_) |\ V  V /  |_|           
-         \_/   |_____||_| \_\ |_|     |___/|_| \___/  \_/\_/   (_)           
+__     __ _____  ____ __   __         _                   _  
+\ \   / /| ____||  _ \\ \ / /    ___ | |  ___ __      __ | | 
+ \ \ / / |  _|  | |_) |\ V /    / __|| | / _ \\ \ /\ / / | | 
+  \ V /  | |___ |  _ <  | |     \__ \| || (_) |\ V  V /  |_|
+   \_/   |_____||_| \_\ |_|     |___/|_| \___/  \_/\_/   (_)
 
 ```
 
-```{r plot-the-map, fig.height=9.4, fig.width=15, message=FALSE, warning=FALSE}
+```{r plot-the-map, fig.height=12.5, fig.width=20, message=FALSE, warning=FALSE}
 pal_order <- c(2,2,2,3,3,3,3,5,5,5,5,3,5,5,5,5,5,7,10,10,7,9,8,4,6,7,11,12,12,12,12,12,1,12)
-(lupal <- c(scico(11, pal="hawaii", alp=0.75),"#90DAF9C0")[pal_order])
+lupal <- c(scico(11, pal="hawaii", alp=0.75),"#90DAF9C0")[pal_order]
 
 s0 <- 2
 par(mar=c(0,0,0,0)*s0, oma=c(3,3,1,1)*s0, mgp=c(1.7,0.3,0)*s0, tcl=0.25*s0, lwd=1*s0)
@@ -107,6 +119,6 @@ legend("topleft", inset=0.01, box.col="gray50", y.int=1,
                 "Intensive hort/agric","Waste management","Marsh/wetland","Water"),
        pch=22, pt.cex=2*s0, cex=s0,
        pt.bg= c(scico(11, pal="hawaii", alp=0.75),"#90DAF9C0")[c(2:11,1,12)])
-addscalebar(plotepsg=4283, label.cex=2, padin=c(1,1))
+addscalebar(plotepsg=4283, label.cex=s0, htin=0.15*s0)
 ```
 
